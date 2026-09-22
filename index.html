@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AfroMkt - Global African Community Marketplace</title>
+  <title>AfroMkt — Launching Soon</title>
   <link rel="icon" type="image/png" href="afromkt-favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,622 +11,285 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --green: #006b3f;
-      --green-dark: #005633;
-      --gold: #fcd116;
-      --red: #ce1126;
-      --orange: #f97316;
-      --brown: #5d4037;
-      --cream: #fff8e7;
-      --white: #ffffff;
-      --light: #f9fafb;
+      --green-900: #042f1f;
+      --green-800: #0a5c3b;
+      --green-700: #0f7a4d;
+      --gold-500: #f3c623;
+      --gold-400: #ffd86b;
+      --red-500: #c53a32;
+      --cream: #fff7e3;
       --ink: #111827;
       --muted: #4b5563;
-      --line: #e5e7eb;
-      --shadow: 0 20px 45px rgba(17, 24, 39, 0.1);
-      --success-bg: #ecfdf5;
-      --success-text: #065f46;
-      --error-bg: #fef2f2;
-      --error-text: #b91c1c;
-      --transition: all 0.28s ease;
+      --white: #ffffff;
+      --line: rgba(255, 255, 255, 0.14);
+      --shadow: 0 25px 70px rgba(4, 47, 31, 0.28);
+      --success-bg: rgba(15, 122, 77, 0.16);
+      --success-text: #d1fae5;
+      --error-bg: rgba(197, 58, 50, 0.16);
+      --error-text: #fee2e2;
     }
 
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
     }
 
     body {
+      min-height: 100vh;
       font-family: Inter, sans-serif;
-      color: var(--ink);
-      background: var(--white);
-      line-height: 1.55;
+      color: var(--white);
+      background:
+        radial-gradient(circle at top right, rgba(243, 198, 35, 0.22), transparent 24%),
+        radial-gradient(circle at left 20%, rgba(197, 58, 50, 0.24), transparent 26%),
+        linear-gradient(135deg, var(--green-900), #083723 45%, #0f5e3d 100%);
       overflow-x: hidden;
     }
 
     a {
-      text-decoration: none;
       color: inherit;
+      text-decoration: none;
     }
 
-    ul {
-      list-style: none;
+    .page-shell {
+      position: relative;
+      min-height: 100vh;
+      padding: 28px 20px 24px;
+      isolation: isolate;
     }
 
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
+    .page-shell::before,
+    .page-shell::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      border-radius: 999px;
+      filter: blur(12px);
+      opacity: 0.8;
+    }
+
+    .page-shell::before {
+      width: 280px;
+      height: 280px;
+      top: 8%;
+      right: -80px;
+      background: rgba(243, 198, 35, 0.18);
+    }
+
+    .page-shell::after {
+      width: 240px;
+      height: 240px;
+      bottom: 6%;
+      left: -70px;
+      background: rgba(197, 58, 50, 0.16);
     }
 
     .container {
-      max-width: 1180px;
+      width: min(1120px, 100%);
       margin: 0 auto;
-      padding: 0 20px;
     }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 22px;
-      border-radius: 999px;
-      border: 0;
-      font-weight: 800;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .btn-primary {
-      background: var(--green);
-      color: white;
-      box-shadow: 0 12px 24px rgba(0, 107, 63, 0.22);
-    }
-
-    .btn-primary:hover {
-      background: var(--green-dark);
-    }
-
-    .btn-outline {
-      border: 2px solid var(--green);
-      color: var(--green);
-      background: white;
-    }
-
-    .btn-outline:hover {
-      background: var(--green);
-      color: white;
-    }
-
-    .btn-gold {
-      background: var(--gold);
-      color: var(--ink);
-    }
-
-    .btn-gold:hover {
-      background: #e9be0b;
-    }
-
-    .btn-muted {
-      background: rgba(255, 255, 255, 0.12);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-    }
-
-    .btn-muted:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      padding: 14px 0;
-      background: rgba(255, 255, 255, 0.92);
-      border-bottom: 1px solid rgba(229, 231, 235, 0.9);
-      backdrop-filter: blur(14px);
-    }
-
-    nav .container {
+    .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
+      gap: 16px;
+      margin-bottom: 32px;
     }
 
-    .logo {
+    .brand {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-size: 25px;
-      font-weight: 900;
-      color: var(--green);
-      letter-spacing: -0.04em;
+      gap: 12px;
     }
 
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      font-weight: 700;
-      color: var(--muted);
-    }
-
-    .nav-links a:hover {
-      color: var(--green);
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .language-toggle,
-    .country-toggle,
-    .ghost-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 9px 12px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: white;
-      color: var(--ink);
-      font-weight: 900;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(17, 24, 39, 0.06);
-      transition: var(--transition);
-    }
-
-    .language-toggle:hover,
-    .country-toggle:hover,
-    .ghost-chip:hover {
-      border-color: var(--green);
-      transform: translateY(-1px);
-    }
-
-    .language-toggle .inactive {
-      color: #9ca3af;
-    }
-
-    .country-wrap {
-      position: relative;
-    }
-
-    .country-menu {
-      position: absolute;
-      right: 0;
-      top: 48px;
-      width: 250px;
-      padding: 10px;
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      display: none;
-    }
-
-    .country-menu.open {
-      display: grid;
-      gap: 6px;
-    }
-
-    .country-option {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 11px 12px;
-      border: 0;
-      border-radius: 12px;
-      background: white;
-      cursor: pointer;
-      font-weight: 800;
-      text-align: left;
-    }
-
-    .country-option:hover,
-    .country-option.active {
-      background: #f0fdf4;
-      color: var(--green);
-    }
-
-    .market-banner {
-      display: none;
-      padding: 10px 0;
-      text-align: center;
-      font-weight: 900;
-      color: #7c2d12;
-      background: #fef3c7;
-      border-bottom: 1px solid #fde68a;
-    }
-
-    .market-banner.show {
+    .brand img {
+      height: 52px;
+      width: auto;
       display: block;
     }
 
-    .hero {
-      position: relative;
-      padding: 84px 0 70px;
-      text-align: center;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 82% 16%, rgba(252, 209, 22, 0.28), transparent 26%),
-        radial-gradient(circle at 12% 28%, rgba(206, 17, 38, 0.11), transparent 22%),
-        linear-gradient(135deg, #fff 0%, #f0fdf4 100%);
+    .launch-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      font-weight: 800;
+      color: var(--cream);
     }
 
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: auto -10% -120px -10%;
-      height: 180px;
-      background: repeating-linear-gradient(
-        45deg,
-        rgba(0, 107, 63, 0.09) 0 10px,
-        rgba(252, 209, 22, 0.12) 10px 20px,
-        rgba(206, 17, 38, 0.08) 20px 30px
-      );
-      transform: rotate(-2deg);
+    .hero-card {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 30px;
+      padding: 40px;
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
     }
 
-    .hero .container {
-      position: relative;
-      z-index: 1;
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      justify-content: center;
     }
 
     .eyebrow {
       display: inline-flex;
+      width: fit-content;
       align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      margin-bottom: 22px;
-      border-radius: 999px;
-      background: rgba(252, 209, 22, 0.22);
-      color: var(--brown);
-      font-weight: 900;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .hero h1 {
-      max-width: 940px;
-      margin: 0 auto 18px;
-      font-size: clamp(38px, 7vw, 74px);
-      line-height: 0.98;
-      font-weight: 900;
-      letter-spacing: -0.06em;
-    }
-
-    .hero p {
-      max-width: 740px;
-      margin: 0 auto 34px;
-      color: var(--muted);
-      font-size: clamp(17px, 2.5vw, 22px);
-    }
-
-    .search-bar {
-      max-width: 700px;
-      margin: 0 auto 30px;
-      display: flex;
       gap: 10px;
-      padding: 9px;
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-    }
-
-    .search-bar input {
-      flex: 1;
-      min-width: 0;
-      border: 0;
-      outline: 0;
-      padding: 14px 16px;
-      font-size: 16px;
-    }
-
-    .hero-btns {
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .flags-row {
-      padding: 36px 0;
-      background: white;
-      border-bottom: 1px solid #f3f4f6;
-    }
-
-    .flags-container {
-      display: flex;
-      justify-content: center;
-      gap: 22px;
-      flex-wrap: wrap;
-    }
-
-    .flag-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 9px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .flag-item:hover {
-      transform: translateY(-5px);
-    }
-
-    .flag-icon {
-      width: 58px;
-      height: 58px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      font-size: 31px;
-      background: var(--cream);
-      box-shadow: 0 8px 18px rgba(93, 64, 55, 0.09);
-    }
-
-    .flag-item span {
-      color: var(--muted);
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(243, 198, 35, 0.16);
+      color: var(--gold-400);
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
-    section {
-      padding: 76px 0;
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 42px;
-    }
-
-    .section-header h2 {
-      margin-bottom: 10px;
-      font-size: clamp(30px, 4vw, 44px);
-      line-height: 1.05;
-      letter-spacing: -0.04em;
-    }
-
-    .section-header p {
-      color: var(--muted);
-      font-size: 17px;
-    }
-
-    .categories {
-      background: var(--light);
-    }
-
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
-      gap: 20px;
-    }
-
-    .category-card {
-      min-height: 158px;
-      padding: 24px 18px;
-      background: white;
-      border: 1px solid transparent;
-      border-radius: 22px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 8px 24px rgba(17, 24, 39, 0.04);
-    }
-
-    .category-card:hover {
-      transform: translateY(-6px) scale(1.01);
-      border-color: rgba(0, 107, 63, 0.4);
-      box-shadow: 0 18px 38px rgba(0, 107, 63, 0.12);
-    }
-
-    .category-icon {
-      display: block;
-      margin-bottom: 13px;
-      font-size: 38px;
-    }
-
-    .category-card h3 {
-      margin-bottom: 8px;
-      font-size: 18px;
-    }
-
-    .category-card p {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .seller-launch {
-      position: relative;
-      overflow: hidden;
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 46px;
-      border-radius: 34px;
-      color: white;
-      background:
-        radial-gradient(circle at 90% 12%, rgba(252, 209, 22, 0.42), transparent 24%),
-        linear-gradient(135deg, var(--green), #073b2a 48%, var(--brown));
-      box-shadow: 0 28px 70px rgba(0, 107, 63, 0.22);
-    }
-
-    .seller-launch::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        45deg,
-        rgba(252, 209, 22, 0.12) 0 10px,
-        transparent 10px 22px,
-        rgba(206, 17, 38, 0.1) 22px 34px,
-        transparent 34px 48px
-      );
-      opacity: 0.65;
-    }
-
-    .seller-launch-content {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1.35fr 0.65fr;
-      gap: 32px;
-      align-items: center;
-    }
-
-    .seller-launch h2 {
-      font-size: clamp(34px, 5vw, 58px);
-      line-height: 1;
+    h1 {
+      font-size: clamp(2.8rem, 7vw, 5.4rem);
+      line-height: 0.96;
       letter-spacing: -0.06em;
-      margin-bottom: 18px;
+      font-weight: 900;
+      max-width: 9ch;
     }
 
-    .seller-launch p {
-      color: #f9fafb;
-      font-size: 19px;
-      margin-bottom: 24px;
-      max-width: 680px;
+    .tagline {
+      max-width: 620px;
+      font-size: clamp(1.05rem, 2vw, 1.32rem);
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.88);
     }
 
-    .free-badge {
+    .feature-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .feature-chip {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 18px;
+      padding: 10px 14px;
       border-radius: 999px;
-      background: var(--gold);
-      color: var(--ink);
-      font-weight: 900;
-      box-shadow: 0 14px 30px rgba(252, 209, 22, 0.28);
-      margin-bottom: 18px;
-    }
-
-    .seller-orb {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      justify-self: center;
-      background: rgba(255, 255, 255, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      font-size: 86px;
-      animation: pulse 2.4s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%,
-      100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.05);
-      }
-    }
-
-    .dashboard-section {
-      padding-top: 0;
-      display: none;
-    }
-
-    .dashboard-section.show {
-      display: block;
-    }
-
-    .dashboard-panel {
-      border-radius: 28px;
-      padding: 32px;
-      background: linear-gradient(135deg, rgba(0, 107, 63, 0.96), rgba(17, 24, 39, 0.96));
-      color: white;
-      box-shadow: var(--shadow);
-    }
-
-    .dashboard-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      align-items: flex-start;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    .dashboard-top h2 {
-      font-size: clamp(28px, 4vw, 42px);
-      line-height: 1.05;
-      margin-bottom: 8px;
-      letter-spacing: -0.04em;
-    }
-
-    .dashboard-top p {
-      color: rgba(255, 255, 255, 0.82);
-      max-width: 620px;
-    }
-
-    .dashboard-meta {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 16px;
-    }
-
-    .dashboard-card {
-      padding: 20px;
-      border-radius: 20px;
       background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 0.95rem;
+      font-weight: 700;
     }
 
-    .dashboard-card span {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: rgba(255, 255, 255, 0.74);
+    .waitlist-card {
+      padding: 28px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.07));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .waitlist-card h2 {
+      font-size: 1.7rem;
+      letter-spacing: -0.03em;
+    }
+
+    .waitlist-card p {
+      color: rgba(255, 255, 255, 0.82);
+      line-height: 1.65;
+    }
+
+    .waitlist-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 0.92rem;
       font-weight: 800;
+      color: var(--cream);
     }
 
-    .dashboard-card strong {
-      font-size: 20px;
-      line-height: 1.3;
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 14px 15px;
+      font: inherit;
+      color: var(--white);
+      background: rgba(0, 0, 0, 0.18);
+      outline: none;
+      transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
-    .dashboard-note {
-      margin-top: 18px;
-      padding: 16px 18px;
+    .field select option {
+      color: var(--ink);
+      background: var(--white);
+    }
+
+    .field input::placeholder {
+      color: rgba(255, 255, 255, 0.48);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--gold-400);
+      transform: translateY(-1px);
+    }
+
+    .submit-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      border: 0;
       border-radius: 18px;
-      background: rgba(252, 209, 22, 0.16);
-      border: 1px solid rgba(252, 209, 22, 0.32);
-      color: #fffbe9;
-      font-weight: 600;
+      padding: 15px 18px;
+      font: inherit;
+      font-weight: 900;
+      color: var(--green-900);
+      background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(243, 198, 35, 0.22);
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.03);
+    }
+
+    .submit-btn:disabled {
+      cursor: wait;
+      opacity: 0.84;
+      transform: none;
     }
 
     .status-text {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 700;
       display: none;
+      padding: 13px 14px;
+      border-radius: 16px;
+      font-size: 0.94rem;
+      font-weight: 700;
+      line-height: 1.5;
     }
 
     .status-text.show {
@@ -636,2436 +299,244 @@
     .status-text.success {
       background: var(--success-bg);
       color: var(--success-text);
+      border: 1px solid rgba(209, 250, 229, 0.16);
     }
 
     .status-text.error {
       background: var(--error-bg);
       color: var(--error-text);
+      border: 1px solid rgba(254, 226, 226, 0.16);
     }
 
-    .status-text.info {
-      background: #eff6ff;
-      color: #1d4ed8;
-    }
-
-    .how-it-works {
-      background: radial-gradient(circle at 15% 20%, rgba(252, 209, 22, 0.16), transparent 28%), linear-gradient(135deg, #3c241b, var(--brown));
-      color: white;
-    }
-
-    .how-it-works .section-header p,
-    .step-content p {
-      color: #e5e7eb;
-    }
-
-    .steps-container {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 56px;
-    }
-
-    .step-group h3 {
-      display: inline-block;
-      margin-bottom: 26px;
-      padding-bottom: 10px;
-      border-bottom: 3px solid var(--gold);
-      font-size: 24px;
-    }
-
-    .step {
+    .extras {
       display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
       gap: 18px;
-      margin-bottom: 24px;
-    }
-
-    .step-num {
-      width: 42px;
-      height: 42px;
-      flex: 0 0 42px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: var(--gold);
-      color: var(--ink);
-      font-weight: 900;
-    }
-
-    .step-content h4 {
-      margin-bottom: 4px;
-      font-size: 19px;
-    }
-
-    .reviews {
-      background: var(--light);
-    }
-
-    .review-feature-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0 auto 18px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: rgba(0, 107, 63, 0.1);
-      color: var(--green);
-      font-weight: 900;
-    }
-
-    .review-panel {
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      gap: 28px;
-      align-items: start;
-    }
-
-    .review-form-card,
-    .review-card,
-    .price-card,
-    .benefit-card,
-    .auth-card {
-      background: white;
-      border: 1px solid var(--line);
+      margin-top: 30px;
+      padding: 20px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 24px;
-      box-shadow: 0 10px 28px rgba(17, 24, 39, 0.05);
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    .review-form-card {
-      padding: 30px;
-    }
-
-    .rating-stars {
+    .socials {
       display: flex;
-      gap: 8px;
-      margin: 18px 0;
-    }
-
-    .star-button {
-      border: 0;
-      background: transparent;
-      color: var(--gold);
-      font-size: 34px;
-      cursor: pointer;
-      filter: drop-shadow(0 3px 3px rgba(252, 209, 22, 0.25));
-      transition: var(--transition);
-    }
-
-    .star-button:hover,
-    .star-button.active {
-      transform: scale(1.12);
-    }
-
-    .review-form-card textarea,
-    .auth-card textarea,
-    .auth-card input,
-    .auth-card select {
-      width: 100%;
-      resize: vertical;
-      padding: 14px 15px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      outline: none;
-      background: white;
-    }
-
-    .review-form-card textarea:focus,
-    .auth-card textarea:focus,
-    .auth-card input:focus,
-    .auth-card select:focus {
-      border-color: var(--green);
-      box-shadow: 0 0 0 4px rgba(0, 107, 63, 0.09);
-    }
-
-    .review-form-card textarea {
-      min-height: 130px;
-      margin-bottom: 16px;
-    }
-
-    .review-note {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 14px;
-    }
-
-    .sample-label {
-      display: inline-flex;
-      width: max-content;
-      margin-bottom: 12px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: var(--gold);
-      color: var(--ink);
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .review-list {
-      display: grid;
-      gap: 16px;
-    }
-
-    .review-card {
-      padding: 22px;
-      background: #fffdf5;
-    }
-
-    .review-stars {
-      color: var(--gold);
-      letter-spacing: 2px;
-      margin-bottom: 10px;
-      font-size: 20px;
-    }
-
-    .review-card h4 {
-      margin-bottom: 6px;
-    }
-
-    .review-card p {
-      color: var(--muted);
-    }
-
-    .pricing-cards {
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      gap: 26px;
-      flex-wrap: wrap;
-    }
-
-    .price-card {
-      position: relative;
-      width: min(100%, 360px);
-      padding: 38px;
-      text-align: center;
-      transition: var(--transition);
-    }
-
-    .price-card:hover,
-    .benefit-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow);
-    }
-
-    .price-card.featured {
-      border: 2px solid var(--green);
-      box-shadow: 0 22px 46px rgba(0, 107, 63, 0.13);
-    }
-
-    .popular-badge {
-      position: absolute;
-      top: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: var(--green);
-      color: white;
-      font-size: 12px;
-      font-weight: 900;
-      white-space: nowrap;
-    }
-
-    .price-card h3 {
-      font-size: 25px;
-    }
-
-    .price {
-      margin: 10px 0 20px;
-      font-size: 48px;
-      font-weight: 900;
-      letter-spacing: -0.05em;
-    }
-
-    .price span {
-      font-size: 18px;
-      color: var(--muted);
-      font-weight: 600;
-      letter-spacing: 0;
-    }
-
-    .features-list {
-      margin-bottom: 28px;
-      text-align: left;
-    }
-
-    .features-list li {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 12px;
-      color: var(--muted);
-    }
-
-    .features-list li::before {
-      content: "✓";
-      color: var(--green);
-      font-weight: 900;
-    }
-
-    .trial-note {
-      margin-top: 28px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    .testimonials {
-      background: #fef3c7;
-    }
-
-    .benefits-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 24px;
-    }
-
-    .benefit-card {
-      padding: 32px 24px;
-      border-radius: 26px;
-      transition: var(--transition);
-      background: white;
-    }
-
-    .benefit-icon {
-      display: grid;
-      place-items: center;
-      width: 54px;
-      height: 54px;
-      border-radius: 16px;
-      margin-bottom: 20px;
-      font-size: 26px;
-    }
-
-    .benefit-card h4 {
-      margin-bottom: 10px;
-      font-size: 18px;
-      line-height: 1.35;
-      letter-spacing: -0.02em;
-    }
-
-    .benefit-card p {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .newsletter {
-      text-align: center;
-      color: white;
-      background: radial-gradient(circle at 85% 20%, rgba(252, 209, 22, 0.28), transparent 24%), linear-gradient(135deg, var(--red), #9f1239);
-    }
-
-    .newsletter h2 {
-      margin-bottom: 12px;
-      font-size: clamp(32px, 4vw, 48px);
-      letter-spacing: -0.04em;
-    }
-
-    .newsletter p {
-      max-width: 650px;
-      margin: 0 auto 30px;
-      opacity: 0.94;
-      font-size: 18px;
-    }
-
-    .newsletter-form {
-      max-width: 620px;
-      margin: 0 auto;
-      display: flex;
-      gap: 10px;
-      padding: 7px;
-      border-radius: 18px;
-      background: white;
-      box-shadow: 0 16px 30px rgba(17, 24, 39, 0.12);
-    }
-
-    .newsletter-form input {
-      flex: 1;
-      min-width: 0;
-      padding: 14px 16px;
-      border: 0;
-      outline: 0;
-      font-size: 16px;
-      border-radius: 12px;
-    }
-
-    footer {
-      padding: 58px 0 28px;
-      color: white;
-      background: var(--ink);
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1.4fr;
-      gap: 38px;
-      margin-bottom: 32px;
-    }
-
-    .footer-logo {
-      display: inline-block;
-      margin-bottom: 14px;
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-    }
-
-    .footer-logo span {
-      color: var(--gold);
-    }
-
-    .footer-tagline {
-      max-width: 330px;
-      margin-bottom: 18px;
-      color: #d1d5db;
-    }
-
-    .footer-market-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 34px;
-      padding: 18px;
-      border: 1px solid #374151;
-      border-radius: 20px;
-    }
-
-    .footer-market-pill {
-      display: inline-flex;
-      gap: 7px;
       align-items: center;
-      padding: 8px 11px;
-      border-radius: 999px;
-      background: #1f2937;
-      color: #e5e7eb;
-      font-size: 13px;
-      font-weight: 800;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .social-links {
-      display: flex;
-      gap: 12px;
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.07);
+      font-weight: 800;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .social-link:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 216, 107, 0.7);
     }
 
     .social-icon {
-      width: 40px;
-      height: 40px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: #374151;
-      font-size: 12px;
-      font-weight: 900;
-      transition: var(--transition);
-    }
-
-    .social-icon:hover {
-      background: var(--green);
-      transform: translateY(-2px);
-    }
-
-    .footer-links h4 {
-      margin-bottom: 18px;
-      color: var(--gold);
-    }
-
-    .footer-links li {
-      margin-bottom: 10px;
-    }
-
-    .footer-links a {
-      color: #d1d5db;
-      transition: var(--transition);
-    }
-
-    .footer-links a:hover {
-      color: white;
-      padding-left: 4px;
-    }
-
-    .footer-bottom {
-      padding-top: 24px;
-      border-top: 1px solid #374151;
-      color: #9ca3af;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(17, 24, 39, 0.62);
-      z-index: 100;
-      display: none;
-      place-items: center;
-      padding: 20px;
-    }
-
-    .modal-backdrop.show {
-      display: grid;
-    }
-
-    .country-modal,
-    .auth-card {
-      width: min(680px, 100%);
-      padding: 32px;
-      border-radius: 30px;
-      background: white;
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
-    }
-
-    .country-modal h2,
-    .auth-card h2 {
-      font-size: 34px;
-      letter-spacing: -0.04em;
-      margin-bottom: 8px;
-    }
-
-    .country-modal p,
-    .auth-card p {
-      color: var(--muted);
-      margin-bottom: 22px;
-    }
-
-    .country-grid,
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-
-    .country-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: #fff;
-      cursor: pointer;
-      text-align: left;
-      font-weight: 900;
-      transition: var(--transition);
-    }
-
-    .country-card:hover {
-      border-color: var(--green);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 28px rgba(0, 107, 63, 0.1);
-    }
-
-    .country-card .flag {
-      font-size: 28px;
-    }
-
-    .country-card small {
-      display: block;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .form-grid.two {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .field {
-      display: grid;
-      gap: 8px;
-    }
-
-    .field label {
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--ink);
-    }
-
-    .auth-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 6px;
-    }
-
-    .auth-switch {
-      color: var(--green);
-      font-weight: 800;
-      cursor: pointer;
-      background: transparent;
-      border: 0;
-      padding: 0;
-    }
-
-    .muted-note {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 10px;
-    }
-
-    .market-data-section {
-      background: white;
-    }
-
-    .market-data-section.alt {
-      background: var(--light);
-    }
-
-    .live-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 22px;
-    }
-
-    .listing-card {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      min-height: 260px;
-      padding: 26px;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: white;
-      box-shadow: 0 14px 32px rgba(17, 24, 39, 0.06);
-      transition: var(--transition);
-    }
-
-    .listing-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow);
-    }
-
-    .listing-card.placeholder {
-      justify-content: center;
-      border-style: dashed;
-      background: linear-gradient(135deg, #fffdf5, #ffffff);
-    }
-
-    .listing-card.error {
-      border-color: rgba(206, 17, 38, 0.18);
-      background: #fff7f7;
-    }
-
-    .listing-card-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .listing-card h3 {
-      font-size: 24px;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-    }
-
-    .listing-badge {
+      width: 18px;
+      height: 18px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(0, 107, 63, 0.1);
-      color: var(--green);
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      white-space: nowrap;
     }
 
-    .listing-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .note {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 0.96rem;
+      line-height: 1.6;
+      max-width: 520px;
     }
 
-    .meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: #f9fafb;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .listing-description {
-      color: var(--muted);
-      flex: 1;
-    }
-
-    .listing-footer {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 14px;
-      margin-top: auto;
-    }
-
-    .listing-price {
-      font-size: 30px;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-      color: var(--ink);
-    }
-
-    .listing-store {
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .loading-panel {
-      display: grid;
-      place-items: center;
-      gap: 14px;
-      min-height: 220px;
-      padding: 28px;
-      border: 1px dashed var(--line);
-      border-radius: 24px;
-      background: #fafafa;
+    footer {
+      margin-top: 28px;
       text-align: center;
-    }
-
-    .loading-panel p {
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .spinner {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      border: 4px solid rgba(0, 107, 63, 0.15);
-      border-top-color: var(--green);
-      animation: spin 0.85s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(22px);
-      transition: opacity 0.65s ease, transform 0.65s ease;
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .hidden {
-      display: none !important;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.92rem;
     }
 
     @media (max-width: 920px) {
-      .review-panel,
-      .seller-launch-content,
-      .dashboard-top,
-      .footer-grid,
-      .steps-container,
-      .form-grid.two {
+      .hero-card {
         grid-template-columns: 1fr;
+        padding: 28px;
       }
 
-      .dashboard-top {
-        display: grid;
+      h1 {
+        max-width: 100%;
       }
     }
 
-    @media (max-width: 820px) {
-      nav .container {
-        align-items: flex-start;
+    @media (max-width: 600px) {
+      .page-shell {
+        padding: 20px 14px 22px;
       }
 
-      .nav-links {
-        display: none;
-      }
-
-      .hero {
-        padding-top: 58px;
-      }
-
-      .search-bar,
-      .newsletter-form {
+      .topbar {
         flex-direction: column;
-        border-radius: 20px;
+        align-items: flex-start;
+        margin-bottom: 22px;
       }
 
-      .hero-btns .btn,
-      .newsletter-form .btn {
-        width: 100%;
-        max-width: 100%;
+      .hero-card,
+      .waitlist-card,
+      .extras {
+        padding: 22px;
       }
 
-      .seller-launch {
-        padding: 32px 24px;
+      .extras {
+        flex-direction: column;
       }
 
-      .seller-orb {
-        width: 150px;
-        height: 150px;
-        font-size: 62px;
-      }
-
-      .flag-icon {
-        width: 52px;
-        height: 52px;
-        font-size: 28px;
-      }
-
-      .country-menu {
-        right: auto;
-        left: 0;
-      }
-
-      .country-toggle span:last-child {
-        display: none;
+      h1 {
+        font-size: clamp(2.35rem, 14vw, 4rem);
       }
     }
   </style>
 </head>
 <body>
-  <div id="marketBanner" class="market-banner"></div>
-
-  <nav>
+  <main class="page-shell">
     <div class="container">
-      <a href="#top" class="logo" aria-label="AfroMkt home">
-        <img src="afromkt-logo.png" alt="AfroMkt" style="height: 44px; width: auto;" />
-      </a>
-
-      <div class="nav-links">
-        <a href="#categories" data-i18n="nav.categories">Categories</a>
-        <a href="#sellers" data-i18n="nav.featured">First Sellers</a>
-        <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
-        <a href="#dashboardSection" id="dashboardLink" class="hidden">My Dashboard</a>
+      <div class="topbar">
+        <a class="brand" href="#" aria-label="AfroMkt home">
+          <img src="afromkt-logo.png" alt="AfroMkt logo" />
+        </a>
+        <div class="launch-pill">🌍 Launching first in Portugal 🇵🇹</div>
       </div>
 
-      <div class="nav-actions">
-        <div class="country-wrap">
-          <button id="countryToggle" class="country-toggle" type="button">
-            <span id="selectedCountryFlag">🇵🇹</span>
-            <span id="selectedCountryName">Portugal</span>
-            ⌄
-          </button>
-          <div id="countryMenu" class="country-menu"></div>
+      <section class="hero-card">
+        <div class="hero-copy">
+          <div class="eyebrow">Launching Soon</div>
+          <h1>Something Big is Coming 🌍</h1>
+          <p class="tagline">
+            The global African community marketplace — foods, fashion, braids, beauty, services &amp; more. Starting in Portugal 🇵🇹
+          </p>
+
+          <div class="feature-row" aria-label="AfroMkt categories">
+            <span class="feature-chip">🍲 Foods</span>
+            <span class="feature-chip">👗 Fashion</span>
+            <span class="feature-chip">💇 Braids</span>
+            <span class="feature-chip">💄 Beauty</span>
+            <span class="feature-chip">🛠️ Services</span>
+          </div>
         </div>
 
-        <button id="languageToggle" class="language-toggle" type="button">
-          <span id="activeFlag">🇬🇧</span>
-          <span id="languageText">EN | <span class="inactive">PT</span> | <span class="inactive">FR</span></span>
-        </button>
-
-        <button id="authButton" class="ghost-chip" type="button">Seller Login</button>
-        <button class="btn btn-primary" id="navSellCta" type="button" data-i18n="nav.sell">Sell on AfroMkt</button>
-      </div>
-    </div>
-  </nav>
-
-  <header id="top" class="hero">
-    <div class="container">
-      <div class="eyebrow" id="marketEyebrow">🇵🇹 Live in Portugal</div>
-      <h1 id="heroTitle">Your African Community Marketplace in Portugal</h1>
-      <p data-i18n="hero.subtitle">
-        Where Africa Meets Portugal. Discover authentic products, skilled professionals, and vibrant events within our community.
-      </p>
-
-      <div class="search-bar">
-        <input id="searchInput" type="text" placeholder="Find African products & services near you in Lisbon..." />
-        <button class="btn btn-primary" type="button" data-i18n="hero.search">Search</button>
-      </div>
-
-      <div class="hero-btns">
-        <a href="#categories" class="btn btn-primary" data-i18n="hero.shop">Shop Now</a>
-        <button class="btn btn-outline" id="heroMarketCta" type="button">Sell on AfroMkt</button>
-      </div>
-    </div>
-  </header>
-
-  <section class="flags-row">
-    <div class="container">
-      <div class="flags-container">
-        <div class="flag-item"><div class="flag-icon">🇦🇴</div><span data-i18n="community.angola">Angola</span></div>
-        <div class="flag-item"><div class="flag-icon">🇬🇼</div><span data-i18n="community.guineaBissau">Guinea-Bissau</span></div>
-        <div class="flag-item"><div class="flag-icon">🇬🇳</div><span data-i18n="community.guinea">Guinea</span></div>
-        <div class="flag-item"><div class="flag-icon">🇬🇭</div><span data-i18n="community.ghana">Ghana</span></div>
-        <div class="flag-item"><div class="flag-icon">🇳🇬</div><span data-i18n="community.nigeria">Nigeria</span></div>
-        <div class="flag-item"><div class="flag-icon">🇨🇻</div><span data-i18n="community.capeVerde">Cape Verde</span></div>
-        <div class="flag-item"><div class="flag-icon">🇸🇹</div><span data-i18n="community.saoTome">São Tomé</span></div>
-        <div class="flag-item"><div class="flag-icon">🇸🇳</div><span data-i18n="community.senegal">Senegal</span></div>
-        <div class="flag-item"><div class="flag-icon">🇨🇮</div><span data-i18n="community.coteIvoire">Côte d'Ivoire</span></div>
-        <div class="flag-item"><div class="flag-icon">➕</div><span data-i18n="community.more">More Communities</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="categories" class="categories">
-    <div class="container">
-      <div class="section-header">
-        <h2 data-i18n="categories.title">Browse Marketplace</h2>
-        <p data-i18n="categories.subtitle">Everything you need, from groceries to grooming.</p>
-      </div>
-
-      <div class="categories-grid">
-        <div class="category-card reveal"><span class="category-icon">🛒</span><h3 data-i18n="cat.food">Food & Groceries</h3><p data-i18n="cat.foodDesc">African food products, spices, drinks, frozen foods.</p></div>
-        <div class="category-card reveal"><span class="category-icon">💈</span><h3 data-i18n="cat.barbers">Barbers & Hair Salons</h3><p data-i18n="cat.barbersDesc">Barber shops, men's cuts, African hair care.</p></div>
-        <div class="category-card reveal"><span class="category-icon">💅</span><h3 data-i18n="cat.beauty">Beauty & Makeup</h3><p data-i18n="cat.beautyDesc">Makeup artists, nail techs, beauty products.</p></div>
-        <div class="category-card reveal"><span class="category-icon">🪢</span><h3 data-i18n="cat.braids">Braids & Natural Hair</h3><p data-i18n="cat.braidsDesc">Braiding salons, loc specialists, twist outs.</p></div>
-        <div class="category-card reveal"><span class="category-icon">👗</span><h3 data-i18n="cat.fashion">Fashion & Clothing</h3><p data-i18n="cat.fashionDesc">African print clothing, ankara, accessories.</p></div>
-        <div class="category-card reveal"><span class="category-icon">💆</span><h3 data-i18n="cat.wigs">Wigs & Hair Extensions</h3><p data-i18n="cat.wigsDesc">Wig sellers, lace fronts, bundles.</p></div>
-        <div class="category-card reveal"><span class="category-icon">🍽️</span><h3 data-i18n="cat.restaurants">Restaurants & Catering</h3><p data-i18n="cat.restaurantsDesc">African restaurants, home caterers, event food.</p></div>
-        <div class="category-card reveal"><span class="category-icon">🧴</span><h3 data-i18n="cat.health">Health & Skincare</h3><p data-i18n="cat.healthDesc">Shea butter, African black soap, natural skincare.</p></div>
-        <div class="category-card reveal"><span class="category-icon">🎵</span><h3 data-i18n="cat.events">Events & Entertainment</h3><p data-i18n="cat.eventsDesc">African events, DJs, performers.</p></div>
-        <div class="category-card reveal"><span class="category-icon">🔧</span><h3 data-i18n="cat.services">Services</h3><p data-i18n="cat.servicesDesc">Shipping, money transfer agents, and more.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="sellers">
-    <div class="container">
-      <div class="seller-launch reveal">
-        <div class="seller-launch-content">
+        <aside class="waitlist-card">
           <div>
-            <span class="free-badge" data-i18n="sellers.badge">🎁 7 FREE spots remaining</span>
-            <h2 data-i18n="sellers.title">Be One of Our First Sellers! 🌍</h2>
-            <p data-i18n="sellers.offer">
-              The first 10 sellers join AfroMkt completely FREE — no monthly fee, forever. List your products, reach the African community, and grow your business.
-            </p>
-            <button class="btn btn-gold" id="sellerLaunchCta" type="button">Claim Your Free Spot</button>
-            <div id="sellerInlineStatus" class="status-text" aria-live="polite"></div>
+            <h2>Join the AfroMkt waitlist</h2>
+            <p>Be first to hear when we launch, open new countries, and start onboarding community businesses.</p>
           </div>
-          <div class="seller-orb">🚀</div>
+
+          <form id="waitlistForm" class="waitlist-form">
+            <div class="field">
+              <label for="waitlistEmail">Email address</label>
+              <input id="waitlistEmail" type="email" placeholder="you@example.com" autocomplete="email" required />
+            </div>
+
+            <div class="field">
+              <label for="waitlistCountry">Country</label>
+              <select id="waitlistCountry" required>
+                <option value="Portugal">Portugal</option>
+                <option value="United Kingdom">UK</option>
+                <option value="Australia">Australia</option>
+                <option value="United States">USA</option>
+                <option value="Canada">Canada</option>
+                <option value="Germany">Germany</option>
+                <option value="France">France</option>
+                <option value="Spain">Spain</option>
+                <option value="Hungary">Hungary</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <button id="waitlistSubmit" class="submit-btn" type="submit">Get launch updates</button>
+            <div id="waitlistStatus" class="status-text" aria-live="polite"></div>
+          </form>
+        </aside>
+      </section>
+
+      <section class="extras">
+        <p class="note">
+          AfroMkt is preparing a bold new home for African-owned brands, products, and services across the diaspora. We’re keeping it simple for now: join the waitlist and we’ll let you know when the doors open.
+        </p>
+
+        <div class="socials" aria-label="Social media links">
+          <a class="social-link" href="#" aria-label="Instagram placeholder link">
+            <span class="social-icon">
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="2"></rect><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"></circle><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"></circle></svg>
+            </span>
+            Instagram
+          </a>
+          <a class="social-link" href="#" aria-label="Facebook placeholder link">
+            <span class="social-icon">
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true"><path d="M13.3 20V12.7h2.4l.4-2.8h-2.8V8.1c0-.8.2-1.4 1.4-1.4H16V4.1c-.6-.1-1.2-.1-1.8-.1-1.8 0-3 1.1-3 3.2v2.7H9v2.8h2.4V20h1.9Z" fill="currentColor"></path></svg>
+            </span>
+            Facebook
+          </a>
         </div>
-      </div>
+      </section>
+
+      <footer>© 2026 AfroMkt. All rights reserved.</footer>
     </div>
-  </section>
-
-  <section id="marketplaceSection" class="market-data-section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Live Marketplace Sellers</h2>
-        <p>These seller cards now load straight from AfroMkt’s Supabase database.</p>
-      </div>
-
-      <div id="storesLoading" class="loading-panel">
-        <div class="spinner" aria-hidden="true"></div>
-        <p>Loading seller storefronts…</p>
-      </div>
-
-      <div id="storesGrid" class="live-grid hidden" aria-live="polite"></div>
-    </div>
-  </section>
-
-  <section id="productsSection" class="market-data-section alt">
-    <div class="container">
-      <div class="section-header">
-        <h2>Fresh Listings from the Community</h2>
-        <p>Available products and services also load live from Supabase, alongside the store they belong to.</p>
-      </div>
-
-      <div id="productsLoading" class="loading-panel">
-        <div class="spinner" aria-hidden="true"></div>
-        <p>Loading products and listings…</p>
-      </div>
-
-      <div id="productsGrid" class="live-grid hidden" aria-live="polite"></div>
-    </div>
-  </section>
-
-  <section id="dashboardSection" class="dashboard-section">
-    <div class="container">
-      <div class="dashboard-panel">
-        <div class="dashboard-top">
-          <div>
-            <h2>My Store Dashboard</h2>
-            <p id="dashboardSubtitle">Sign in to see your first AfroMkt store draft and keep building your seller presence.</p>
-          </div>
-          <button id="logoutButton" class="btn btn-muted hidden" type="button">Log out</button>
-        </div>
-
-        <div class="dashboard-meta">
-          <div class="dashboard-card">
-            <span>Store name</span>
-            <strong id="dashboardStoreName">Not signed in yet</strong>
-          </div>
-          <div class="dashboard-card">
-            <span>Plan</span>
-            <strong id="dashboardPlan">Free</strong>
-          </div>
-          <div class="dashboard-card">
-            <span>Category</span>
-            <strong id="dashboardCategory">Ready when you are</strong>
-          </div>
-          <div class="dashboard-card">
-            <span>Market</span>
-            <strong id="dashboardCountry">Choose your country</strong>
-          </div>
-        </div>
-
-        <div class="dashboard-note" id="dashboardNote">
-          Edit store coming soon — this panel is now live and connected to your Supabase seller account.
-        </div>
-        <div id="dashboardStatus" class="status-text" aria-live="polite"></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="how-it-works">
-    <div class="container">
-      <div class="section-header">
-        <h2 data-i18n="how.title">How AfroMkt Works</h2>
-        <p data-i18n="how.subtitle">Connecting the community in three simple steps.</p>
-      </div>
-
-      <div class="steps-container">
-        <div class="step-group reveal">
-          <h3 data-i18n="how.buyers">For Buyers</h3>
-          <div class="step"><div class="step-num">1</div><div class="step-content"><h4 data-i18n="how.browse">Browse</h4><p data-i18n="how.browseDesc">Explore categories or search for specific items and services near you.</p></div></div>
-          <div class="step"><div class="step-num">2</div><div class="step-content"><h4 data-i18n="how.connect">Connect</h4><p data-i18n="how.connectDesc">Message sellers directly to ask questions or confirm details.</p></div></div>
-          <div class="step"><div class="step-num">3</div><div class="step-content"><h4 data-i18n="how.buy">Buy</h4><p data-i18n="how.buyDesc">Complete your purchase safely and support local African businesses.</p></div></div>
-        </div>
-
-        <div class="step-group reveal">
-          <h3 data-i18n="how.sellers">For Sellers</h3>
-          <div class="step"><div class="step-num">1</div><div class="step-content"><h4 data-i18n="how.signUp">Sign Up</h4><p data-i18n="how.signUpDesc">Create your store profile in minutes and choose your plan.</p></div></div>
-          <div class="step"><div class="step-num">2</div><div class="step-content"><h4 data-i18n="how.list">List</h4><p data-i18n="how.listDesc">Upload photos and descriptions of your products or services.</p></div></div>
-          <div class="step"><div class="step-num">3</div><div class="step-content"><h4 data-i18n="how.earn">Earn</h4><p data-i18n="how.earnDesc">Receive orders, grow your brand, and reach more customers.</p></div></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="reviews" class="reviews">
-    <div class="container">
-      <div class="section-header">
-        <div class="review-feature-label" data-i18n="reviews.featureLabel">Standard Review System</div>
-        <h2 data-i18n="reviews.title">Customer Reviews</h2>
-        <p data-i18n="reviews.subtitle">Every store on AfroMkt has a dedicated review page where verified buyers can rate and review after purchase.</p>
-      </div>
-
-      <div class="review-panel">
-        <div class="review-form-card reveal">
-          <h3 data-i18n="reviews.formTitle">Rate your seller</h3>
-          <div class="rating-stars">
-            <button class="star-button active" data-rating="1" type="button">★</button>
-            <button class="star-button active" data-rating="2" type="button">★</button>
-            <button class="star-button active" data-rating="3" type="button">★</button>
-            <button class="star-button active" data-rating="4" type="button">★</button>
-            <button class="star-button active" data-rating="5" type="button">★</button>
-          </div>
-          <textarea data-i18n-placeholder="reviews.placeholder" placeholder="Tell the community about the product, service, delivery, or experience..."></textarea>
-          <button class="btn btn-primary" type="button" data-i18n="reviews.submit">Submit Review</button>
-          <p class="review-note" data-i18n="reviews.note">This review flow appears on every seller store page after buyers complete a purchase.</p>
-        </div>
-
-        <div class="review-list">
-          <div class="sample-label" data-i18n="reviews.sampleLabel">Sample Reviews</div>
-          <article class="review-card reveal"><div class="review-stars">★★★★★</div><h4>Ana</h4><p data-i18n="reviews.sample1">Fresh ingredients, fast replies, and the spices tasted just like home.</p></article>
-          <article class="review-card reveal"><div class="review-stars">★★★★★</div><h4>Miguel</h4><p data-i18n="reviews.sample2">Great haircut and clean service. Booking was simple and the seller was professional.</p></article>
-          <article class="review-card reveal"><div class="review-stars">★★★★★</div><h4>Lara</h4><p data-i18n="reviews.sample3">Loved the wig quality and the styling advice. I would buy again.</p></article>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="pricing" class="pricing">
-    <div class="container">
-      <div class="section-header">
-        <h2 data-i18n="pricing.title">Ready to Start Selling?</h2>
-        <p id="pricingSubtitle">Choose the plan that fits your business goals.</p>
-      </div>
-
-      <div class="pricing-cards">
-        <div class="price-card reveal">
-          <h3 data-i18n="pricing.starter">Starter</h3>
-          <div class="price"><span id="starterPrice">€10</span><span id="starterPeriod">/mo</span></div>
-          <ul class="features-list">
-            <li data-i18n="pricing.starter1">Up to 15 listings</li>
-            <li data-i18n="pricing.starter2">Custom store page</li>
-            <li data-i18n="pricing.starter3">Buyer messages</li>
-            <li data-i18n="pricing.starter4">Basic analytics</li>
-          </ul>
-          <button class="btn btn-outline seller-plan-cta" id="starterCta" type="button">Start Free Trial</button>
-        </div>
-
-        <div class="price-card featured reveal">
-          <span class="popular-badge" data-i18n="pricing.popular">Most Popular</span>
-          <h3 data-i18n="pricing.pro">Pro</h3>
-          <div class="price"><span id="proPrice">€20</span><span id="proPeriod">/mo</span></div>
-          <ul class="features-list">
-            <li data-i18n="pricing.pro1">Unlimited listings</li>
-            <li data-i18n="pricing.pro2">Featured placement</li>
-            <li data-i18n="pricing.pro3">Verified Seller badge</li>
-            <li data-i18n="pricing.pro4">Priority support</li>
-            <li data-i18n="pricing.pro5">Advanced analytics</li>
-          </ul>
-          <button class="btn btn-primary seller-plan-cta" id="proCta" type="button">Join as Pro</button>
-        </div>
-      </div>
-
-      <p class="trial-note" id="pricingNote">First 10 sellers get lifetime free access. Standard plans apply after the launch offer is full.</p>
-    </div>
-  </section>
-
-  <section class="testimonials">
-    <div class="container">
-      <div class="section-header">
-        <h2 data-i18n="benefits.title">Why AfroMkt?</h2>
-        <p data-i18n="benefits.subtitle">Built to help African-owned businesses look professional, get discovered, and grow faster.</p>
-      </div>
-
-      <div class="benefits-grid">
-        <article class="benefit-card reveal"><div class="benefit-icon" style="background: rgba(206, 17, 38, 0.12);">🚫📱</div><h4 data-i18n="benefits.card1Title">Stop relying on WhatsApp groups</h4><p data-i18n="benefits.card1Desc">Get your own professional store page that buyers can browse, trust, and share anytime.</p></article>
-        <article class="benefit-card reveal"><div class="benefit-icon" style="background: rgba(0, 107, 63, 0.12);">🌍</div><h4 data-i18n="benefits.card2Title">Reach African community buyers</h4><p data-i18n="benefits.card2Desc">Be found by diaspora customers actively looking for your products and services.</p></article>
-        <article class="benefit-card reveal"><div class="benefit-icon" style="background: rgba(252, 209, 22, 0.24);">💰</div><h4 data-i18n="benefits.card3Title">Start from a low monthly plan — or free</h4><p data-i18n="benefits.card3Desc">Join for a simple local price, or claim lifetime free access if you are one of our first 10 sellers.</p></article>
-        <article class="benefit-card reveal"><div class="benefit-icon" style="background: rgba(252, 209, 22, 0.24);">⭐</div><h4 data-i18n="benefits.card4Title">Build trust with verified reviews</h4><p data-i18n="benefits.card4Desc">Let happy customers do the talking with ratings attached to your store page.</p></article>
-        <article class="benefit-card reveal"><div class="benefit-icon" style="background: rgba(249, 115, 22, 0.14);">📦</div><h4 data-i18n="benefits.card5Title">Sell everything in one community marketplace</h4><p data-i18n="benefits.card5Desc">Food, fashion, hair, beauty, events, and services — all in one place built for us.</p></article>
-      </div>
-    </div>
-  </section>
-
-  <section class="newsletter">
-    <div class="container">
-      <h2 id="newsletterTitle">Join the Waitlist</h2>
-      <p id="newsletterSubtitle">Be the first to know when we launch new features and community events.</p>
-
-      <form id="newsletterForm" class="newsletter-form">
-        <input id="newsletterEmail" type="email" data-i18n-placeholder="newsletter.placeholder" placeholder="Enter your email address" autocomplete="email" required />
-        <button class="btn btn-gold" id="newsletterButton" type="submit">Join Now</button>
-      </form>
-      <div id="newsletterStatus" class="status-text" aria-live="polite"></div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <a href="#top" class="footer-logo">Afro<span>Mkt</span></a>
-          <p class="footer-tagline" data-i18n="footer.tagline">Connecting African Communities Worldwide</p>
-          <div class="social-links">
-            <a href="#" class="social-icon">IG</a>
-            <a href="#" class="social-icon">FB</a>
-            <a href="#" class="social-icon">TK</a>
-          </div>
-        </div>
-
-        <div class="footer-links">
-          <h4 data-i18n="footer.marketplace">Marketplace</h4>
-          <ul>
-            <li><a href="#categories" data-i18n="footer.allCategories">All Categories</a></li>
-            <li><a href="#sellers" data-i18n="footer.firstSellers">First Sellers</a></li>
-            <li><a href="#reviews" data-i18n="footer.reviews">Customer Reviews</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-links">
-          <h4 data-i18n="footer.company">Company</h4>
-          <ul>
-            <li><a href="#" data-i18n="footer.about">About Us</a></li>
-            <li><a href="#" data-i18n="footer.terms">Terms of Service</a></li>
-            <li><a href="#" data-i18n="footer.privacy">Privacy Policy</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-links">
-          <h4 data-i18n="footer.sell">Sell</h4>
-          <ul>
-            <li><a href="#dashboardSection">My Store Dashboard</a></li>
-            <li><a href="#pricing" data-i18n="footer.plans">Pricing Plans</a></li>
-            <li><button class="auth-switch" id="footerSellCta" type="button" style="text-align:left;">Claim Free Spot</button></li>
-          </ul>
-        </div>
-      </div>
-
-      <div id="footerMarketRow" class="footer-market-row"></div>
-      <div class="footer-bottom" data-i18n="footer.copyright">© 2026 AfroMkt. All rights reserved.</div>
-    </div>
-  </footer>
-
-  <div id="countryModal" class="modal-backdrop">
-    <div class="country-modal">
-      <h2 data-i18n="modal.title">Where are you shopping from?</h2>
-      <p data-i18n="modal.subtitle">Choose your country so AfroMkt can show the right market, currency, and local waitlist.</p>
-      <div id="countryModalGrid" class="country-grid"></div>
-    </div>
-  </div>
-
-  <div id="sellerModal" class="modal-backdrop" aria-hidden="true">
-    <div class="auth-card">
-      <h2>Claim your free seller spot</h2>
-      <p>Create your AfroMkt seller account, save your store details, and unlock your new seller dashboard.</p>
-
-      <form id="sellerSignupForm">
-        <div class="form-grid two">
-          <div class="field">
-            <label for="sellerName">Full name</label>
-            <input id="sellerName" type="text" required autocomplete="name" placeholder="Your name" />
-          </div>
-          <div class="field">
-            <label for="sellerEmail">Email</label>
-            <input id="sellerEmail" type="email" required autocomplete="email" placeholder="you@example.com" />
-          </div>
-        </div>
-
-        <div class="form-grid two">
-          <div class="field">
-            <label for="sellerStoreName">Store name</label>
-            <input id="sellerStoreName" type="text" required autocomplete="organization" placeholder="Your business or store name" />
-          </div>
-          <div class="field">
-            <label for="sellerCategory">Category</label>
-            <select id="sellerCategory" required>
-              <option value="">Select a category</option>
-              <option value="food">Food</option>
-              <option value="barber">Barber</option>
-              <option value="beauty">Beauty</option>
-              <option value="braids">Braids</option>
-              <option value="fashion">Fashion</option>
-              <option value="wigs">Wigs</option>
-              <option value="restaurant">Restaurant</option>
-              <option value="skincare">Skincare</option>
-              <option value="events">Events</option>
-              <option value="services">Services</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-grid two">
-          <div class="field">
-            <label for="sellerCountry">Country</label>
-            <input id="sellerCountry" type="text" required autocomplete="country-name" placeholder="Portugal" />
-          </div>
-          <div class="field">
-            <label for="sellerPassword">Password</label>
-            <input id="sellerPassword" type="password" required minlength="6" autocomplete="new-password" placeholder="At least 6 characters" />
-          </div>
-        </div>
-
-        <div id="sellerModalStatus" class="status-text" aria-live="polite"></div>
-
-        <div class="auth-actions">
-          <button id="sellerSubmitButton" class="btn btn-primary" type="submit">Create seller account</button>
-          <button class="auth-switch" id="openLoginFromSeller" type="button">Already have an account? Log in</button>
-        </div>
-        <p class="muted-note">We added a password field so sellers can use the email/password login flow immediately after sign-up.</p>
-      </form>
-    </div>
-  </div>
-
-  <div id="loginModal" class="modal-backdrop" aria-hidden="true">
-    <div class="auth-card">
-      <h2>Seller login</h2>
-      <p>Sign in with your AfroMkt seller account to open your store dashboard.</p>
-
-      <form id="sellerLoginForm">
-        <div class="field">
-          <label for="loginEmail">Email</label>
-          <input id="loginEmail" type="email" required autocomplete="email" placeholder="you@example.com" />
-        </div>
-        <div class="field">
-          <label for="loginPassword">Password</label>
-          <input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Your password" />
-        </div>
-
-        <div id="loginModalStatus" class="status-text" aria-live="polite"></div>
-
-        <div class="auth-actions">
-          <button id="loginSubmitButton" class="btn btn-primary" type="submit">Log in</button>
-          <button class="auth-switch" id="openSignupFromLogin" type="button">Need a seller account? Create one</button>
-        </div>
-      </form>
-    </div>
-  </div>
+  </main>
 
   <script>
     const SUPABASE_URL = "https://nmusxculduptvefgqfjn.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tdXN4Y3VsZHVwdHZlZmdxZmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNjcwNDQsImV4cCI6MjEwNTY0MzA0NH0._Nn3nacYJOg2nLcG_kxNSI3vTWtDHUEEH11Lvsera8s";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const STORAGE_LANG = "afromkt-language";
-    const STORAGE_COUNTRY = "afromkt-country";
-    const STORAGE_PENDING_SELLER = "afromkt-pending-seller";
+    const waitlistForm = document.getElementById("waitlistForm");
+    const waitlistEmail = document.getElementById("waitlistEmail");
+    const waitlistCountry = document.getElementById("waitlistCountry");
+    const waitlistSubmit = document.getElementById("waitlistSubmit");
+    const waitlistStatus = document.getElementById("waitlistStatus");
 
-    const countries = {
-      pt: { flag: "🇵🇹", name: { en: "Portugal", pt: "Portugal", fr: "Portugal", hu: "Portugália" }, market: { en: "Portugal", pt: "Portugal", fr: "Portugal", hu: "Portugália" }, city: { en: "Lisbon", pt: "Lisboa", fr: "Lisbonne", hu: "Lisszabon" }, live: true, currency: "€", starter: "10", pro: "20" },
-      uk: { flag: "🇬🇧", name: { en: "United Kingdom", pt: "Reino Unido", fr: "Royaume-Uni", hu: "Egyesült Királyság" }, market: { en: "the UK", pt: "Reino Unido", fr: "Royaume-Uni", hu: "az Egyesült Királyság" }, city: { en: "London", pt: "Londres", fr: "Londres", hu: "London" }, currency: "£", starter: "20", pro: "45" },
-      au: { flag: "🇦🇺", name: { en: "Australia", pt: "Austrália", fr: "Australie", hu: "Ausztrália" }, market: { en: "Australia", pt: "Austrália", fr: "Australie", hu: "Ausztrália" }, city: { en: "Sydney", pt: "Sydney", fr: "Sydney", hu: "Sydney" }, currency: "A$", starter: "25", pro: "45" },
-      us: { flag: "🇺🇸", name: { en: "United States", pt: "Estados Unidos", fr: "États-Unis", hu: "Egyesült Államok" }, market: { en: "the USA", pt: "Estados Unidos", fr: "États-Unis", hu: "az Egyesült Államok" }, city: { en: "New York", pt: "Nova Iorque", fr: "New York", hu: "New York" }, currency: "$", starter: "20", pro: "45" },
-      ca: { flag: "🇨🇦", name: { en: "Canada", pt: "Canadá", fr: "Canada", hu: "Kanada" }, market: { en: "Canada", pt: "Canadá", fr: "Canada", hu: "Kanada" }, city: { en: "Toronto", pt: "Toronto", fr: "Toronto", hu: "Toronto" }, currency: "C$", starter: "25", pro: "55" },
-      de: { flag: "🇩🇪", name: { en: "Germany (EU)", pt: "Alemanha (UE)", fr: "Allemagne (UE)", hu: "Németország (EU)" }, market: { en: "Germany", pt: "Alemanha", fr: "Allemagne", hu: "Németország" }, city: { en: "Berlin", pt: "Berlim", fr: "Berlin", hu: "Berlin" }, currency: "€", starter: "15", pro: "35" },
-      fr: { flag: "🇫🇷", name: { en: "France (EU)", pt: "França (UE)", fr: "France (UE)", hu: "Franciaország (EU)" }, market: { en: "France", pt: "França", fr: "France", hu: "Franciaország" }, city: { en: "Paris", pt: "Paris", fr: "Paris", hu: "Párizs" }, currency: "€", starter: "15", pro: "35" },
-      es: { flag: "🇪🇸", name: { en: "Spain (EU)", pt: "Espanha (UE)", fr: "Espagne (UE)", hu: "Spanyolország (EU)" }, market: { en: "Spain", pt: "Espanha", fr: "Espagne", hu: "Spanyolország" }, city: { en: "Madrid", pt: "Madrid", fr: "Madrid", hu: "Madrid" }, currency: "€", starter: "20", pro: "30" },
-      hu: { flag: "🇭🇺", name: { en: "Hungary (EU)", pt: "Hungria (UE)", fr: "Hongrie (UE)", hu: "Magyarország (EU)" }, market: { en: "Hungary", pt: "Hungria", fr: "Hongrie", hu: "Magyarország" }, city: { en: "Budapest", pt: "Budapeste", fr: "Budapest", hu: "Budapest" }, currency: "", starter: "10,000 HUF", pro: "20,000 HUF" },
-      global: { flag: "🌍", name: { en: "Other / Global", pt: "Outro / Global", fr: "Autre / Global", hu: "Más / Globális" }, market: { en: "Global", pt: "Global", fr: "Mondial", hu: "Globális" }, city: { en: "your city", pt: "a tua cidade", fr: "votre ville", hu: "a városod" }, currency: "€", starter: "15", pro: "35" }
-    };
-
-    const t = {
-      en: {
-        "nav.categories": "Categories",
-        "nav.featured": "First Sellers",
-        "nav.pricing": "Pricing",
-        "nav.sell": "Sell on AfroMkt",
-        "hero.subtitle": "Where Africa Meets the World. Discover authentic products, skilled professionals, and vibrant events within our community.",
-        "hero.search": "Search",
-        "hero.shop": "Shop Now",
-        "community.angola": "Angola",
-        "community.guineaBissau": "Guinea-Bissau",
-        "community.guinea": "Guinea",
-        "community.ghana": "Ghana",
-        "community.nigeria": "Nigeria",
-        "community.capeVerde": "Cape Verde",
-        "community.saoTome": "São Tomé",
-        "community.senegal": "Senegal",
-        "community.coteIvoire": "Côte d'Ivoire",
-        "community.more": "More Communities",
-        "categories.title": "Browse Marketplace",
-        "categories.subtitle": "Everything you need, from groceries to grooming.",
-        "cat.food": "Food & Groceries",
-        "cat.foodDesc": "African food products, spices, drinks, frozen foods.",
-        "cat.barbers": "Barbers & Hair Salons",
-        "cat.barbersDesc": "Barber shops, men's cuts, African hair care.",
-        "cat.beauty": "Beauty & Makeup",
-        "cat.beautyDesc": "Makeup artists, nail techs, beauty products.",
-        "cat.braids": "Braids & Natural Hair",
-        "cat.braidsDesc": "Braiding salons, loc specialists, twist outs.",
-        "cat.fashion": "Fashion & Clothing",
-        "cat.fashionDesc": "African print clothing, ankara, accessories.",
-        "cat.wigs": "Wigs & Hair Extensions",
-        "cat.wigsDesc": "Wig sellers, lace fronts, bundles.",
-        "cat.restaurants": "Restaurants & Catering",
-        "cat.restaurantsDesc": "African restaurants, home caterers, event food.",
-        "cat.health": "Health & Skincare",
-        "cat.healthDesc": "Shea butter, African black soap, natural skincare.",
-        "cat.events": "Events & Entertainment",
-        "cat.eventsDesc": "African events, DJs, performers.",
-        "cat.services": "Services",
-        "cat.servicesDesc": "Shipping, money transfer agents, and more.",
-        "sellers.badge": "🎁 7 FREE spots remaining",
-        "sellers.title": "Be One of Our First Sellers! 🌍",
-        "sellers.offer": "The first 10 sellers join AfroMkt completely FREE — no monthly fee, forever. List your products, reach the African community, and grow your business.",
-        "how.title": "How AfroMkt Works",
-        "how.subtitle": "Connecting the community in three simple steps.",
-        "how.buyers": "For Buyers",
-        "how.sellers": "For Sellers",
-        "how.browse": "Browse",
-        "how.browseDesc": "Explore categories or search for specific items and services near you.",
-        "how.connect": "Connect",
-        "how.connectDesc": "Message sellers directly to ask questions or confirm details.",
-        "how.buy": "Buy",
-        "how.buyDesc": "Complete your purchase safely and support local African businesses.",
-        "how.signUp": "Sign Up",
-        "how.signUpDesc": "Create your store profile in minutes and choose your plan.",
-        "how.list": "List",
-        "how.listDesc": "Upload photos and descriptions of your products or services.",
-        "how.earn": "Earn",
-        "how.earnDesc": "Receive orders, grow your brand, and reach more customers.",
-        "reviews.featureLabel": "Standard Feature for Every Store",
-        "reviews.title": "Customer Reviews",
-        "reviews.subtitle": "Every store on AfroMkt has a dedicated review page where verified buyers can rate and review after purchase.",
-        "reviews.formTitle": "Rate your seller",
-        "reviews.placeholder": "Tell the community about the product, service, delivery, or experience...",
-        "reviews.submit": "Submit Review",
-        "reviews.note": "This review flow appears on every seller store page after buyers complete a purchase.",
-        "reviews.sampleLabel": "Sample Reviews",
-        "reviews.sample1": "Fresh ingredients, fast replies, and the spices tasted just like home.",
-        "reviews.sample2": "Great haircut and clean service. Booking was simple and the seller was professional.",
-        "reviews.sample3": "Loved the wig quality and the styling advice. I would buy again.",
-        "pricing.title": "Ready to Start Selling?",
-        "pricing.starter": "Basic",
-        "pricing.pro": "Premium",
-        "pricing.popular": "Most Popular",
-        "pricing.starter1": "Up to 15 listings",
-        "pricing.starter2": "Custom store page",
-        "pricing.starter3": "Buyer messages",
-        "pricing.starter4": "Basic analytics",
-        "pricing.pro1": "Unlimited listings",
-        "pricing.pro2": "Featured placement",
-        "pricing.pro3": "Verified Seller badge",
-        "pricing.pro4": "Priority support",
-        "pricing.pro5": "Advanced analytics",
-        "benefits.title": "Why AfroMkt?",
-        "benefits.subtitle": "Built to help African-owned businesses look professional, get discovered, and grow faster.",
-        "benefits.card1Title": "Stop relying on WhatsApp groups",
-        "benefits.card1Desc": "Get your own professional store page that buyers can browse, trust, and share anytime.",
-        "benefits.card2Title": "Reach African community buyers",
-        "benefits.card2Desc": "Be found by diaspora customers actively looking for your products and services.",
-        "benefits.card3Title": "Start from a low monthly plan — or free",
-        "benefits.card3Desc": "Join for a simple local price, or claim lifetime free access if you are one of our first 10 sellers.",
-        "benefits.card4Title": "Build trust with verified reviews",
-        "benefits.card4Desc": "Let happy customers do the talking with ratings attached to your store page.",
-        "benefits.card5Title": "Sell everything in one community marketplace",
-        "benefits.card5Desc": "Food, fashion, hair, beauty, events, and services — all in one place built for us.",
-        "newsletter.placeholder": "Enter your email address",
-        "footer.tagline": "Connecting African Communities Worldwide",
-        "footer.marketplace": "Marketplace",
-        "footer.allCategories": "All Categories",
-        "footer.firstSellers": "First Sellers",
-        "footer.reviews": "Customer Reviews",
-        "footer.company": "Company",
-        "footer.about": "About Us",
-        "footer.terms": "Terms of Service",
-        "footer.privacy": "Privacy Policy",
-        "footer.sell": "Sell",
-        "footer.plans": "Pricing Plans",
-        "footer.copyright": "© 2026 AfroMkt. All rights reserved.",
-        "modal.title": "Where are you shopping from?",
-        "modal.subtitle": "Choose your country so AfroMkt can show the right market, currency, and local waitlist."
-      },
-      pt: {
-        "nav.categories": "Categorias",
-        "nav.featured": "Primeiros Vendedores",
-        "nav.pricing": "Preços",
-        "nav.sell": "Vender no AfroMkt",
-        "hero.subtitle": "Onde África encontra o mundo. Descobre produtos autênticos, profissionais qualificados e eventos vibrantes da nossa comunidade.",
-        "hero.search": "Pesquisar",
-        "hero.shop": "Comprar Agora",
-        "community.angola": "Angola",
-        "community.guineaBissau": "Guiné-Bissau",
-        "community.guinea": "Guiné",
-        "community.ghana": "Gana",
-        "community.nigeria": "Nigéria",
-        "community.capeVerde": "Cabo Verde",
-        "community.saoTome": "São Tomé",
-        "community.senegal": "Senegal",
-        "community.coteIvoire": "Costa do Marfim",
-        "community.more": "Mais Comunidades",
-        "categories.title": "Explora o Marketplace",
-        "categories.subtitle": "Tudo o que precisas, de mercearia a cuidados pessoais.",
-        "cat.food": "Comida e Mercearia",
-        "cat.foodDesc": "Produtos alimentares africanos, especiarias, bebidas e congelados.",
-        "cat.barbers": "Barbeiros e Cabeleireiros",
-        "cat.barbersDesc": "Barbearias, cortes masculinos e cuidados capilares africanos.",
-        "cat.beauty": "Beleza e Maquilhagem",
-        "cat.beautyDesc": "Maquilhadores, técnicas de unhas e produtos de beleza.",
-        "cat.braids": "Tranças e Cabelo Natural",
-        "cat.braidsDesc": "Salões de tranças, especialistas em locs e twist outs.",
-        "cat.fashion": "Moda e Roupa",
-        "cat.fashionDesc": "Roupa com padrões africanos, ankara e acessórios.",
-        "cat.wigs": "Perucas e Extensões",
-        "cat.wigsDesc": "Vendedores de perucas, lace fronts e bundles.",
-        "cat.restaurants": "Restaurantes e Catering",
-        "cat.restaurantsDesc": "Restaurantes africanos, catering caseiro e comida para eventos.",
-        "cat.health": "Saúde e Skincare",
-        "cat.healthDesc": "Manteiga de karité, sabão preto africano e skincare natural.",
-        "cat.events": "Eventos e Entretenimento",
-        "cat.eventsDesc": "Eventos africanos, DJs e artistas.",
-        "cat.services": "Serviços",
-        "cat.servicesDesc": "Envios, agentes de transferência de dinheiro e muito mais.",
-        "sellers.badge": "🎁 7 lugares GRÁTIS disponíveis",
-        "sellers.title": "Sê Um dos Nossos Primeiros Vendedores! 🌍",
-        "sellers.offer": "Os primeiros 10 vendedores entram no AfroMkt totalmente GRÁTIS — sem mensalidade, para sempre. Lista os teus produtos, alcança a comunidade africana e faz crescer o teu negócio.",
-        "how.title": "Como Funciona o AfroMkt",
-        "how.subtitle": "A ligar a comunidade em três passos simples.",
-        "how.buyers": "Para Compradores",
-        "how.sellers": "Para Vendedores",
-        "how.browse": "Explorar",
-        "how.browseDesc": "Explora categorias ou pesquisa produtos e serviços perto de ti.",
-        "how.connect": "Contactar",
-        "how.connectDesc": "Envia mensagem diretamente aos vendedores para tirar dúvidas ou confirmar detalhes.",
-        "how.buy": "Comprar",
-        "how.buyDesc": "Conclui a compra com segurança e apoia negócios africanos locais.",
-        "how.signUp": "Registar",
-        "how.signUpDesc": "Cria o perfil da tua loja em minutos e escolhe o teu plano.",
-        "how.list": "Publicar",
-        "how.listDesc": "Carrega fotos e descrições dos teus produtos ou serviços.",
-        "how.earn": "Ganhar",
-        "how.earnDesc": "Recebe encomendas, faz crescer a tua marca e chega a mais clientes.",
-        "reviews.featureLabel": "Funcionalidade padrão para todas as lojas",
-        "reviews.title": "Avaliações de Clientes",
-        "reviews.subtitle": "Todas as lojas no AfroMkt têm uma página de avaliações dedicada onde compradores verificados podem classificar e avaliar depois da compra.",
-        "reviews.formTitle": "Avalia o vendedor",
-        "reviews.placeholder": "Conta à comunidade sobre o produto, serviço, entrega ou experiência...",
-        "reviews.submit": "Enviar Avaliação",
-        "reviews.note": "Este fluxo aparece em todas as páginas de loja depois de uma compra concluída.",
-        "reviews.sampleLabel": "Exemplos de Avaliações",
-        "reviews.sample1": "Ingredientes frescos, respostas rápidas e as especiarias sabiam mesmo a casa.",
-        "reviews.sample2": "Ótimo corte e serviço limpo. A marcação foi simples e o vendedor foi profissional.",
-        "reviews.sample3": "Adorei a qualidade da peruca e os conselhos de styling. Compraria outra vez.",
-        "pricing.title": "Pronto para Começar a Vender?",
-        "pricing.starter": "Basic",
-        "pricing.pro": "Premium",
-        "pricing.popular": "Mais Popular",
-        "pricing.starter1": "Até 15 anúncios",
-        "pricing.starter2": "Página de loja personalizada",
-        "pricing.starter3": "Mensagens de compradores",
-        "pricing.starter4": "Análises básicas",
-        "pricing.pro1": "Anúncios ilimitados",
-        "pricing.pro2": "Colocação em destaque",
-        "pricing.pro3": "Selo de Vendedor Verificado",
-        "pricing.pro4": "Suporte prioritário",
-        "pricing.pro5": "Análises avançadas",
-        "benefits.title": "Porquê o AfroMkt?",
-        "benefits.subtitle": "Criado para ajudar negócios africanos a parecerem profissionais, serem descobertos e crescerem mais rápido.",
-        "benefits.card1Title": "Para de depender de grupos de WhatsApp",
-        "benefits.card1Desc": "Garante a tua própria página de loja profissional que compradores podem explorar, confiar e partilhar.",
-        "benefits.card2Title": "Alcança compradores da comunidade africana",
-        "benefits.card2Desc": "Sê encontrado por clientes da diáspora que procuram ativamente os teus produtos e serviços.",
-        "benefits.card3Title": "Começa com um plano local baixo — ou grátis",
-        "benefits.card3Desc": "Adere por um preço simples, ou garante acesso gratuito vitalício se fores um dos primeiros 10 vendedores.",
-        "benefits.card4Title": "Cria confiança com avaliações verificadas",
-        "benefits.card4Desc": "Deixa clientes satisfeitos falarem por ti com classificações ligadas à tua loja.",
-        "benefits.card5Title": "Vende tudo num marketplace comunitário",
-        "benefits.card5Desc": "Comida, moda, cabelo, beleza, eventos e serviços — tudo num único lugar feito para nós.",
-        "newsletter.placeholder": "Introduz o teu endereço de email",
-        "footer.tagline": "Conectando Comunidades Africanas no Mundo",
-        "footer.marketplace": "Marketplace",
-        "footer.allCategories": "Todas as Categorias",
-        "footer.firstSellers": "Primeiros Vendedores",
-        "footer.reviews": "Avaliações de Clientes",
-        "footer.company": "Empresa",
-        "footer.about": "Sobre Nós",
-        "footer.terms": "Termos de Serviço",
-        "footer.privacy": "Política de Privacidade",
-        "footer.sell": "Vender",
-        "footer.plans": "Planos de Preços",
-        "footer.copyright": "© 2026 AfroMkt. Todos os direitos reservados.",
-        "modal.title": "De onde estás a comprar?",
-        "modal.subtitle": "Escolhe o teu país para o AfroMkt mostrar o mercado, moeda e lista de espera local."
-      },
-      fr: {
-        "nav.categories": "Catégories",
-        "nav.featured": "Premiers vendeurs",
-        "nav.pricing": "Tarifs",
-        "nav.sell": "Vendre sur AfroMkt",
-        "hero.subtitle": "Là où l’Afrique rencontre le monde. Découvrez des produits authentiques, des professionnels qualifiés et des événements vibrants de notre communauté.",
-        "hero.search": "Rechercher",
-        "hero.shop": "Acheter",
-        "community.angola": "Angola",
-        "community.guineaBissau": "Guinée-Bissau",
-        "community.guinea": "Guinée",
-        "community.ghana": "Ghana",
-        "community.nigeria": "Nigéria",
-        "community.capeVerde": "Cap-Vert",
-        "community.saoTome": "São Tomé",
-        "community.senegal": "Sénégal",
-        "community.coteIvoire": "Côte d’Ivoire",
-        "community.more": "Plus de communautés",
-        "categories.title": "Explorer le marketplace",
-        "categories.subtitle": "Tout ce dont vous avez besoin, de l’épicerie aux soins.",
-        "cat.food": "Alimentation & Épicerie",
-        "cat.foodDesc": "Produits africains, épices, boissons et surgelés.",
-        "cat.barbers": "Barbiers & Salons",
-        "cat.barbersDesc": "Barbiers, coupes homme et soins capillaires africains.",
-        "cat.beauty": "Beauté & Maquillage",
-        "cat.beautyDesc": "Maquilleurs, prothésistes ongulaires et produits de beauté.",
-        "cat.braids": "Tresses & Cheveux naturels",
-        "cat.braidsDesc": "Salons de tresses, spécialistes locs et twist outs.",
-        "cat.fashion": "Mode & Vêtements",
-        "cat.fashionDesc": "Wax, ankara, vêtements et accessoires africains.",
-        "cat.wigs": "Perruques & Extensions",
-        "cat.wigsDesc": "Perruques, lace fronts et bundles.",
-        "cat.restaurants": "Restaurants & Traiteur",
-        "cat.restaurantsDesc": "Restaurants africains, traiteurs maison et repas événementiels.",
-        "cat.health": "Santé & Skincare",
-        "cat.healthDesc": "Beurre de karité, savon noir africain et soins naturels.",
-        "cat.events": "Événements & Divertissement",
-        "cat.eventsDesc": "Événements africains, DJs et artistes.",
-        "cat.services": "Services",
-        "cat.servicesDesc": "Livraison, transferts d’argent et plus encore.",
-        "sellers.badge": "🎁 7 places GRATUITES restantes",
-        "sellers.title": "Soyez parmi nos premiers vendeurs ! 🌍",
-        "sellers.offer": "Les 10 premiers vendeurs rejoignent AfroMkt gratuitement — sans abonnement mensuel, à vie. Listez vos produits, touchez la communauté africaine et développez votre activité.",
-        "how.title": "Comment fonctionne AfroMkt",
-        "how.subtitle": "Connecter la communauté en trois étapes simples.",
-        "how.buyers": "Pour les acheteurs",
-        "how.sellers": "Pour les vendeurs",
-        "how.browse": "Explorer",
-        "how.browseDesc": "Parcourez les catégories ou recherchez des produits et services près de chez vous.",
-        "how.connect": "Contacter",
-        "how.connectDesc": "Envoyez un message direct aux vendeurs pour poser des questions ou confirmer les détails.",
-        "how.buy": "Acheter",
-        "how.buyDesc": "Achetez en toute sécurité et soutenez les entreprises africaines locales.",
-        "how.signUp": "S’inscrire",
-        "how.signUpDesc": "Créez votre profil de boutique en quelques minutes et choisissez votre plan.",
-        "how.list": "Publier",
-        "how.listDesc": "Ajoutez photos et descriptions de vos produits ou services.",
-        "how.earn": "Gagner",
-        "how.earnDesc": "Recevez des commandes, développez votre marque et touchez plus de clients.",
-        "reviews.featureLabel": "Fonction standard pour chaque boutique",
-        "reviews.title": "Avis clients",
-        "reviews.subtitle": "Chaque boutique AfroMkt dispose d’une page d’avis dédiée où les acheteurs vérifiés peuvent noter et commenter après achat.",
-        "reviews.formTitle": "Notez votre vendeur",
-        "reviews.placeholder": "Parlez du produit, du service, de la livraison ou de l’expérience...",
-        "reviews.submit": "Envoyer l’avis",
-        "reviews.note": "Ce flux d’avis apparaît sur chaque page boutique après un achat confirmé.",
-        "reviews.sampleLabel": "Exemples d’avis",
-        "reviews.sample1": "Ingrédients frais, réponses rapides, et les épices avaient le goût de la maison.",
-        "reviews.sample2": "Très bonne coupe et service propre. Réservation simple et vendeur professionnel.",
-        "reviews.sample3": "J’ai adoré la qualité de la perruque et les conseils de coiffage. Je rachèterais.",
-        "pricing.title": "Prêt à vendre ?",
-        "pricing.starter": "Basic",
-        "pricing.pro": "Premium",
-        "pricing.popular": "Le plus populaire",
-        "pricing.starter1": "Jusqu’à 15 annonces",
-        "pricing.starter2": "Page boutique personnalisée",
-        "pricing.starter3": "Messages acheteurs",
-        "pricing.starter4": "Statistiques basiques",
-        "pricing.pro1": "Annonces illimitées",
-        "pricing.pro2": "Mise en avant",
-        "pricing.pro3": "Badge vendeur vérifié",
-        "pricing.pro4": "Support prioritaire",
-        "pricing.pro5": "Statistiques avancées",
-        "benefits.title": "Pourquoi AfroMkt ?",
-        "benefits.subtitle": "Conçu pour aider les entreprises africaines à paraître professionnelles, être découvertes et grandir plus vite.",
-        "benefits.card1Title": "Arrêtez de dépendre des groupes WhatsApp",
-        "benefits.card1Desc": "Obtenez votre page boutique professionnelle que les acheteurs peuvent consulter, faire confiance et partager.",
-        "benefits.card2Title": "Touchez les acheteurs de la communauté africaine",
-        "benefits.card2Desc": "Soyez trouvé par des clients de la diaspora qui recherchent activement vos produits et services.",
-        "benefits.card3Title": "Commencez avec un petit plan local — ou gratuit",
-        "benefits.card3Desc": "Rejoignez avec un prix local simple, ou obtenez l’accès gratuit à vie si vous êtes parmi les 10 premiers vendeurs.",
-        "benefits.card4Title": "Construisez la confiance avec des avis vérifiés",
-        "benefits.card4Desc": "Laissez vos clients satisfaits parler pour vous avec des notes liées à votre boutique.",
-        "benefits.card5Title": "Vendez tout dans un marketplace communautaire",
-        "benefits.card5Desc": "Cuisine, mode, cheveux, beauté, événements et services — tout au même endroit, fait pour nous.",
-        "newsletter.placeholder": "Entrez votre adresse email",
-        "footer.tagline": "Connecter les Communautés Africaines dans le Monde",
-        "footer.marketplace": "Marketplace",
-        "footer.allCategories": "Toutes les catégories",
-        "footer.firstSellers": "Premiers vendeurs",
-        "footer.reviews": "Avis clients",
-        "footer.company": "Entreprise",
-        "footer.about": "À propos",
-        "footer.terms": "Conditions d’utilisation",
-        "footer.privacy": "Politique de confidentialité",
-        "footer.sell": "Vendre",
-        "footer.plans": "Plans tarifaires",
-        "footer.copyright": "© 2026 AfroMkt. Tous droits réservés.",
-        "modal.title": "Depuis quel pays achetez-vous ?",
-        "modal.subtitle": "Choisissez votre pays pour afficher le marché, la devise et la liste d’attente locale."
-      }
-    };
-
-    let currentLanguage = localStorage.getItem(STORAGE_LANG) || detectLanguage();
-    let currentCountry = localStorage.getItem(STORAGE_COUNTRY) || detectCountry();
-    let authSubscription = null;
-
-    const marketBanner = document.getElementById("marketBanner");
-    const marketEyebrow = document.getElementById("marketEyebrow");
-    const heroTitle = document.getElementById("heroTitle");
-    const searchInput = document.getElementById("searchInput");
-    const starterPrice = document.getElementById("starterPrice");
-    const starterPeriod = document.getElementById("starterPeriod");
-    const proPrice = document.getElementById("proPrice");
-    const proPeriod = document.getElementById("proPeriod");
-    const pricingSubtitle = document.getElementById("pricingSubtitle");
-    const pricingNote = document.getElementById("pricingNote");
-    const newsletterTitle = document.getElementById("newsletterTitle");
-    const newsletterSubtitle = document.getElementById("newsletterSubtitle");
-    const newsletterButton = document.getElementById("newsletterButton");
-    const footerMarketRow = document.getElementById("footerMarketRow");
-    const selectedCountryFlag = document.getElementById("selectedCountryFlag");
-    const selectedCountryName = document.getElementById("selectedCountryName");
-    const countryMenu = document.getElementById("countryMenu");
-    const countryModal = document.getElementById("countryModal");
-    const countryModalGrid = document.getElementById("countryModalGrid");
-    const countryToggle = document.getElementById("countryToggle");
-    const languageToggle = document.getElementById("languageToggle");
-    const activeFlag = document.getElementById("activeFlag");
-    const languageText = document.getElementById("languageText");
-    const authButton = document.getElementById("authButton");
-    const dashboardLink = document.getElementById("dashboardLink");
-    const dashboardSection = document.getElementById("dashboardSection");
-    const dashboardStoreName = document.getElementById("dashboardStoreName");
-    const dashboardPlan = document.getElementById("dashboardPlan");
-    const dashboardCategory = document.getElementById("dashboardCategory");
-    const dashboardCountry = document.getElementById("dashboardCountry");
-    const dashboardSubtitle = document.getElementById("dashboardSubtitle");
-    const dashboardNote = document.getElementById("dashboardNote");
-    const dashboardStatus = document.getElementById("dashboardStatus");
-    const logoutButton = document.getElementById("logoutButton");
-    const sellerModal = document.getElementById("sellerModal");
-    const loginModal = document.getElementById("loginModal");
-    const sellerModalStatus = document.getElementById("sellerModalStatus");
-    const loginModalStatus = document.getElementById("loginModalStatus");
-    const sellerInlineStatus = document.getElementById("sellerInlineStatus");
-    const newsletterStatus = document.getElementById("newsletterStatus");
-    const storesLoading = document.getElementById("storesLoading");
-    const storesGrid = document.getElementById("storesGrid");
-    const productsLoading = document.getElementById("productsLoading");
-    const productsGrid = document.getElementById("productsGrid");
-    const sellerSubmitButton = document.getElementById("sellerSubmitButton");
-    const loginSubmitButton = document.getElementById("loginSubmitButton");
-
-    const sellerCtas = [
-      document.getElementById("navSellCta"),
-      document.getElementById("heroMarketCta"),
-      document.getElementById("sellerLaunchCta"),
-      document.getElementById("starterCta"),
-      document.getElementById("proCta"),
-      document.getElementById("footerSellCta")
-    ].filter(Boolean);
-
-    function detectLanguage() {
-      const langs = navigator.languages || [navigator.language];
-      if (langs.some((lang) => (lang || "").toLowerCase().startsWith("hu"))) return "hu";
-      if (langs.some((lang) => (lang || "").toLowerCase().startsWith("fr"))) return "fr";
-      if (langs.some((lang) => (lang || "").toLowerCase().startsWith("pt"))) return "pt";
-      return "en";
+    function setStatus(message, kind) {
+      waitlistStatus.textContent = message;
+      waitlistStatus.className = `status-text show ${kind}`;
     }
 
-    function detectCountry() {
-      const lang = (navigator.language || "").toLowerCase();
-      if (lang.includes("gb")) return "uk";
-      if (lang.includes("au")) return "au";
-      if (lang.includes("us")) return "us";
-      if (lang.includes("ca")) return "ca";
-      if (lang.includes("es")) return "es";
-      if (lang.includes("hu")) return "hu";
-      if (lang.startsWith("de")) return "de";
-      if (lang.startsWith("fr")) return "fr";
-      if (lang.startsWith("pt")) return "pt";
-      return "global";
-    }
-
-    function tr(key) {
-      return (t[currentLanguage] && t[currentLanguage][key]) || t.en[key] || key;
-    }
-
-    function period() {
-      if (currentLanguage === "pt") return "/mês";
-      if (currentLanguage === "fr") return "/mois";
-      return "/mo";
-    }
-
-    function countryName(key = currentCountry) {
-      return countries[key].name[currentLanguage] || countries[key].name.en;
-    }
-
-    function marketName() {
-      return countries[currentCountry].market[currentLanguage] || countries[currentCountry].market.en;
-    }
-
-    function trComingSoon() {
-      if (currentLanguage === "fr") return `Bientôt en ${marketName()}`;
-      if (currentLanguage === "pt") return `Em breve em ${marketName()}`;
-      return `Coming Soon to ${marketName()}`;
-    }
-
-    function heroText() {
-      if (currentLanguage === "fr") return `Votre marketplace communautaire africain en ${marketName()}`;
-      if (currentLanguage === "pt") return `O teu marketplace da comunidade africana em ${marketName()}`;
-      return `Your African Community Marketplace in ${marketName()}`;
-    }
-
-    function globalHero() {
-      if (currentLanguage === "fr") return "Votre marketplace communautaire africain mondial";
-      if (currentLanguage === "pt") return "O teu marketplace global da comunidade africana";
-      return "Your Global African Community Marketplace";
-    }
-
-    function searchPlaceholder() {
-      const city = countries[currentCountry].city;
-      if (currentLanguage === "fr") return `Trouvez des produits et services africains près de chez vous à ${city.fr || city.en}...`;
-      if (currentLanguage === "pt") return `Encontra produtos e serviços africanos perto de ti em ${city.pt || city.en}...`;
-      return `Find African products & services near you in ${city.en}...`;
-    }
-
-    function waitlistText() {
-      if (currentLanguage === "fr") return `Rejoindre la liste d’attente pour ${marketName()}`;
-      if (currentLanguage === "pt") return `Entrar na lista de espera para ${marketName()}`;
-      return `Join the waitlist for ${marketName()}`;
-    }
-
-    function claimText() {
-      if (currentLanguage === "fr") return "Réserver ma place gratuite";
-      if (currentLanguage === "pt") return "Garante o Teu Lugar Grátis";
-      return "Claim Your Free Spot";
-    }
-
-    function freeTrialText() {
-      if (currentLanguage === "fr") return "Commencer l’essai gratuit";
-      if (currentLanguage === "pt") return "Começar Teste Grátis";
-      return "Start Free Trial";
-    }
-
-    function joinProText() {
-      if (currentLanguage === "fr") return "Passer au Pro";
-      if (currentLanguage === "pt") return "Aderir ao Pro";
-      return "Join as Pro";
-    }
-
-    function joinNowText() {
-      if (currentLanguage === "fr") return "Rejoindre maintenant";
-      if (currentLanguage === "pt") return "Entrar Agora";
-      return "Join Now";
-    }
-
-    function newsletterTitleLive() {
-      if (currentLanguage === "fr") return "Rejoindre la liste";
-      if (currentLanguage === "pt") return "Junta-te à Lista de Espera";
-      return "Join the Waitlist";
-    }
-
-    function newsletterSubtitleLive() {
-      if (currentLanguage === "fr") return "Soyez les premiers informés des nouvelles fonctionnalités et événements communautaires.";
-      if (currentLanguage === "pt") return "Sê o primeiro a saber quando lançarmos novas funcionalidades e eventos comunitários.";
-      return "Be the first to know when we launch new features and community events.";
-    }
-
-    function waitlistTitle() {
-      if (currentLanguage === "fr") return `Rejoindre la liste d’attente pour ${marketName()}`;
-      if (currentLanguage === "pt") return `Entrar na lista de espera para ${marketName()}`;
-      return `Join the waitlist for ${marketName()}`;
-    }
-
-    function waitlistSubtitle() {
-      if (currentLanguage === "fr") return `AfroMkt arrive bientôt en ${marketName()}. Inscrivez-vous pour être prévenu au lancement.`;
-      if (currentLanguage === "pt") return `O AfroMkt chega em breve a ${marketName()}. Inscreve-te para seres avisado no lançamento.`;
-      return `AfroMkt is coming soon to ${marketName()}. Sign up to get notified at launch.`;
-    }
-
-    function pricingSubtitleLive() {
-      if (currentLanguage === "fr") return "Choisissez le plan adapté à votre activité.";
-      if (currentLanguage === "pt") return "Escolhe o plano certo para os objetivos do teu negócio.";
-      return "Choose the plan that fits your business goals.";
-    }
-
-    function pricingSubtitleSoon() {
-      if (currentLanguage === "fr") return `Prix indicatifs pour ${marketName()}. Rejoignez la liste d’attente pour l’accès au lancement.`;
-      if (currentLanguage === "pt") return `Preços indicativos para ${marketName()}. Entra na lista de espera para acesso no lançamento.`;
-      return `Indicative pricing for ${marketName()}. Join the waitlist for launch access.`;
-    }
-
-    function pricingNoteLive() {
-      if (currentLanguage === "fr") return "Les 10 premiers vendeurs obtiennent un accès gratuit à vie.";
-      if (currentLanguage === "pt") return "Os primeiros 10 vendedores têm acesso gratuito vitalício.";
-      return "First 10 sellers get lifetime free access.";
-    }
-
-    function pricingNoteSoon() {
-      if (currentLanguage === "fr") return `AfroMkt n’est pas encore actif en ${marketName()} ; les 10 premiers vendeurs de chaque marché obtiennent l’accès gratuit à vie.`;
-      if (currentLanguage === "pt") return `O AfroMkt ainda não está ativo em ${marketName()}; os primeiros 10 vendedores de cada mercado têm acesso gratuito vitalício.`;
-      return `AfroMkt is not live in ${marketName()} yet; the first 10 sellers in every market get lifetime free access.`;
-    }
-
-    function updateSellerCountryField() {
-      const sellerCountryField = document.getElementById("sellerCountry");
-      if (sellerCountryField && !sellerCountryField.dataset.locked) {
-        sellerCountryField.value = countryName();
-      }
-    }
-
-    function renderCountries() {
-      const makeButton = (key, cls) => `
-        <button class="${cls} ${key === currentCountry ? "active" : ""}" data-country="${key}" type="button">
-          <span><span class="flag">${countries[key].flag}</span> ${countryName(key)}</span>
-          <small>${countries[key].live ? "LIVE" : "Soon"}</small>
-        </button>
-      `;
-
-      countryMenu.innerHTML = Object.keys(countries).map((key) => makeButton(key, "country-option")).join("");
-      countryModalGrid.innerHTML = Object.keys(countries).map((key) => makeButton(key, "country-card")).join("");
-      document.querySelectorAll("[data-country]").forEach((button) => {
-        button.onclick = () => selectCountry(button.dataset.country, true);
-      });
-    }
-
-    function updateMarket() {
-      const country = countries[currentCountry];
-      const isLive = country.live;
-      selectedCountryFlag.textContent = country.flag;
-      selectedCountryName.textContent = countryName();
-      marketEyebrow.textContent = isLive
-        ? `${country.flag} ${currentLanguage === "fr" ? "Marché actif" : currentLanguage === "pt" ? "Mercado ativo" : "Live market"}: ${countryName()}`
-        : `🚀 ${trComingSoon()}`;
-      heroTitle.textContent = currentCountry === "global" ? globalHero() : heroText();
-      searchInput.placeholder = searchPlaceholder();
-      marketBanner.textContent = isLive ? "" : `🚀 ${trComingSoon()} — ${waitlistText()}`;
-      marketBanner.classList.toggle("show", !isLive);
-      const cta = isLive ? tr("nav.sell") : waitlistText();
-      document.getElementById("heroMarketCta").textContent = cta;
-      document.getElementById("navSellCta").textContent = cta;
-      document.getElementById("sellerLaunchCta").textContent = isLive ? claimText() : waitlistText();
-      document.getElementById("starterCta").textContent = isLive ? freeTrialText() : waitlistText();
-      document.getElementById("proCta").textContent = isLive ? joinProText() : waitlistText();
-      newsletterTitle.textContent = isLive ? newsletterTitleLive() : waitlistTitle();
-      newsletterSubtitle.textContent = isLive ? newsletterSubtitleLive() : waitlistSubtitle();
-      newsletterButton.textContent = isLive ? joinNowText() : waitlistText();
-      pricingSubtitle.textContent = isLive ? pricingSubtitleLive() : pricingSubtitleSoon();
-      pricingNote.textContent = isLive ? pricingNoteLive() : pricingNoteSoon();
-      starterPrice.textContent = `${country.currency}${country.starter}`;
-      proPrice.textContent = `${country.currency}${country.pro}`;
-      starterPeriod.textContent = period();
-      proPeriod.textContent = period();
-      footerMarketRow.innerHTML = Object.keys(countries)
-        .map((key) => `<span class="footer-market-pill">${countries[key].flag} ${countryName(key)} ${countries[key].live ? "LIVE" : "Soon"}</span>`)
-        .join("");
-      renderCountries();
-      updateSellerCountryField();
-    }
-
-    function applyLanguage(language) {
-      currentLanguage = ["en", "pt", "fr", "hu"].includes(language) ? language : "en";
-      document.documentElement.lang = currentLanguage === "pt" ? "pt-PT" : currentLanguage === "fr" ? "fr" : currentLanguage === "hu" ? "hu" : "en";
-      document.querySelectorAll("[data-i18n]").forEach((element) => {
-        element.textContent = tr(element.dataset.i18n);
-      });
-      document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-        element.placeholder = tr(element.dataset.i18nPlaceholder);
-      });
-      activeFlag.textContent = currentLanguage === "pt" ? "🇵🇹" : currentLanguage === "fr" ? "🇫🇷" : currentLanguage === "hu" ? "🇭🇺" : "🇬🇧";
-      languageText.innerHTML = currentLanguage === "en"
-        ? 'EN | <span class="inactive">PT</span> | <span class="inactive">FR</span> | <span class="inactive">HU</span>'
-        : currentLanguage === "pt"
-        ? '<span class="inactive">EN</span> | PT | <span class="inactive">FR</span> | <span class="inactive">HU</span>'
-        : currentLanguage === "fr"
-        ? '<span class="inactive">EN</span> | <span class="inactive">PT</span> | FR | <span class="inactive">HU</span>'
-        : '<span class="inactive">EN</span> | <span class="inactive">PT</span> | <span class="inactive">FR</span> | HU';
-      localStorage.setItem(STORAGE_LANG, currentLanguage);
-      updateMarket();
-    }
-
-    function selectCountry(key, save) {
-      currentCountry = key in countries ? key : "global";
-      if (save) localStorage.setItem(STORAGE_COUNTRY, currentCountry);
-      countryMenu.classList.remove("open");
-      countryModal.classList.remove("show");
-      updateMarket();
-    }
-
-    function showStatus(element, message, kind = "info") {
-      if (!element) return;
-      element.textContent = message;
-      element.className = `status-text show ${kind}`;
-    }
-
-    function clearStatus(element) {
-      if (!element) return;
-      element.textContent = "";
-      element.className = "status-text";
-    }
-
-    function openModal(modal) {
-      modal.classList.add("show");
-      modal.setAttribute("aria-hidden", "false");
-    }
-
-    function closeModal(modal) {
-      modal.classList.remove("show");
-      modal.setAttribute("aria-hidden", "true");
-    }
-
-    function openSellerModal() {
-      clearStatus(sellerModalStatus);
-      document.getElementById("sellerCountry").value = countryName();
-      closeModal(loginModal);
-      openModal(sellerModal);
-    }
-
-    function openLoginModal() {
-      clearStatus(loginModalStatus);
-      closeModal(sellerModal);
-      openModal(loginModal);
-    }
-
-    function getPendingSeller() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_PENDING_SELLER) || "null");
-      } catch (error) {
-        return null;
-      }
-    }
-
-    function savePendingSeller(payload) {
-      localStorage.setItem(STORAGE_PENDING_SELLER, JSON.stringify(payload));
-    }
-
-    function clearPendingSeller() {
-      localStorage.removeItem(STORAGE_PENDING_SELLER);
-    }
-
-    function capitalizeCategory(value) {
-      if (!value) return "Not set yet";
-      return value.charAt(0).toUpperCase() + value.slice(1);
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
-    function formatLocation(city, country) {
-      const parts = [city, country].filter(Boolean);
-      return parts.length ? parts.join(", ") : "Location coming soon";
-    }
-
-    function formatPrice(price, currency) {
-      const numeric = Number(price);
-      const formattedNumber = Number.isFinite(numeric)
-        ? new Intl.NumberFormat(undefined, { minimumFractionDigits: numeric % 1 === 0 ? 0 : 2, maximumFractionDigits: 2 }).format(numeric)
-        : escapeHtml(price || "—");
-      return `${formattedNumber} ${escapeHtml(currency || "")}`.trim();
-    }
-
-    function toggleLoadingState(loadingElement, gridElement, isLoading) {
-      loadingElement.classList.toggle("hidden", !isLoading);
-      gridElement.classList.toggle("hidden", isLoading);
-    }
-
-    function storePlaceholderCard(message, tone = "placeholder") {
-      return `
-        <article class="listing-card ${tone}">
-          <div class="listing-card-header">
-            <div>
-              <h3>${tone === "error" ? "Marketplace unavailable" : "No stores yet"}</h3>
-              <p class="listing-description">${escapeHtml(message)}</p>
-            </div>
-            <span class="listing-badge">Seller spot</span>
-          </div>
-          <div class="listing-meta">
-            <span class="meta-chip">🌍 AfroMkt launch phase</span>
-          </div>
-          <div class="listing-footer">
-            <span class="listing-store">New sellers will appear here automatically.</span>
-            <button class="btn btn-primary" type="button" onclick="document.getElementById('sellerLaunchCta').click()">Become a seller</button>
-          </div>
-        </article>
-      `;
-    }
-
-    function productPlaceholderCard(message, tone = "placeholder") {
-      return `
-        <article class="listing-card ${tone}">
-          <div class="listing-card-header">
-            <div>
-              <h3>${tone === "error" ? "Products unavailable" : "Products coming soon!"}</h3>
-              <p class="listing-description">${escapeHtml(message)}</p>
-            </div>
-            <span class="listing-badge">Listings</span>
-          </div>
-          <div class="listing-meta">
-            <span class="meta-chip">🛍️ AfroMkt marketplace feed</span>
-          </div>
-          <div class="listing-footer">
-            <span class="listing-store">Once sellers add listings, they will show up here.</span>
-            <button class="btn btn-outline" type="button" onclick="document.getElementById('sellerLaunchCta').click()">Create first listing</button>
-          </div>
-        </article>
-      `;
-    }
-
-    function renderStores(stores) {
-      if (!stores.length) {
-        storesGrid.innerHTML = storePlaceholderCard("No stores yet — be one of our first sellers!");
-        return;
-      }
-
-      storesGrid.innerHTML = stores.map((store) => {
-        const description = store.description?.trim() || "A fresh AfroMkt seller profile is live. Full store details are coming soon.";
-        return `
-          <article class="listing-card">
-            <div class="listing-card-header">
-              <div>
-                <h3>${escapeHtml(store.store_name || "Unnamed store")}</h3>
-              </div>
-              <span class="listing-badge">${escapeHtml(capitalizeCategory(store.category || "seller"))}</span>
-            </div>
-            <div class="listing-meta">
-              <span class="meta-chip">📍 ${escapeHtml(formatLocation(store.city, store.country))}</span>
-              <span class="meta-chip">🟢 Active store</span>
-            </div>
-            <p class="listing-description">${escapeHtml(description)}</p>
-            <div class="listing-footer">
-              <span class="listing-store">Store page coming next</span>
-              <button class="btn btn-outline" type="button">View Store</button>
-            </div>
-          </article>
-        `;
-      }).join("");
-    }
-
-    function renderProducts(products, stores) {
-      if (!products.length) {
-        productsGrid.innerHTML = productPlaceholderCard("Products coming soon!");
-        return;
-      }
-
-      const storeMap = new Map(stores.map((store) => [store.id, store.store_name]));
-      productsGrid.innerHTML = products.map((product) => `
-        <article class="listing-card">
-          <div class="listing-card-header">
-            <div>
-              <h3>${escapeHtml(product.name || "Untitled listing")}</h3>
-            </div>
-            <span class="listing-badge">${escapeHtml(capitalizeCategory(product.category || "listing"))}</span>
-          </div>
-          <div class="listing-meta">
-            <span class="meta-chip">🏪 ${escapeHtml(storeMap.get(product.store_id) || "AfroMkt seller")}</span>
-            <span class="meta-chip">✅ Available now</span>
-          </div>
-          <p class="listing-description">${escapeHtml(product.description?.trim() || "This listing is live in AfroMkt and ready to be featured on the seller’s storefront.")}</p>
-          <div class="listing-footer">
-            <div>
-              <div class="listing-price">${formatPrice(product.price, product.currency)}</div>
-              <div class="listing-store">Belongs to ${escapeHtml(storeMap.get(product.store_id) || "an AfroMkt seller")}</div>
-            </div>
-            <button class="btn btn-outline" type="button">View Store</button>
-          </div>
-        </article>
-      `).join("");
-    }
-
-    async function loadMarketplaceData() {
-      toggleLoadingState(storesLoading, storesGrid, true);
-      toggleLoadingState(productsLoading, productsGrid, true);
-
-      try {
-        const [storesResult, productsResult] = await Promise.all([
-          supabaseClient
-            .from("stores")
-            .select("id, store_name, category, city, country, description")
-            .eq("is_active", true)
-            .order("created_at", { ascending: false }),
-          supabaseClient
-            .from("products")
-            .select("id, store_id, name, description, price, currency, category")
-            .eq("is_available", true)
-            .order("created_at", { ascending: false })
-        ]);
-
-        if (storesResult.error) throw storesResult.error;
-        if (productsResult.error) throw productsResult.error;
-
-        const stores = storesResult.data || [];
-        const products = productsResult.data || [];
-
-        renderStores(stores);
-        renderProducts(products, stores);
-      } catch (error) {
-        console.error("AfroMkt marketplace load failed", error);
-        storesGrid.innerHTML = storePlaceholderCard("No stores yet — be one of our first sellers!");
-        productsGrid.innerHTML = productPlaceholderCard("Products coming soon!");
-      } finally {
-        toggleLoadingState(storesLoading, storesGrid, false);
-        toggleLoadingState(productsLoading, productsGrid, false);
-      }
-    }
-
-    async function insertWaitlist(email) {
-      const payload = {
-        email,
-        country: countryName()
-      };
-      const { error } = await supabaseClient.from("waitlist").insert(payload);
-      if (error) throw error;
-    }
-
-    async function updateProfileForUser(user, payload) {
-      if (!user) return;
-      const { error } = await supabaseClient
-        .from("profiles")
-        .update({
-          full_name: payload.full_name,
-          email: user.email,
-          role: "seller",
-          country: payload.country
-        })
-        .eq("id", user.id);
-      if (error) throw error;
-    }
-
-    async function getExistingStore(userId) {
-      const { data, error } = await supabaseClient
-        .from("stores")
-        .select("id, store_name, plan, category, country, is_active")
-        .eq("owner_id", userId)
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      if (error && error.code !== "PGRST116") throw error;
-      return data || null;
-    }
-
-    async function createStoreForUser(user, payload) {
-      const existingStore = await getExistingStore(user.id);
-      if (existingStore) return existingStore;
-
-      const description = `Landing page seller signup for ${payload.store_name}.`;
-      const { data, error } = await supabaseClient
-        .from("stores")
-        .insert({
-          owner_id: user.id,
-          store_name: payload.store_name,
-          description,
-          category: payload.category,
-          country: payload.country,
-          plan: "free",
-          is_active: true,
-          is_verified: false
-        })
-        .select("id, store_name, plan, category, country, is_active")
-        .single();
-      if (error) throw error;
-      return data;
-    }
-
-    async function ensureSellerSetup(user, payload) {
-      await updateProfileForUser(user, payload);
-      const store = await createStoreForUser(user, payload);
-      clearPendingSeller();
-      return store;
-    }
-
-    async function populateDashboard(user) {
-      dashboardSection.classList.add("show");
-      dashboardLink.classList.remove("hidden");
-      logoutButton.classList.remove("hidden");
-      authButton.textContent = "My Dashboard";
-
-      const pendingSeller = getPendingSeller();
-      let createdStoreFromPending = false;
-      try {
-        let store = await getExistingStore(user.id);
-        if (!store && pendingSeller && pendingSeller.email?.toLowerCase() === (user.email || "").toLowerCase()) {
-          store = await ensureSellerSetup(user, pendingSeller);
-          createdStoreFromPending = true;
-          showStatus(dashboardStatus, "Your seller account is connected and your first store draft is ready.", "success");
-        } else {
-          clearStatus(dashboardStatus);
-        }
-
-        dashboardStoreName.textContent = store?.store_name || "No store created yet";
-        dashboardPlan.textContent = capitalizeCategory(store?.plan || "free");
-        dashboardCategory.textContent = capitalizeCategory(store?.category || "Coming soon");
-        dashboardCountry.textContent = store?.country || countryName();
-        dashboardSubtitle.textContent = `Signed in as ${user.email || "seller"}.`;
-        dashboardNote.textContent = store
-          ? "Edit store coming soon — your Supabase-connected dashboard is now showing the live store draft from the database."
-          : "You are signed in. Create your first store from the seller sign-up modal if you have not done that yet.";
-
-        if (createdStoreFromPending) {
-          await loadMarketplaceData();
-        }
-      } catch (error) {
-        showStatus(dashboardStatus, friendlyError(error, "We could not load your store dashboard right now."), "error");
-      }
-    }
-
-    function resetDashboard() {
-      dashboardSection.classList.remove("show");
-      dashboardLink.classList.add("hidden");
-      logoutButton.classList.add("hidden");
-      authButton.textContent = "Seller Login";
-      dashboardStoreName.textContent = "Not signed in yet";
-      dashboardPlan.textContent = "Free";
-      dashboardCategory.textContent = "Ready when you are";
-      dashboardCountry.textContent = countryName();
-      dashboardSubtitle.textContent = "Sign in to see your first AfroMkt store draft and keep building your seller presence.";
-      dashboardNote.textContent = "Edit store coming soon — this panel is now live and connected to your Supabase seller account.";
-      clearStatus(dashboardStatus);
-    }
-
-    function friendlyError(error, fallback) {
-      const message = error?.message || "";
-      if (message.toLowerCase().includes("duplicate key") || message.toLowerCase().includes("already exists")) {
-        return "That email is already registered. Try logging in instead.";
-      }
-      if (message.toLowerCase().includes("invalid login")) {
-        return "That email or password did not match. Please try again.";
-      }
-      return fallback || message || "Something went wrong.";
-    }
-
-    async function handleNewsletterSubmit(event) {
+    async function handleWaitlistSubmit(event) {
       event.preventDefault();
-      clearStatus(newsletterStatus);
-      const email = document.getElementById("newsletterEmail").value.trim();
-      if (!email) return;
-      newsletterButton.disabled = true;
-      newsletterButton.textContent = "Saving...";
-      try {
-        await insertWaitlist(email);
-        event.target.reset();
-        showStatus(newsletterStatus, `You’re on the AfroMkt waitlist for ${countryName()}.`, "success");
-      } catch (error) {
-        const message = error?.message?.toLowerCase().includes("duplicate")
-          ? `You are already on the waitlist for ${countryName()}.`
-          : friendlyError(error, "We could not save your waitlist signup right now.");
-        showStatus(newsletterStatus, message, error?.message?.toLowerCase().includes("duplicate") ? "info" : "error");
-      } finally {
-        newsletterButton.disabled = false;
-        newsletterButton.textContent = countries[currentCountry].live ? joinNowText() : waitlistText();
-      }
-    }
-
-    async function handleSellerSignup(event) {
-      event.preventDefault();
-      clearStatus(sellerModalStatus);
-      clearStatus(sellerInlineStatus);
-      const payload = {
-        full_name: document.getElementById("sellerName").value.trim(),
-        email: document.getElementById("sellerEmail").value.trim(),
-        store_name: document.getElementById("sellerStoreName").value.trim(),
-        category: document.getElementById("sellerCategory").value,
-        country: document.getElementById("sellerCountry").value.trim(),
-        password: document.getElementById("sellerPassword").value
-      };
-
-      sellerSubmitButton.disabled = true;
-      sellerSubmitButton.textContent = "Creating account...";
+      waitlistSubmit.disabled = true;
+      waitlistSubmit.textContent = "Saving...";
+      waitlistStatus.className = "status-text";
+      waitlistStatus.textContent = "";
 
       try {
-        savePendingSeller(payload);
-        const { data, error } = await supabaseClient.auth.signUp({
-          email: payload.email,
-          password: payload.password,
-          options: {
-            data: {
-              full_name: payload.full_name,
-              role: "seller",
-              country: payload.country
-            }
+        const email = waitlistEmail.value.trim();
+        const country = waitlistCountry.value;
+        const { error } = await supabaseClient.from("waitlist").insert({ email, country });
+        if (error) {
+          if ((error.message || "").toLowerCase().includes("duplicate")) {
+            setStatus("You’re already on the AfroMkt waitlist for that country.", "success");
+          } else {
+            throw error;
           }
-        });
-        if (error) throw error;
-
-        if (data.session && data.user) {
-          await ensureSellerSetup(data.user, payload);
-          await populateDashboard(data.user);
-          await loadMarketplaceData();
-          showStatus(sellerModalStatus, "Seller account created. Your dashboard is now live below.", "success");
-          showStatus(sellerInlineStatus, "Seller account created and linked to Supabase.", "success");
-          closeModal(sellerModal);
-          document.getElementById("sellerSignupForm").reset();
-          updateSellerCountryField();
-          dashboardSection.scrollIntoView({ behavior: "smooth", block: "start" });
         } else {
-          showStatus(sellerModalStatus, "Account created. Please confirm your email, then log in to finish activating your store.", "info");
-          showStatus(sellerInlineStatus, "Seller account created. Confirm the email, then log in to finish your store setup.", "info");
+          setStatus("You’re on the list — we’ll let you know when AfroMkt launches.", "success");
+          waitlistForm.reset();
+          waitlistCountry.value = "Portugal";
         }
       } catch (error) {
-        showStatus(sellerModalStatus, friendlyError(error, "We could not create the seller account right now."), "error");
+        setStatus(error?.message || "We couldn’t save your signup right now. Please try again.", "error");
       } finally {
-        sellerSubmitButton.disabled = false;
-        sellerSubmitButton.textContent = "Create seller account";
+        waitlistSubmit.disabled = false;
+        waitlistSubmit.textContent = "Get launch updates";
       }
     }
 
-    async function handleSellerLogin(event) {
-      event.preventDefault();
-      clearStatus(loginModalStatus);
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value;
-      loginSubmitButton.disabled = true;
-      loginSubmitButton.textContent = "Signing in...";
-      try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        await populateDashboard(data.user);
-        showStatus(loginModalStatus, "Logged in. Your seller dashboard is ready.", "success");
-        closeModal(loginModal);
-        document.getElementById("sellerLoginForm").reset();
-        dashboardSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      } catch (error) {
-        showStatus(loginModalStatus, friendlyError(error, "We could not log you in right now."), "error");
-      } finally {
-        loginSubmitButton.disabled = false;
-        loginSubmitButton.textContent = "Log in";
-      }
-    }
-
-    async function handleLogout() {
-      await supabaseClient.auth.signOut();
-      resetDashboard();
-      showStatus(dashboardStatus, "You have been logged out.", "info");
-    }
-
-    async function bootstrapAuth() {
-      await loadMarketplaceData();
-      const { data } = await supabaseClient.auth.getSession();
-      if (data.session?.user) {
-        await populateDashboard(data.session.user);
-      } else {
-        resetDashboard();
-      }
-      if (authSubscription?.data?.subscription) authSubscription.data.subscription.unsubscribe();
-      authSubscription = supabaseClient.auth.onAuthStateChange(async (_event, session) => {
-        if (session?.user) {
-          await populateDashboard(session.user);
-        } else {
-          resetDashboard();
-        }
-      });
-    }
-
-    countryToggle.onclick = () => countryMenu.classList.toggle("open");
-    languageToggle.onclick = () => applyLanguage(currentLanguage === "en" ? "pt" : currentLanguage === "pt" ? "fr" : currentLanguage === "fr" ? "hu" : "en");
-    authButton.onclick = async () => {
-      const { data } = await supabaseClient.auth.getSession();
-      if (data.session?.user) {
-        dashboardSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      } else {
-        openLoginModal();
-      }
-    };
-    logoutButton.onclick = handleLogout;
-    document.getElementById("newsletterForm").addEventListener("submit", handleNewsletterSubmit);
-    document.getElementById("sellerSignupForm").addEventListener("submit", handleSellerSignup);
-    document.getElementById("sellerLoginForm").addEventListener("submit", handleSellerLogin);
-    document.getElementById("openLoginFromSeller").onclick = openLoginModal;
-    document.getElementById("openSignupFromLogin").onclick = openSellerModal;
-    sellerCtas.forEach((button) => button.addEventListener("click", openSellerModal));
-
-    document.querySelectorAll("a[href^='#']").forEach((anchor) => {
-      anchor.addEventListener("click", (event) => {
-        const target = document.querySelector(anchor.getAttribute("href"));
-        if (target) {
-          event.preventDefault();
-          target.scrollIntoView({ behavior: "smooth" });
-        }
-      });
-    });
-
-    document.addEventListener("click", (event) => {
-      if (!event.target.closest(".country-wrap")) countryMenu.classList.remove("open");
-    });
-
-    [countryModal, sellerModal, loginModal].forEach((modal) => {
-      modal.addEventListener("click", (event) => {
-        if (event.target === modal) closeModal(modal);
-      });
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        closeModal(countryModal);
-        closeModal(sellerModal);
-        closeModal(loginModal);
-      }
-    });
-
-    document.querySelectorAll(".star-button").forEach((star) => {
-      star.onclick = () => {
-        const rating = Number(star.dataset.rating);
-        document.querySelectorAll(".star-button").forEach((button) => {
-          button.classList.toggle("active", Number(button.dataset.rating) <= rating);
-        });
-      };
-    });
-
-    document.querySelectorAll(".reveal").forEach((element) => {
-      new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("visible");
-        });
-      }, { threshold: 0.1 }).observe(element);
-    });
-
-    applyLanguage(currentLanguage);
-    renderCountries();
-    updateSellerCountryField();
-    if (!localStorage.getItem(STORAGE_COUNTRY)) countryModal.classList.add("show");
-    bootstrapAuth();
+    waitlistForm.addEventListener("submit", handleWaitlistSubmit);
   </script>
 </body>
 </html>
