@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AfroMkt — Launching Soon</title>
-  <link rel="icon" type="image/png" href="afromkt-favicon.png" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f3c623'/%3E%3Crect x='6' y='6' width='52' height='52' rx='10' fill='white'/%3E%3Cpath d='M26 11c5-1 10 0 14 2l3 6 6 8-1 8-5 7-2 8-5 7-9 1-4-8-3-5 1-7-4-4-5-8 1-8 5-7 8-2Z' fill='%230a5c3b'/%3E%3Cpath d='M38 10c4 1 7 4 8 8v9c0 3-2 6-5 6s-5-3-5-6v-4c0-2-1-4-3-4h-4v-4c0-3 1-5 3-7 2-1 4-2 6-2Z' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -100,13 +100,38 @@
     .brand {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .brand img {
-      height: 52px;
-      width: auto;
-      display: block;
+    .brand-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+      flex: 0 0 auto;
+    }
+
+    .brand-wordmark {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1;
+    }
+
+    .brand-wordmark strong {
+      font-size: 1.55rem;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      color: var(--white);
+    }
+
+    .brand-wordmark span {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.68);
     }
 
     .launch-pill {
@@ -409,7 +434,18 @@
     <div class="container">
       <div class="topbar">
         <a class="brand" href="#" aria-label="AfroMkt home">
-          <img src="afromkt-logo.png" alt="AfroMkt logo" />
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64" width="56" height="56" role="presentation" xmlns="http://www.w3.org/2000/svg">
+              <rect width="64" height="64" rx="18" fill="#f3c623"/>
+              <rect x="7" y="7" width="50" height="50" rx="12" fill="#ffffff"/>
+              <path d="M26 11c5-1 10 0 14 2l3 6 6 8-1 8-5 7-2 8-5 7-9 1-4-8-3-5 1-7-4-4-5-8 1-8 5-7 8-2Z" fill="#0a5c3b"/>
+              <path d="M38 10c4 1 7 4 8 8v9c0 3-2 6-5 6s-5-3-5-6v-4c0-2-1-4-3-4h-4v-4c0-3 1-5 3-7 2-1 4-2 6-2Z" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="brand-wordmark">
+            <strong>AfroMkt</strong>
+            <span>Launching Soon</span>
+          </span>
         </a>
         <div class="launch-pill">🌍 Launching first in Portugal 🇵🇹</div>
       </div>
