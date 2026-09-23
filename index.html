@@ -1006,117 +1006,152 @@
         const countrySelectorBtn = document.getElementById('countrySelectorBtn');
         const countrySelectorLabel = document.getElementById('countrySelectorLabel');
         const countryOptions = document.querySelectorAll('.country-option');
-        const storedCountrySelection = localStorage.getItem('afromkt-selected-country');
 
-        const applyCountrySelection = selection => {
-            countrySelectorLabel.textContent = `${selection.flag} ${selection.country}`;
+        const getStoredCountrySelection = () => {
+            try {
+                const storedValue = window.localStorage.getItem('afromkt-selected-country');
+                return storedValue ? JSON.parse(storedValue) : null;
+            } catch (error) {
+                console.error('Failed to read stored country selection:', error);
+                return null;
+            }
+        };
+
+        const saveCountrySelection = selection => {
+            try {
+                window.localStorage.setItem('afromkt-selected-country', JSON.stringify(selection));
+            } catch (error) {
+                console.error('Failed to save country selection:', error);
+            }
+        };
+
+        if (countrySelector && countrySelectorBtn && countrySelectorLabel && countryOptions.length) {
+            const applyCountrySelection = selection => {
+                countrySelectorLabel.textContent = `${selection.flag} ${selection.country}`;
+
+                countryOptions.forEach(option => {
+                    const isActive = option.dataset.country === selection.country;
+                    option.classList.toggle('active', isActive);
+                    option.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            };
+
+            const getDefaultCountrySelection = () => {
+                const defaultOption = countryOptions[0];
+                return {
+                    country: defaultOption.dataset.country,
+                    flag: defaultOption.dataset.flag,
+                    code: defaultOption.dataset.code
+                };
+            };
+
+            const setCountrySelection = selection => {
+                applyCountrySelection(selection);
+                saveCountrySelection(selection);
+            };
+
+            const initialCountrySelection = getStoredCountrySelection() || getDefaultCountrySelection();
+            applyCountrySelection(initialCountrySelection);
+
+            countrySelectorBtn.addEventListener('click', () => {
+                const isOpen = countrySelector.classList.toggle('open');
+                countrySelectorBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
 
             countryOptions.forEach(option => {
-                const isActive = option.dataset.country === selection.country;
-                option.classList.toggle('active', isActive);
-                option.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-            });
-        };
-
-        const getDefaultCountrySelection = () => {
-            const defaultOption = countryOptions[0];
-            return {
-                country: defaultOption.dataset.country,
-                flag: defaultOption.dataset.flag,
-                code: defaultOption.dataset.code
-            };
-        };
-
-        const setCountrySelection = selection => {
-            applyCountrySelection(selection);
-            localStorage.setItem('afromkt-selected-country', JSON.stringify(selection));
-        };
-
-        const initialCountrySelection = (() => {
-            try {
-                return storedCountrySelection ? JSON.parse(storedCountrySelection) : getDefaultCountrySelection();
-            } catch (error) {
-                console.error('Failed to parse stored country selection:', error);
-                return getDefaultCountrySelection();
-            }
-        })();
-
-        applyCountrySelection(initialCountrySelection);
-
-        countrySelectorBtn.addEventListener('click', () => {
-            const isOpen = countrySelector.classList.toggle('open');
-            countrySelectorBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        });
-
-        countryOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                setCountrySelection({
-                    country: option.dataset.country,
-                    flag: option.dataset.flag,
-                    code: option.dataset.code
+                option.addEventListener('click', () => {
+                    setCountrySelection({
+                        country: option.dataset.country,
+                        flag: option.dataset.flag,
+                        code: option.dataset.code
+                    });
+                    countrySelector.classList.remove('open');
+                    countrySelectorBtn.setAttribute('aria-expanded', 'false');
                 });
-                countrySelector.classList.remove('open');
-                countrySelectorBtn.setAttribute('aria-expanded', 'false');
             });
-        });
 
-        document.addEventListener('click', event => {
-            if (!countrySelector.contains(event.target)) {
-                countrySelector.classList.remove('open');
-                countrySelectorBtn.setAttribute('aria-expanded', 'false');
-            }
-        });
+            document.addEventListener('click', event => {
+                if (!countrySelector.contains(event.target)) {
+                    countrySelector.classList.remove('open');
+                    countrySelectorBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
 
         const waitlistForm = document.getElementById('waitlist-form');
         const waitlistEmail = document.getElementById('waitlist-email');
         const waitlistBtn = document.getElementById('waitlist-btn');
         const waitlistMsg = document.getElementById('waitlist-msg');
         const waitlistEndpoint = 'https://nmusxculduptvefgqfjn.supabase.co/functions/v1/notify-waitlist';
+        const waitlistSuccessColor = '#1a5c38';
+        const waitlistDuplicateColor = '#D4A017';
+        const waitlistErrorColor = '#d62828';
 
-        waitlistForm.addEventListener('submit', async event => {
-            event.preventDefault();
+        if (waitlistForm && waitlistEmail && waitlistBtn && waitlistMsg) {
+            waitlistForm.addEventListener('submit', async event => {
+                event.preventDefault();
 
-            const email = waitlistEmail.value.trim();
-            if (!email) {
-                return;
-            }
-
-            waitlistBtn.disabled = true;
-            waitlistBtn.textContent = 'Joining...';
-            waitlistMsg.textContent = '';
-
-            try {
-                const response = await fetch(waitlistEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email })
-                });
-
-                const payload = await response.json().catch(() => ({}));
-
-                if (!response.ok) {
-                    const isDuplicate = response.status === 409 || payload.code === 'duplicate_email';
-                    waitlistMsg.textContent = isDuplicate
-                        ? 'This email is already on the list!'
-                        : 'Something went wrong. Please try again.';
-                    waitlistMsg.style.color = isDuplicate ? '#D4A017' : '#f8d7da';
+                const emailValue = waitlistEmail.value.trim();
+                if (!emailValue) {
+                    waitlistMsg.textContent = 'Please enter your email address.';
+                    waitlistMsg.style.color = waitlistErrorColor;
                     return;
                 }
 
-                waitlistMsg.textContent = "🎉 You're on the list! Check your email.";
-                waitlistMsg.style.color = '#7CFFB2';
-                waitlistForm.reset();
-            } catch (error) {
-                console.error('Waitlist signup failed:', error);
-                waitlistMsg.textContent = 'Something went wrong. Please try again.';
-                waitlistMsg.style.color = '#f8d7da';
-            } finally {
-                waitlistBtn.disabled = false;
-                waitlistBtn.textContent = 'Join Waitlist';
-            }
-        });
+                waitlistBtn.disabled = true;
+                waitlistBtn.textContent = 'Joining...';
+                waitlistMsg.textContent = '';
+                waitlistMsg.style.color = waitlistSuccessColor;
+
+                try {
+                    const response = await fetch(waitlistEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: emailValue })
+                    });
+
+                    let payload = {};
+                    try {
+                        payload = await response.json();
+                    } catch (error) {
+                        payload = {};
+                    }
+
+                    if (response.status === 200) {
+                        waitlistMsg.textContent = "🎉 You're on the list! Check your email.";
+                        waitlistMsg.style.color = waitlistSuccessColor;
+                        waitlistForm.reset();
+                        return;
+                    }
+
+                    if (response.status === 409) {
+                        waitlistMsg.textContent = 'This email is already on the list!';
+                        waitlistMsg.style.color = waitlistDuplicateColor;
+                        return;
+                    }
+
+                    console.error('Waitlist signup returned an unexpected response:', response.status, payload);
+                    waitlistMsg.textContent = 'Something went wrong. Please try again.';
+                    waitlistMsg.style.color = waitlistErrorColor;
+                } catch (error) {
+                    console.error('Waitlist signup failed before reaching the Edge Function:', error);
+                    waitlistMsg.textContent = 'Something went wrong. Please try again.';
+                    waitlistMsg.style.color = waitlistErrorColor;
+                } finally {
+                    waitlistBtn.disabled = false;
+                    waitlistBtn.textContent = 'Join Waitlist';
+                }
+            });
+        } else {
+            console.error('Waitlist form elements not found.', {
+                waitlistForm,
+                waitlistEmail,
+                waitlistBtn,
+                waitlistMsg
+            });
+        }
     </script>
 </body>
 </html>
