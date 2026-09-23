@@ -166,6 +166,85 @@
             align-items: center;
         }
 
+        .country-selector {
+            position: relative;
+        }
+
+        .country-selector-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(26, 92, 56, 0.18);
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .country-selector-btn:hover,
+        .country-selector.open .country-selector-btn {
+            background-color: var(--accent);
+            color: var(--white);
+        }
+
+        .country-selector-label {
+            white-space: nowrap;
+        }
+
+        .country-selector-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 220px;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+            padding: 10px;
+            display: none;
+            z-index: 1001;
+        }
+
+        .country-selector.open .country-selector-menu {
+            display: block;
+        }
+
+        .country-option {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border: none;
+            background: transparent;
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+        }
+
+        .country-option:hover,
+        .country-option.active {
+            background-color: rgba(26, 92, 56, 0.08);
+            color: var(--primary-dark);
+        }
+
+        .country-option-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .country-option-code {
+            color: var(--accent-dark);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
         .nav-buttons .sign-in {
             font-weight: 600;
             color: var(--primary-dark);
@@ -596,6 +675,20 @@
             .mobile-menu-btn {
                 display: block;
             }
+            .country-selector-menu {
+                position: static;
+                min-width: 100%;
+                margin-top: 10px;
+                box-shadow: none;
+                border: 1px solid rgba(26, 92, 56, 0.12);
+            }
+            .country-selector,
+            .country-selector-btn {
+                width: 100%;
+            }
+            .country-selector-btn {
+                justify-content: center;
+            }
             .hero {
                 padding: 140px 0 80px;
             }
@@ -669,6 +762,34 @@
 
             <div class="nav-buttons" id="navButtons">
                 <a href="#waitlist" class="sign-in">Sign In</a>
+                <div class="country-selector" id="countrySelector">
+                    <button class="country-selector-btn" id="countrySelectorBtn" type="button" aria-haspopup="true" aria-expanded="false">
+                        <span aria-hidden="true">🌍</span>
+                        <span class="country-selector-label" id="countrySelectorLabel">🇵🇹 Portugal</span>
+                    </button>
+                    <div class="country-selector-menu" id="countrySelectorMenu">
+                        <button class="country-option" type="button" data-country="Portugal" data-flag="🇵🇹" data-code="PT">
+                            <span class="country-option-meta"><span>🇵🇹</span><span>Portugal</span></span>
+                            <span class="country-option-code">PT</span>
+                        </button>
+                        <button class="country-option" type="button" data-country="UK" data-flag="🇬🇧" data-code="EN">
+                            <span class="country-option-meta"><span>🇬🇧</span><span>UK</span></span>
+                            <span class="country-option-code">EN</span>
+                        </button>
+                        <button class="country-option" type="button" data-country="France" data-flag="🇫🇷" data-code="FR">
+                            <span class="country-option-meta"><span>🇫🇷</span><span>France</span></span>
+                            <span class="country-option-code">FR</span>
+                        </button>
+                        <button class="country-option" type="button" data-country="USA" data-flag="🇺🇸" data-code="EN">
+                            <span class="country-option-meta"><span>🇺🇸</span><span>USA</span></span>
+                            <span class="country-option-code">EN</span>
+                        </button>
+                        <button class="country-option" type="button" data-country="Australia" data-flag="🇦🇺" data-code="EN">
+                            <span class="country-option-meta"><span>🇦🇺</span><span>Australia</span></span>
+                            <span class="country-option-code">EN</span>
+                        </button>
+                    </div>
+                </div>
                 <a href="#waitlist" class="btn btn-gold">Get Started</a>
             </div>
 
@@ -879,6 +1000,71 @@
                 navbar.classList.remove('nav-active');
                 mobileBtn.innerHTML = '☰';
             });
+        });
+
+        const countrySelector = document.getElementById('countrySelector');
+        const countrySelectorBtn = document.getElementById('countrySelectorBtn');
+        const countrySelectorLabel = document.getElementById('countrySelectorLabel');
+        const countryOptions = document.querySelectorAll('.country-option');
+        const storedCountrySelection = localStorage.getItem('afromkt-selected-country');
+
+        const applyCountrySelection = selection => {
+            countrySelectorLabel.textContent = `${selection.flag} ${selection.country}`;
+
+            countryOptions.forEach(option => {
+                const isActive = option.dataset.country === selection.country;
+                option.classList.toggle('active', isActive);
+                option.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+        };
+
+        const getDefaultCountrySelection = () => {
+            const defaultOption = countryOptions[0];
+            return {
+                country: defaultOption.dataset.country,
+                flag: defaultOption.dataset.flag,
+                code: defaultOption.dataset.code
+            };
+        };
+
+        const setCountrySelection = selection => {
+            applyCountrySelection(selection);
+            localStorage.setItem('afromkt-selected-country', JSON.stringify(selection));
+        };
+
+        const initialCountrySelection = (() => {
+            try {
+                return storedCountrySelection ? JSON.parse(storedCountrySelection) : getDefaultCountrySelection();
+            } catch (error) {
+                console.error('Failed to parse stored country selection:', error);
+                return getDefaultCountrySelection();
+            }
+        })();
+
+        applyCountrySelection(initialCountrySelection);
+
+        countrySelectorBtn.addEventListener('click', () => {
+            const isOpen = countrySelector.classList.toggle('open');
+            countrySelectorBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        countryOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                setCountrySelection({
+                    country: option.dataset.country,
+                    flag: option.dataset.flag,
+                    code: option.dataset.code
+                });
+                countrySelector.classList.remove('open');
+                countrySelectorBtn.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        document.addEventListener('click', event => {
+            if (!countrySelector.contains(event.target)) {
+                countrySelector.classList.remove('open');
+                countrySelectorBtn.setAttribute('aria-expanded', 'false');
+            }
         });
 
         const waitlistForm = document.getElementById('waitlist-form');
