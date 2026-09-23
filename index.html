@@ -291,6 +291,18 @@
             background-color: var(--accent-dark);
         }
 
+        .waitlist-form button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #waitlist-msg {
+            margin-top: 14px;
+            font-size: 0.95rem;
+            min-height: 24px;
+        }
+
         /* Section Headings */
         .section-header {
             text-align: center;
@@ -681,10 +693,11 @@
 
                     <div class="waitlist-container" id="waitlist">
                         <h3>Join the Waitlist</h3>
-                        <form class="waitlist-form" onsubmit="event.preventDefault(); alert('Thanks for joining the waitlist! We will notify you when we launch.');">
-                            <input type="email" placeholder="Enter your email address" required>
-                            <button type="submit">Join Waitlist</button>
+                        <form class="waitlist-form" id="waitlist-form">
+                            <input id="waitlist-email" type="email" placeholder="Enter your email address" required>
+                            <button id="waitlist-btn" type="submit">Join Waitlist</button>
                         </form>
+                        <p id="waitlist-msg" aria-live="polite"></p>
                     </div>
                 </div>
             </div>
@@ -866,6 +879,57 @@
                 navbar.classList.remove('nav-active');
                 mobileBtn.innerHTML = '☰';
             });
+        });
+
+        const waitlistForm = document.getElementById('waitlist-form');
+        const waitlistEmail = document.getElementById('waitlist-email');
+        const waitlistBtn = document.getElementById('waitlist-btn');
+        const waitlistMsg = document.getElementById('waitlist-msg');
+        const waitlistEndpoint = 'https://nmusxculduptvefgqfjn.supabase.co/functions/v1/notify-waitlist';
+
+        waitlistForm.addEventListener('submit', async event => {
+            event.preventDefault();
+
+            const email = waitlistEmail.value.trim();
+            if (!email) {
+                return;
+            }
+
+            waitlistBtn.disabled = true;
+            waitlistBtn.textContent = 'Joining...';
+            waitlistMsg.textContent = '';
+
+            try {
+                const response = await fetch(waitlistEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const payload = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    const isDuplicate = response.status === 409 || payload.code === 'duplicate_email';
+                    waitlistMsg.textContent = isDuplicate
+                        ? 'This email is already on the list!'
+                        : 'Something went wrong. Please try again.';
+                    waitlistMsg.style.color = isDuplicate ? '#D4A017' : '#f8d7da';
+                    return;
+                }
+
+                waitlistMsg.textContent = "🎉 You're on the list! Check your email.";
+                waitlistMsg.style.color = '#7CFFB2';
+                waitlistForm.reset();
+            } catch (error) {
+                console.error('Waitlist signup failed:', error);
+                waitlistMsg.textContent = 'Something went wrong. Please try again.';
+                waitlistMsg.style.color = '#f8d7da';
+            } finally {
+                waitlistBtn.disabled = false;
+                waitlistBtn.textContent = 'Join Waitlist';
+            }
         });
     </script>
 </body>
