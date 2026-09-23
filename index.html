@@ -1,578 +1,872 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AfroMkt — Launching Soon</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f3c623'/%3E%3Crect x='6' y='6' width='52' height='52' rx='10' fill='white'/%3E%3Cpath d='M26 11c5-1 10 0 14 2l3 6 6 8-1 8-5 7-2 8-5 7-9 1-4-8-3-5 1-7-4-4-5-8 1-8 5-7 8-2Z' fill='%230a5c3b'/%3E%3Cpath d='M38 10c4 1 7 4 8 8v9c0 3-2 6-5 6s-5-3-5-6v-4c0-2-1-4-3-4h-4v-4c0-3 1-5 3-7 2-1 4-2 6-2Z' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --green-900: #042f1f;
-      --green-800: #0a5c3b;
-      --green-700: #0f7a4d;
-      --gold-500: #f3c623;
-      --gold-400: #ffd86b;
-      --red-500: #c53a32;
-      --cream: #fff7e3;
-      --ink: #111827;
-      --muted: #4b5563;
-      --white: #ffffff;
-      --line: rgba(255, 255, 255, 0.14);
-      --shadow: 0 25px 70px rgba(4, 47, 31, 0.28);
-      --success-bg: rgba(15, 122, 77, 0.16);
-      --success-text: #d1fae5;
-      --error-bg: rgba(197, 58, 50, 0.16);
-      --error-text: #fee2e2;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfroMkt - The African Community Marketplace</title>
+    <meta name="description" content="Shop African. Sell African. Live African. Launching in Portugal | Going Global.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a5c38;
+            --primary-dark: #0d4a2a;
+            --accent: #D4A017;
+            --accent-dark: #c9922a;
+            --red-accent: #8B1A1A;
+            --white: #ffffff;
+            --light-bg: #f4f6f5;
+            --text-main: #333333;
+            --text-light: #666666;
+            --transition: all 0.3s ease;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
 
-    body {
-      min-height: 100vh;
-      font-family: Inter, sans-serif;
-      color: var(--white);
-      background:
-        radial-gradient(circle at top right, rgba(243, 198, 35, 0.22), transparent 24%),
-        radial-gradient(circle at left 20%, rgba(197, 58, 50, 0.24), transparent 26%),
-        linear-gradient(135deg, var(--green-900), #083723 45%, #0f5e3d 100%);
-      overflow-x: hidden;
-    }
+        body {
+            color: var(--text-main);
+            background-color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
 
-    .page-shell {
-      position: relative;
-      min-height: 100vh;
-      padding: 28px 20px 24px;
-      isolation: isolate;
-    }
+        ul {
+            list-style: none;
+        }
 
-    .page-shell::before,
-    .page-shell::after {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      border-radius: 999px;
-      filter: blur(12px);
-      opacity: 0.8;
-    }
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-    .page-shell::before {
-      width: 280px;
-      height: 280px;
-      top: 8%;
-      right: -80px;
-      background: rgba(243, 198, 35, 0.18);
-    }
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border: 2px solid transparent;
+        }
 
-    .page-shell::after {
-      width: 240px;
-      height: 240px;
-      bottom: 6%;
-      left: -70px;
-      background: rgba(197, 58, 50, 0.16);
-    }
+        .btn-gold {
+            background-color: var(--accent);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(212, 160, 23, 0.3);
+        }
 
-    .container {
-      width: min(1120px, 100%);
-      margin: 0 auto;
-    }
+        .btn-gold:hover {
+            background-color: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 160, 23, 0.4);
+        }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
+        .btn-outline-light {
+            background-color: transparent;
+            color: var(--white);
+            border-color: var(--white);
+        }
 
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 14px;
-    }
+        .btn-outline-light:hover {
+            background-color: var(--white);
+            color: var(--primary-dark);
+        }
 
-    .brand-mark {
-      width: 56px;
-      height: 56px;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-      flex: 0 0 auto;
-    }
+        .btn-green {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-green:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
 
-    .brand-wordmark {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      line-height: 1;
-    }
+        /* Navbar */
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
 
-    .brand-wordmark strong {
-      font-size: 1.55rem;
-      font-weight: 900;
-      letter-spacing: -0.05em;
-      color: var(--white);
-    }
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
 
-    .brand-wordmark span {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.68);
-    }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+        }
 
-    .launch-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      font-weight: 800;
-      color: var(--cream);
-    }
+        .navbar-brand img {
+            height: 45px;
+            width: auto;
+        }
 
-    .hero-card {
-      display: grid;
-      grid-template-columns: 1.08fr 0.92fr;
-      gap: 30px;
-      padding: 40px;
-      border: 1px solid var(--line);
-      border-radius: 32px;
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-    }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
 
-    .hero-copy {
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-      justify-content: center;
-    }
+        .nav-links a {
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
 
-    .eyebrow {
-      display: inline-flex;
-      width: fit-content;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: rgba(243, 198, 35, 0.16);
-      color: var(--gold-400);
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
+        .nav-links a:hover {
+            color: var(--accent);
+        }
 
-    h1 {
-      font-size: clamp(2.8rem, 7vw, 5.4rem);
-      line-height: 0.96;
-      letter-spacing: -0.06em;
-      font-weight: 900;
-      max-width: 9ch;
-    }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
 
-    .tagline {
-      max-width: 620px;
-      font-size: clamp(1.05rem, 2vw, 1.32rem);
-      line-height: 1.65;
-      color: rgba(255, 255, 255, 0.88);
-    }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
 
-    .feature-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
 
-    .feature-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.92);
-      font-size: 0.95rem;
-      font-weight: 700;
-    }
+        .nav-buttons .sign-in {
+            font-weight: 600;
+            color: var(--primary-dark);
+            transition: var(--transition);
+        }
 
-    .waitlist-card {
-      padding: 28px;
-      border-radius: 28px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.07));
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+        .nav-buttons .sign-in:hover {
+            color: var(--accent);
+        }
 
-    .waitlist-card h2 {
-      font-size: 1.7rem;
-      letter-spacing: -0.03em;
-    }
+        .mobile-menu-btn {
+            display: none;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--primary-dark);
+            cursor: pointer;
+        }
 
-    .waitlist-card p {
-      color: rgba(255, 255, 255, 0.82);
-      line-height: 1.65;
-    }
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            position: relative;
+            background-color: var(--primary-dark);
+            /* African geometric mudcloth pattern */
+            background-image: 
+                linear-gradient(135deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+                linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+                linear-gradient(315deg, rgba(255,255,255,0.04) 25%, var(--primary-dark) 25%);
+            background-position: 20px 0, 20px 0, 0 0, 0 0;
+            background-size: 40px 40px;
+            background-repeat: repeat;
+            color: var(--white);
+            text-align: center;
+        }
 
-    .waitlist-form {
-      display: grid;
-      gap: 14px;
-    }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(13, 74, 42, 0.6) 0%, rgba(13, 74, 42, 0.95) 100%);
+            z-index: 1;
+        }
 
-    .field {
-      display: grid;
-      gap: 8px;
-    }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    .field label {
-      font-size: 0.92rem;
-      font-weight: 800;
-      color: var(--cream);
-    }
+        .hero h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #ffffff, #f4e8c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    .field input,
-    .field select {
-      width: 100%;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
-      padding: 14px 15px;
-      font: inherit;
-      color: var(--white);
-      background: rgba(0, 0, 0, 0.18);
-      outline: none;
-      transition: border-color 0.2s ease, transform 0.2s ease;
-    }
+        .hero p {
+            font-size: 1.25rem;
+            font-weight: 300;
+            margin-bottom: 40px;
+            color: #e0e0e0;
+        }
 
-    .field select option {
-      color: var(--ink);
-      background: var(--white);
-    }
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 50px;
+        }
 
-    .field input::placeholder {
-      color: rgba(255, 255, 255, 0.48);
-    }
+        .waitlist-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 500px;
+            margin: 0 auto;
+        }
 
-    .field input:focus,
-    .field select:focus {
-      border-color: var(--gold-400);
-      transform: translateY(-1px);
-    }
+        .waitlist-container h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
 
-    .submit-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      border: 0;
-      border-radius: 18px;
-      padding: 15px 18px;
-      font: inherit;
-      font-weight: 900;
-      color: var(--green-900);
-      background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
-      cursor: pointer;
-      box-shadow: 0 12px 30px rgba(243, 198, 35, 0.22);
-      transition: transform 0.2s ease, filter 0.2s ease;
-    }
+        .waitlist-form {
+            display: flex;
+            gap: 10px;
+        }
 
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.03);
-    }
+        .waitlist-form input {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            outline: none;
+        }
 
-    .submit-btn:disabled {
-      cursor: wait;
-      opacity: 0.84;
-      transform: none;
-    }
+        .waitlist-form input:focus {
+            box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.5);
+        }
 
-    .status-text {
-      display: none;
-      padding: 13px 14px;
-      border-radius: 16px;
-      font-size: 0.94rem;
-      font-weight: 700;
-      line-height: 1.5;
-    }
+        .waitlist-form button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            background-color: var(--accent);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
 
-    .status-text.show {
-      display: block;
-    }
+        .waitlist-form button:hover {
+            background-color: var(--accent-dark);
+        }
 
-    .status-text.success {
-      background: var(--success-bg);
-      color: var(--success-text);
-      border: 1px solid rgba(209, 250, 229, 0.16);
-    }
+        /* Section Headings */
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
 
-    .status-text.error {
-      background: var(--error-bg);
-      color: var(--error-text);
-      border: 1px solid rgba(254, 226, 226, 0.16);
-    }
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
 
-    .extras {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 18px;
-      margin-top: 30px;
-      padding: 20px 24px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.05);
-    }
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 4px;
+            background-color: var(--accent);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
 
-    .socials {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+        .section-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
-    .social-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(255, 255, 255, 0.07);
-      font-weight: 800;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
+        /* Categories Section */
+        .categories-section {
+            padding: 100px 0;
+            background-color: var(--light-bg);
+        }
 
-    .social-link:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 216, 107, 0.7);
-    }
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
 
-    .social-icon {
-      width: 18px;
-      height: 18px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .category-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: var(--transition);
+            border-bottom: 4px solid transparent;
+            cursor: pointer;
+        }
 
-    .note {
-      color: rgba(255, 255, 255, 0.74);
-      font-size: 0.96rem;
-      line-height: 1.6;
-      max-width: 520px;
-    }
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            border-bottom-color: var(--red-accent);
+        }
 
-    footer {
-      margin-top: 28px;
-      text-align: center;
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.92rem;
-    }
+        .category-card .icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
 
-    @media (max-width: 920px) {
-      .hero-card {
-        grid-template-columns: 1fr;
-        padding: 28px;
-      }
+        .category-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
 
-      h1 {
-        max-width: 100%;
-      }
-    }
+        /* How It Works */
+        .how-it-works-section {
+            padding: 100px 0;
+        }
 
-    @media (max-width: 600px) {
-      .page-shell {
-        padding: 20px 14px 22px;
-      }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            text-align: center;
+        }
 
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-        margin-bottom: 22px;
-      }
+        .step-card {
+            position: relative;
+        }
 
-      .hero-card,
-      .waitlist-card,
-      .extras {
-        padding: 22px;
-      }
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background-color: var(--red-accent);
+            color: var(--white);
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 20px rgba(139, 26, 26, 0.2);
+            border: 4px solid var(--white);
+            position: relative;
+            z-index: 2;
+        }
 
-      .extras {
-        flex-direction: column;
-      }
+        .step-card h3 {
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+        }
 
-      h1 {
-        font-size: clamp(2.35rem, 14vw, 4rem);
-      }
-    }
-  </style>
+        .step-card p {
+            color: var(--text-light);
+        }
+
+        /* Seller CTA */
+        .seller-cta {
+            padding: 100px 0;
+            background-color: var(--primary);
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seller-cta::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(212,160,23,0.1) 0%, transparent 60%);
+            z-index: 1;
+        }
+
+        .seller-cta .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .seller-cta h2 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .seller-cta p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Why Us */
+        .why-us-section {
+            padding: 100px 0;
+            background-color: var(--light-bg);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-item {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            transition: var(--transition);
+            border-top: 3px solid var(--primary);
+        }
+
+        .feature-item:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+            transform: translateY(-5px);
+        }
+
+        .feature-item h3 {
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+            margin: 15px 0 10px;
+        }
+
+        .feature-item p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #08301a;
+            color: #d1d5d3;
+            padding: 80px 0 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        .footer-brand img {
+            height: 50px;
+            margin-bottom: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-brand p {
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .footer-heading {
+            color: var(--white);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            .steps-grid {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+            .step-card::after {
+                display: none;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links, .nav-buttons {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .hero {
+                padding: 140px 0 80px;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero-buttons {
+                flex-direction: column;
+            }
+            .waitlist-form {
+                flex-direction: column;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .social-links {
+                justify-content: center;
+            }
+            .footer-brand img {
+                margin: 0 auto 20px;
+            }
+            .footer-brand p {
+                margin: 0 auto 20px;
+            }
+        }
+
+        /* Mobile Menu active state */
+        .nav-active .nav-links {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            padding: 30px 20px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+            align-items: flex-start;
+        }
+        .nav-active .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 260px; /* Adjust based on links */
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            padding: 0 20px 30px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+            align-items: flex-start;
+        }
+    </style>
 </head>
 <body>
-  <main class="page-shell">
-    <div class="container">
-      <div class="topbar">
-        <a class="brand" href="#" aria-label="AfroMkt home">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 64 64" width="56" height="56" role="presentation" xmlns="http://www.w3.org/2000/svg">
-              <rect width="64" height="64" rx="18" fill="#f3c623"/>
-              <rect x="7" y="7" width="50" height="50" rx="12" fill="#ffffff"/>
-              <path d="M26 11c5-1 10 0 14 2l3 6 6 8-1 8-5 7-2 8-5 7-9 1-4-8-3-5 1-7-4-4-5-8 1-8 5-7 8-2Z" fill="#0a5c3b"/>
-              <path d="M38 10c4 1 7 4 8 8v9c0 3-2 6-5 6s-5-3-5-6v-4c0-2-1-4-3-4h-4v-4c0-3 1-5 3-7 2-1 4-2 6-2Z" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span class="brand-wordmark">
-            <strong>AfroMkt</strong>
-            <span>Launching Soon</span>
-          </span>
-        </a>
-        <div class="launch-pill">🌍 Launching first in Portugal 🇵🇹</div>
-      </div>
 
-      <section class="hero-card">
-        <div class="hero-copy">
-          <div class="eyebrow">Launching Soon</div>
-          <h1>Something Big is Coming 🌍</h1>
-          <p class="tagline">
-            The global African community marketplace — foods, fashion, braids, beauty, services &amp; more. Starting in Portugal 🇵🇹
-          </p>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="navbar-brand">
+                <img src="afromkt-profile-avatar.png" alt="AfroMkt Logo">
+                AfroMkt
+            </a>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#categories">Categories</a></li>
+                <li><a href="#how-it-works">How it Works</a></li>
+                <li><a href="#sell">Sell on AfroMkt</a></li>
+            </ul>
 
-          <div class="feature-row" aria-label="AfroMkt categories">
-            <span class="feature-chip">🍲 Foods</span>
-            <span class="feature-chip">👗 Fashion</span>
-            <span class="feature-chip">💇 Braids</span>
-            <span class="feature-chip">💄 Beauty</span>
-            <span class="feature-chip">🛠️ Services</span>
-          </div>
-        </div>
-
-        <aside class="waitlist-card">
-          <div>
-            <h2>Join the AfroMkt waitlist</h2>
-            <p>Be first to hear when we launch, open new countries, and start onboarding community businesses.</p>
-          </div>
-
-          <form id="waitlistForm" class="waitlist-form">
-            <div class="field">
-              <label for="waitlistEmail">Email address</label>
-              <input id="waitlistEmail" type="email" placeholder="you@example.com" autocomplete="email" required />
+            <div class="nav-buttons" id="navButtons">
+                <a href="#waitlist" class="sign-in">Sign In</a>
+                <a href="#waitlist" class="btn btn-gold">Get Started</a>
             </div>
 
-            <div class="field">
-              <label for="waitlistCountry">Country</label>
-              <select id="waitlistCountry" required>
-                <option value="Portugal">Portugal</option>
-                <option value="United Kingdom">UK</option>
-                <option value="Australia">Australia</option>
-                <option value="United States">USA</option>
-                <option value="Canada">Canada</option>
-                <option value="Germany">Germany</option>
-                <option value="France">France</option>
-                <option value="Spain">Spain</option>
-                <option value="Hungary">Hungary</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            <button id="waitlistSubmit" class="submit-btn" type="submit">Get launch updates</button>
-            <div id="waitlistStatus" class="status-text" aria-live="polite"></div>
-          </form>
-        </aside>
-      </section>
-
-      <section class="extras">
-        <p class="note">
-          AfroMkt is preparing a bold new home for African-owned brands, products, and services across the diaspora. We’re keeping it simple for now: join the waitlist and we’ll let you know when the doors open.
-        </p>
-
-        <div class="socials" aria-label="Social media links">
-          <a class="social-link" href="#" aria-label="Instagram placeholder link">
-            <span class="social-icon">
-              <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke="currentColor" stroke-width="2"></rect><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"></circle><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"></circle></svg>
-            </span>
-            Instagram
-          </a>
-          <a class="social-link" href="#" aria-label="Facebook placeholder link">
-            <span class="social-icon">
-              <svg viewBox="0 0 24 24" fill="none" width="18" height="18" aria-hidden="true"><path d="M13.3 20V12.7h2.4l.4-2.8h-2.8V8.1c0-.8.2-1.4 1.4-1.4H16V4.1c-.6-.1-1.2-.1-1.8-.1-1.8 0-3 1.1-3 3.2v2.7H9v2.8h2.4V20h1.9Z" fill="currentColor"></path></svg>
-            </span>
-            Facebook
-          </a>
+            <button class="mobile-menu-btn" id="mobileBtn">
+                ☰
+            </button>
         </div>
-      </section>
+    </nav>
 
-      <footer>© 2026 AfroMkt. All rights reserved.</footer>
-    </div>
-  </main>
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Shop African. Sell African. Live African.</h1>
+                    <p>The African Community Marketplace. <br><strong>Launching in Portugal | Going Global.</strong></p>
+                    
+                    <div class="hero-buttons">
+                        <a href="#categories" class="btn btn-gold">Shop Now</a>
+                        <a href="#sell" class="btn btn-outline-light">Become a Seller</a>
+                    </div>
 
-  <script>
-    const SUPABASE_URL = "https://nmusxculduptvefgqfjn.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tdXN4Y3VsZHVwdHZlZmdxZmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNjcwNDQsImV4cCI6MjEwNTY0MzA0NH0._Nn3nacYJOg2nLcG_kxNSI3vTWtDHUEEH11Lvsera8s";
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    <div class="waitlist-container" id="waitlist">
+                        <h3>Join the Waitlist</h3>
+                        <form class="waitlist-form" onsubmit="event.preventDefault(); alert('Thanks for joining the waitlist! We will notify you when we launch.');">
+                            <input type="email" placeholder="Enter your email address" required>
+                            <button type="submit">Join Waitlist</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    const waitlistForm = document.getElementById("waitlistForm");
-    const waitlistEmail = document.getElementById("waitlistEmail");
-    const waitlistCountry = document.getElementById("waitlistCountry");
-    const waitlistSubmit = document.getElementById("waitlistSubmit");
-    const waitlistStatus = document.getElementById("waitlistStatus");
+        <!-- Categories Section -->
+        <section class="categories-section" id="categories">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Explore Categories</h2>
+                    <p>Discover authentic products, delicious food, and exceptional services from the African community.</p>
+                </div>
+                
+                <div class="categories-grid">
+                    <div class="category-card">
+                        <span class="icon">🍽️</span>
+                        <h3>Food & Groceries</h3>
+                    </div>
+                    <div class="category-card">
+                        <span class="icon">👗</span>
+                        <h3>Fashion & Apparel</h3>
+                    </div>
+                    <div class="category-card">
+                        <span class="icon">💇🏾‍♀️</span>
+                        <h3>Hair & Braids</h3>
+                    </div>
+                    <div class="category-card">
+                        <span class="icon">💄</span>
+                        <h3>Beauty & Skincare</h3>
+                    </div>
+                    <div class="category-card">
+                        <span class="icon">🛠️</span>
+                        <h3>Services & More</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    function setStatus(message, kind) {
-      waitlistStatus.textContent = message;
-      waitlistStatus.className = `status-text show ${kind}`;
-    }
+        <!-- How It Works Section -->
+        <section class="how-it-works-section" id="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <h2>How It Works</h2>
+                    <p>Your seamless gateway to the African marketplace in three simple steps.</p>
+                </div>
 
-    async function handleWaitlistSubmit(event) {
-      event.preventDefault();
-      waitlistSubmit.disabled = true;
-      waitlistSubmit.textContent = "Saving...";
-      waitlistStatus.className = "status-text";
-      waitlistStatus.textContent = "";
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Browse</h3>
+                        <p>Explore thousands of products and services tailored to the African community.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Order</h3>
+                        <p>Securely purchase items or book services from verified local sellers and providers.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Delivered</h3>
+                        <p>Receive your items quickly or get the services done with trusted quality.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-      try {
-        const email = waitlistEmail.value.trim();
-        const country = waitlistCountry.value;
-        const { error } = await supabaseClient.from("waitlist").insert({ email, country });
-        if (error) {
-          if ((error.message || "").toLowerCase().includes("duplicate")) {
-            setStatus("You’re already on the AfroMkt waitlist for that country.", "success");
-          } else {
-            throw error;
-          }
-        } else {
-          setStatus("You’re on the list — we’ll let you know when AfroMkt launches.", "success");
-          waitlistForm.reset();
-          waitlistCountry.value = "Portugal";
-        }
-      } catch (error) {
-        setStatus(error?.message || "We couldn’t save your signup right now. Please try again.", "error");
-      } finally {
-        waitlistSubmit.disabled = false;
-        waitlistSubmit.textContent = "Get launch updates";
-      }
-    }
+        <!-- Seller CTA Section -->
+        <section class="seller-cta" id="sell">
+            <div class="container">
+                <h2>Grow Your Business with AfroMkt</h2>
+                <p>Sell to the African community in Portugal and beyond. Reach thousands of active buyers looking for authentic products and professional services.</p>
+                <a href="#waitlist" class="btn btn-gold" style="padding: 15px 40px; font-size: 1.1rem;">Start Selling Today</a>
+            </div>
+        </section>
 
-    waitlistForm.addEventListener("submit", handleWaitlistSubmit);
-  </script>
+        <!-- Why Us Section -->
+        <section class="why-us-section" id="why-us">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Why AfroMkt?</h2>
+                    <p>We are building more than a marketplace. We are building a community ecosystem.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Secure Payments</h3>
+                        <p>Your transactions are 100% safe and protected with industry-leading security standards.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🌍</div>
+                        <h3>African Community</h3>
+                        <p>Built by Africans, for Africans. A platform that understands and celebrates our rich culture.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Fast Delivery</h3>
+                        <p>Optimized logistics network ensuring your orders reach you fresh and on time.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">✓</div>
+                        <h3>Verified Sellers</h3>
+                        <p>Every seller is vetted for quality and reliability so you can shop with absolute peace of mind.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="afromkt-profile-avatar.png" alt="AfroMkt Logo">
+                    <p>The premier African Community Marketplace. Launching in Portugal, expanding globally to connect our vibrant culture.</p>
+                    <div class="social-links">
+                        <a href="#">FB</a>
+                        <a href="#">IG</a>
+                        <a href="#">TW</a>
+                    </div>
+                </div>
+                
+                <div class="footer-links-group">
+                    <h4 class="footer-heading">Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Shop Categories</a></li>
+                        <li><a href="#">Become a Seller</a></li>
+                        <li><a href="#">Delivery Info</a></li>
+                        <li><a href="#">Buyer Protection</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links-group">
+                    <h4 class="footer-heading">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links-group">
+                    <h4 class="footer-heading">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Seller Agreement</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 AfroMkt (afro-mkt.com). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobileBtn');
+        const navbar = document.querySelector('.navbar');
+
+        mobileBtn.addEventListener('click', () => {
+            navbar.classList.toggle('nav-active');
+            if (navbar.classList.contains('nav-active')) {
+                mobileBtn.innerHTML = '✕';
+            } else {
+                mobileBtn.innerHTML = '☰';
+            }
+        });
+
+        // Close menu when a link is clicked
+        const navLinks = document.querySelectorAll('.nav-links a, .nav-buttons a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navbar.classList.remove('nav-active');
+                mobileBtn.innerHTML = '☰';
+            });
+        });
+    </script>
 </body>
 </html>
