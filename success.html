@@ -3,117 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to AfroMkt</title>
+    <title>Welcome Seller - AfroMkt</title>
     <meta name="description" content="Your AfroMkt seller subscription is active.">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #1a3c2e;
-            --primary-dark: #0d2f21;
-            --accent: #d4a843;
-            --accent-dark: #b88b24;
-            --white: #ffffff;
-            --text-light: #e8eee9;
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            color: var(--white);
-            background-color: var(--primary-dark);
-            background-image:
-                linear-gradient(135deg, rgba(255,255,255,0.04) 25%, transparent 25%),
-                linear-gradient(225deg, rgba(255,255,255,0.04) 25%, transparent 25%),
-                linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
-                linear-gradient(315deg, rgba(255,255,255,0.04) 25%, var(--primary-dark) 25%);
-            background-position: 20px 0, 20px 0, 0 0, 0 0;
-            background-size: 40px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            text-align: center;
-        }
-
-        .success-card {
-            width: 100%;
-            max-width: 680px;
-            padding: 54px 42px;
-            border-radius: 28px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.18);
-            box-shadow: 0 30px 90px rgba(0,0,0,0.25);
-            backdrop-filter: blur(12px);
-        }
-
-        .success-card img {
-            width: 86px;
-            height: 86px;
-            object-fit: contain;
-            margin-bottom: 24px;
-            filter: drop-shadow(0 12px 30px rgba(0,0,0,0.18));
-        }
-
-        h1 {
-            font-size: 3.2rem;
-            line-height: 1.1;
-            margin-bottom: 18px;
-            background: linear-gradient(to right, #ffffff, #f4e8c1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p {
-            color: var(--text-light);
-            font-size: 1.15rem;
-            margin: 0 auto 32px;
-            max-width: 540px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 13px 30px;
-            border-radius: 50px;
-            background-color: var(--accent);
-            color: var(--white);
-            font-weight: 700;
-            text-decoration: none;
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(212,168,67,0.3);
-        }
-
-        .btn:hover {
-            background-color: var(--accent-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(212,168,67,0.42);
-        }
-
-        @media (max-width: 640px) {
-            .success-card {
-                padding: 42px 24px;
-            }
-            h1 {
-                font-size: 2.5rem;
-            }
-            p {
-                font-size: 1rem;
-            }
-        }
+        :root{--primary:#1a3c2e;--primary-dark:#0d2f21;--accent:#d4a843;--accent-dark:#b88b24;--white:#fff;--light-bg:#f4f6f5;--text-main:#2f352f;--text-light:#66706a;--transition:all .3s ease}*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}body{color:var(--text-main);background:var(--light-bg);line-height:1.6;overflow-x:hidden}a{text-decoration:none;color:inherit}.container{width:100%;max-width:1120px;margin:0 auto;padding:0 20px}.btn{display:inline-block;padding:13px 30px;border-radius:50px;background:var(--accent);color:var(--white);font-weight:800;text-decoration:none;transition:var(--transition);box-shadow:0 4px 15px rgba(212,168,67,.3)}.btn:hover{background:var(--accent-dark);transform:translateY(-2px)}.navbar{background:rgba(255,255,255,.96);backdrop-filter:blur(12px);box-shadow:0 2px 10px rgba(0,0,0,.05);position:fixed;top:0;width:100%;z-index:1000}.navbar .container{display:flex;justify-content:space-between;align-items:center;min-height:80px}.brand-logo{width:148px;height:45px;display:block}.nav-links{display:flex;align-items:center;gap:26px;list-style:none}.nav-links a{font-weight:700;color:var(--primary-dark);transition:var(--transition)}.nav-links a:hover{color:var(--accent)}.mobile-menu-btn{display:none;font-size:1.6rem;background:none;border:0;color:var(--primary-dark);cursor:pointer}.hero{min-height:100vh;padding:140px 0 70px;color:var(--white);background-color:var(--primary-dark);background-image:linear-gradient(135deg,rgba(13,47,33,.94),rgba(26,60,46,.86)),linear-gradient(135deg,rgba(255,255,255,.04) 25%,transparent 25%),linear-gradient(225deg,rgba(255,255,255,.04) 25%,transparent 25%);background-size:cover,40px 40px,40px 40px;display:flex;align-items:center}.welcome-card{max-width:880px;margin:0 auto;padding:48px;border-radius:30px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);box-shadow:0 30px 90px rgba(0,0,0,.25);backdrop-filter:blur(12px);text-align:center}.badge{display:inline-flex;margin-bottom:18px;padding:8px 16px;border-radius:999px;background:rgba(212,168,67,.18);color:#f6e7bd;font-weight:800}.welcome-card h1{font-size:3.4rem;line-height:1.1;margin-bottom:18px;background:linear-gradient(to right,#fff,#f4e8c1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.welcome-card>p{color:#e8eee9;font-size:1.15rem;max-width:660px;margin:0 auto 34px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:34px 0;text-align:left}.step{padding:24px;border-radius:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}.step-number{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);font-weight:800;margin-bottom:16px}.step h3{font-size:1.05rem;margin-bottom:8px;color:#fff}.step p{font-size:.94rem;color:rgba(255,255,255,.82)}#email-status{margin-top:18px;min-height:22px;color:#f6e7bd;font-size:.92rem}.footer-note{margin-top:22px;color:rgba(255,255,255,.7);font-size:.9rem}@media(max-width:768px){.nav-links{display:none}.mobile-menu-btn{display:block}.nav-active .nav-links{display:flex;flex-direction:column;position:absolute;top:80px;left:0;width:100%;background:var(--white);padding:24px 20px;box-shadow:0 10px 15px rgba(0,0,0,.05);align-items:flex-start}.welcome-card{padding:34px 22px}.welcome-card h1{font-size:2.45rem}.steps{grid-template-columns:1fr}.hero{padding:120px 0 50px}}
     </style>
 </head>
 <body>
-    <main class="success-card">
-        <img src="afromkt-profile-avatar.png" alt="AfroMkt Logo">
-        <h1>You're in! 🎉</h1>
-        <p>Welcome to AfroMkt. Your seller subscription is active. We'll be in touch soon.</p>
-        <a href="index.html" class="btn">Back to Homepage</a>
-    </main>
+    <nav class="navbar"><div class="container"><a href="index.html" aria-label="AfroMkt homepage"><svg class="brand-logo" viewBox="0 0 220 68" role="img" aria-label="AfroMkt logo"><rect width="220" height="68" rx="18" fill="#1a3c2e"/><path d="M18 49C31 21 47 18 58 49" fill="none" stroke="#d4a843" stroke-width="6" stroke-linecap="round"/><path d="M31 39h14" stroke="#d4a843" stroke-width="5" stroke-linecap="round"/><text x="72" y="43" fill="#fff" font-size="30" font-family="Poppins, Arial" font-weight="800">Afro</text><text x="143" y="43" fill="#d4a843" font-size="30" font-family="Poppins, Arial" font-weight="800">Mkt</text></svg></a><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="sell.html">Seller Plans</a></li><li><a href="dashboard.html">Dashboard</a></li></ul><button class="mobile-menu-btn" id="mobileBtn" aria-label="Open menu">☰</button></div></nav>
+    <main class="hero"><div class="container"><section class="welcome-card"><div class="badge">Seller account activated</div><h1>Welcome to AfroMkt! 🎉</h1><p>Your seller subscription is now active. Here's how to get started:</p><div class="steps"><article class="step"><div class="step-number">1</div><h3>Complete your seller profile</h3><p>Add your business name, contact details, location, and a short brand story.</p></article><article class="step"><div class="step-number">2</div><h3>Add your first product</h3><p>Upload your product details, pricing, category, and the best image URL you have.</p></article><article class="step"><div class="step-number">3</div><h3>Share your store link</h3><p>Invite your customers and community to support your AfroMkt storefront.</p></article></div><a href="dashboard.html" class="btn" id="dashboard-link">Go to Seller Dashboard</a><p id="email-status" aria-live="polite"></p><div class="footer-note">Need help? Contact AfroMkt support and we’ll help you get listed.</div></section></div></main>
+    <script>
+        const mobileBtn=document.getElementById('mobileBtn');const navbar=document.querySelector('.navbar');mobileBtn.addEventListener('click',()=>{navbar.classList.toggle('nav-active');mobileBtn.innerHTML=navbar.classList.contains('nav-active')?'✕':'☰'});
+        const params=new URLSearchParams(window.location.search);const email=params.get('email');const plan=params.get('plan')||'seller';const statusEl=document.getElementById('email-status');const dashboardLink=document.getElementById('dashboard-link');if(plan&&plan!=='seller'){dashboardLink.href='dashboard.html?plan='+encodeURIComponent(plan);}
+        if(email){fetch('https://nmusxculduptvefgqfjn.supabase.co/functions/v1/send-welcome-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,plan})}).then(async response=>{if(response.ok){statusEl.textContent='Welcome email sent to '+email+'.';return}const data=await response.json().catch(()=>({}));statusEl.textContent=data.error?'Welcome email could not be sent: '+data.error:'Welcome email could not be sent.'}).catch(error=>{console.error('Welcome email request failed:',error);statusEl.textContent='Welcome email could not be sent, but your subscription page is ready.'})}
+    </script>
 </body>
 </html>

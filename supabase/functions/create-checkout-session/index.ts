@@ -5,6 +5,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const BASIC_PRICE_ID = "price_1UJ7Pp4Poh3P3Yxvs6XGZQz0";
+const PREMIUM_PRICE_ID = "price_1UJ7Qk4Poh3P3YxvDnZ1nDsT";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -14,6 +17,16 @@ serve(async (req) => {
     const { priceId } = await req.json();
     const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
 
+    if (!STRIPE_SECRET_KEY) {
+      return new Response(JSON.stringify({ error: "Missing STRIPE_SECRET_KEY secret" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const plan = priceId === PREMIUM_PRICE_ID ? "premium" : "basic";
+    const successUrl = `https://afro-mkt.com/success.html?plan=${plan}`;
+
     const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
       headers: {
@@ -22,9 +35,9 @@ serve(async (req) => {
       },
       body: new URLSearchParams({
         "mode": "subscription",
-        "line_items[0][price]": priceId,
+        "line_items[0][price]": priceId || BASIC_PRICE_ID,
         "line_items[0][quantity]": "1",
-        "success_url": "https://afro-mkt.com/success.html",
+        "success_url": successUrl,
         "cancel_url": "https://afro-mkt.com/sell.html",
       }),
     });
