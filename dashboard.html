@@ -1,84 +1,313 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Dashboard - AfroMkt</title>
-    <meta name="description" content="Manage your AfroMkt seller profile and products.">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description" content="Log in to manage your AfroMkt seller plan and product listings.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root{--primary:#1a3c2e;--primary-dark:#0d2f21;--accent:#d4a843;--accent-dark:#b88b24;--white:#fff;--light-bg:#f4f6f5;--text-main:#2f352f;--text-light:#66706a;--success:#1d8f5b;--danger:#b42318;--warning:#b7791f;--transition:all .3s ease}*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}body{color:var(--text-main);background:linear-gradient(180deg,#f4f6f5 0%,#ffffff 42%,#f4f6f5 100%);line-height:1.6;overflow-x:hidden}a{text-decoration:none;color:inherit}ul{list-style:none}.container{width:100%;max-width:1160px;margin:0 auto;padding:0 20px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 28px;border-radius:50px;font-weight:700;font-size:1rem;cursor:pointer;transition:var(--transition);text-align:center;border:2px solid transparent}.btn-gold{background:var(--accent);color:var(--white);box-shadow:0 10px 24px rgba(212,168,67,.26)}.btn-gold:hover{background:var(--accent-dark);transform:translateY(-2px)}.btn-outline{background:#fff;border-color:rgba(26,60,46,.12);color:var(--primary-dark)}.btn-outline:hover{border-color:var(--accent);color:var(--accent-dark)}.navbar{background:rgba(255,255,255,.96);backdrop-filter:blur(12px);box-shadow:0 2px 10px rgba(0,0,0,.05);position:fixed;top:0;width:100%;z-index:1000}.navbar .container{display:flex;justify-content:space-between;align-items:center;min-height:80px;gap:18px}.brand-logo{width:148px;height:45px;display:block}.nav-links{display:flex;align-items:center;gap:26px}.nav-links a{font-weight:600;font-size:.95rem;transition:var(--transition);position:relative}.nav-links a:hover,.nav-links a.active{color:var(--accent)}.nav-links a::after{content:'';position:absolute;width:0;height:2px;bottom:-4px;left:0;background:var(--accent);transition:var(--transition)}.nav-links a:hover::after,.nav-links a.active::after{width:100%}.mobile-menu-btn{display:none;font-size:1.6rem;background:none;border:0;color:var(--primary-dark);cursor:pointer}.dashboard-hero{padding:150px 0 58px;background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:var(--white);position:relative;overflow:hidden}.dashboard-hero::after{content:'';position:absolute;inset:auto -140px -110px auto;width:320px;height:320px;border-radius:50%;background:rgba(212,168,67,.14)}.dashboard-hero h1{font-size:3rem;line-height:1.08;margin-bottom:14px;position:relative}.dashboard-hero p{max-width:720px;color:rgba(255,255,255,.86);position:relative}.dashboard-main{padding:42px 0 90px}.state-card,.card{background:#fff;border-radius:28px;border:1px solid rgba(26,60,46,.09);box-shadow:0 20px 48px rgba(13,47,33,.08)}.state-card{padding:36px}.state-card h2{font-size:1.9rem;color:var(--primary-dark);margin-bottom:12px}.state-card p{color:var(--text-light);margin-bottom:24px}.hidden{display:none!important}.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:44px}.spinner{width:56px;height:56px;border-radius:50%;border:5px solid rgba(26,60,46,.12);border-top-color:var(--accent);animation:spin 1s linear infinite}.email-form{display:grid;grid-template-columns:1fr auto;gap:14px;margin-top:18px}.input{width:100%;padding:16px 18px;border-radius:16px;border:1px solid rgba(26,60,46,.14);font-size:1rem;outline:none;transition:var(--transition)}.input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(212,168,67,.16)}.helper-text{margin-top:14px;font-size:.92rem;color:var(--text-light)}.dashboard-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:24px}.card{padding:30px}.status-pill{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;font-weight:800;font-size:.92rem;margin-bottom:18px}.status-active{background:rgba(29,143,91,.12);color:var(--success)}.status-cancelled{background:rgba(180,35,24,.12);color:var(--danger)}.status-past_due{background:rgba(183,121,31,.14);color:var(--warning)}.summary-title{font-size:2rem;line-height:1.15;color:var(--primary-dark);margin-bottom:10px}.summary-subtitle{color:var(--text-light);margin-bottom:24px}.summary-grid{display:grid;gap:14px}.summary-row{padding:18px 20px;border-radius:20px;background:#f8faf9;border:1px solid rgba(26,60,46,.08);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.summary-row span{color:var(--text-light)}.summary-row strong{color:var(--primary-dark);text-align:right}.summary-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}.tips-list{display:grid;gap:14px;margin-top:16px}.tip-item{padding:18px;border-radius:20px;background:#f8faf9;border:1px solid rgba(26,60,46,.08)}.tip-item h3{font-size:1.05rem;color:var(--primary-dark);margin-bottom:8px}.tip-item p{font-size:.95rem;color:var(--text-light)}.empty-card{display:flex;flex-direction:column;gap:18px}.footer{padding:0 0 40px;color:#6a746e}.footer p{text-align:center;font-size:.92rem}@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:992px){.dashboard-grid{grid-template-columns:1fr}}@media(max-width:768px){.navbar .container{flex-wrap:wrap}.nav-links{display:none}.mobile-menu-btn{display:block;margin-left:auto}.dashboard-hero{padding:132px 0 48px}.dashboard-hero h1{font-size:2.35rem}.dashboard-main{padding:32px 0 72px}.state-card,.card{padding:24px}.email-form{grid-template-columns:1fr}.nav-active .nav-links{display:flex;flex-direction:column;position:absolute;left:0;top:80px;width:100%;background:var(--white);padding:24px 20px;box-shadow:0 10px 15px rgba(0,0,0,.05);align-items:flex-start}}
+        :root {
+            --primary: #1a3c2e;
+            --primary-dark: #0d2f21;
+            --primary-deep: #061d14;
+            --accent: #d4a843;
+            --accent-light: #f5df9c;
+            --accent-dark: #b88b24;
+            --red: #ce3d32;
+            --white: #ffffff;
+            --cream: #fbf6e7;
+            --light-bg: #f4f6f5;
+            --text-main: #203226;
+            --text-light: #66706a;
+            --success: #1d8f5b;
+            --danger: #b42318;
+            --warning: #b7791f;
+            --line: rgba(26, 60, 46, .12);
+            --shadow: 0 24px 70px rgba(6, 29, 20, .18);
+            --transition: all .28s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { min-height: 100vh; color: var(--text-main); background: var(--primary-deep); line-height: 1.6; overflow-x: hidden; }
+        a { color: inherit; text-decoration: none; }
+        ul { list-style: none; }
+        button, input, textarea, select { font: inherit; }
+        .container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+        .hidden { display: none !important; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 48px;
+            padding: 13px 24px;
+            border: 2px solid transparent;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: .98rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        .btn:disabled { opacity: .66; cursor: not-allowed; transform: none !important; }
+        .btn-gold { background: linear-gradient(135deg, var(--accent), #e9c66e); color: #102619; box-shadow: 0 14px 32px rgba(212, 168, 67, .28); }
+        .btn-gold:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 18px 38px rgba(212, 168, 67, .36); }
+        .btn-green { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); box-shadow: 0 14px 32px rgba(26, 60, 46, .25); }
+        .btn-green:hover:not(:disabled) { transform: translateY(-2px); background: linear-gradient(135deg, #23533e, var(--primary)); }
+        .btn-outline { background: rgba(255, 255, 255, .08); color: var(--white); border-color: rgba(255, 255, 255, .24); }
+        .btn-outline:hover:not(:disabled) { background: rgba(255, 255, 255, .15); border-color: var(--accent); transform: translateY(-2px); }
+        .btn-soft { background: #fff; color: var(--primary-dark); border-color: var(--line); }
+        .btn-soft:hover:not(:disabled) { border-color: var(--accent); color: var(--accent-dark); transform: translateY(-2px); }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 50;
+            background: rgba(255, 255, 255, .96);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(26, 60, 46, .08);
+            box-shadow: 0 10px 30px rgba(6, 29, 20, .08);
+        }
+        .navbar .container { display: flex; align-items: center; justify-content: space-between; min-height: 80px; gap: 18px; }
+        .brand-logo { width: 148px; height: 45px; display: block; }
+        .nav-links { display: flex; align-items: center; gap: 26px; }
+        .nav-links a { color: var(--primary-dark); font-size: .95rem; font-weight: 700; transition: var(--transition); position: relative; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent-dark); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; left: 0; bottom: -5px; border-radius: 2px; background: var(--accent); transition: var(--transition); }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .user-chip { display: none; align-items: center; gap: 8px; max-width: 280px; padding: 10px 14px; border-radius: 999px; background: #f7faf8; color: var(--primary-dark); font-size: .88rem; font-weight: 800; border: 1px solid rgba(26, 60, 46, .09); }
+        .user-chip.show { display: inline-flex; }
+        .user-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mobile-menu-btn { display: none; font-size: 1.6rem; border: 0; background: transparent; color: var(--primary-dark); cursor: pointer; }
+
+        .hero {
+            padding: 148px 0 76px;
+            position: relative;
+            color: var(--white);
+            background-color: var(--primary-dark);
+            background-image:
+                radial-gradient(circle at 18% 22%, rgba(212, 168, 67, .22), transparent 28%),
+                radial-gradient(circle at 82% 20%, rgba(206, 61, 50, .18), transparent 22%),
+                linear-gradient(135deg, rgba(255,255,255,.045) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255,255,255,.045) 25%, transparent 25%),
+                linear-gradient(45deg, rgba(255,255,255,.045) 25%, transparent 25%),
+                linear-gradient(315deg, rgba(255,255,255,.045) 25%, var(--primary-dark) 25%);
+            background-position: center, center, 20px 0, 20px 0, 0 0, 0 0;
+            background-size: auto, auto, 40px 40px, 40px 40px, 40px 40px, 40px 40px;
+            overflow: hidden;
+        }
+        .hero::after { content: ''; position: absolute; inset: auto -80px -130px -80px; height: 190px; background: repeating-linear-gradient(45deg, rgba(212,168,67,.20) 0 10px, transparent 10px 24px, rgba(255,255,255,.08) 24px 34px, transparent 34px 50px); transform: rotate(-2deg); }
+        .hero-content { position: relative; z-index: 2; max-width: 860px; }
+        .hero-kicker { display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: 999px; background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.18); color: var(--accent-light); font-weight: 900; margin-bottom: 20px; }
+        .hero h1 { font-size: clamp(2.45rem, 6vw, 4.8rem); line-height: 1.02; letter-spacing: -.05em; margin-bottom: 18px; font-weight: 900; }
+        .hero p { max-width: 720px; color: rgba(255,255,255,.86); font-size: clamp(1rem, 2vw, 1.22rem); }
+        .hero-stats { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+        .hero-pill { padding: 11px 15px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: rgba(255,255,255,.10); color: rgba(255,255,255,.92); font-weight: 800; }
+
+        .main { padding: 42px 0 90px; background: linear-gradient(180deg, #f4f6f5 0%, #ffffff 54%, #f4f6f5 100%); }
+        .panel, .card { background: rgba(255,255,255,.98); border: 1px solid rgba(26, 60, 46, .09); border-radius: 28px; box-shadow: 0 20px 52px rgba(13, 47, 33, .09); }
+        .panel { padding: 34px; }
+        .panel-title { font-size: clamp(1.7rem, 3vw, 2.35rem); color: var(--primary-dark); line-height: 1.12; margin-bottom: 10px; }
+        .panel-copy { color: var(--text-light); max-width: 720px; }
+
+        .auth-layout { display: grid; grid-template-columns: .92fr 1.08fr; gap: 28px; align-items: stretch; }
+        .auth-promo { color: var(--white); background: radial-gradient(circle at 90% 14%, rgba(212,168,67,.34), transparent 28%), linear-gradient(135deg, var(--primary), var(--primary-dark)); overflow: hidden; position: relative; }
+        .auth-promo::after { content: ''; position: absolute; width: 250px; height: 250px; right: -80px; bottom: -80px; border-radius: 50%; background: rgba(255,255,255,.08); }
+        .auth-promo h2 { font-size: 2.2rem; line-height: 1.1; margin-bottom: 16px; position: relative; z-index: 2; }
+        .auth-promo p { color: rgba(255,255,255,.84); margin-bottom: 24px; position: relative; z-index: 2; }
+        .feature-list { display: grid; gap: 14px; position: relative; z-index: 2; }
+        .feature-item { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 18px; background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.13); }
+        .feature-item strong { display: block; color: var(--accent-light); margin-bottom: 2px; }
+        .feature-item span { color: rgba(255,255,255,.82); font-size: .93rem; }
+
+        .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 6px; border-radius: 999px; background: #f0f4f1; margin: 24px 0; }
+        .tab-btn { border: 0; border-radius: 999px; padding: 12px 16px; background: transparent; color: var(--text-light); font-weight: 900; cursor: pointer; transition: var(--transition); }
+        .tab-btn.active { background: var(--white); color: var(--primary-dark); box-shadow: 0 10px 20px rgba(13,47,33,.08); }
+        .form { display: grid; gap: 16px; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .field { display: grid; gap: 8px; }
+        .field label { color: var(--primary-dark); font-weight: 800; font-size: .92rem; }
+        .input, .textarea, .select { width: 100%; border: 1px solid rgba(26,60,46,.16); border-radius: 16px; outline: none; background: #fff; color: var(--text-main); transition: var(--transition); }
+        .input, .select { min-height: 52px; padding: 0 16px; }
+        .textarea { min-height: 132px; padding: 15px 16px; resize: vertical; }
+        .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(212,168,67,.18); }
+        .form-help { color: var(--text-light); font-size: .9rem; }
+        .message { display: none; padding: 13px 15px; border-radius: 16px; font-weight: 700; font-size: .92rem; }
+        .message.show { display: block; }
+        .message.success { background: rgba(29,143,91,.12); color: var(--success); }
+        .message.error { background: rgba(180,35,24,.11); color: var(--danger); }
+        .message.info { background: rgba(26,60,46,.09); color: var(--primary-dark); }
+
+        .dashboard-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
+        .dashboard-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; }
+        .dashboard-grid { display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 24px; align-items: start; }
+        .card { padding: 28px; }
+        .card h2 { color: var(--primary-dark); font-size: 1.55rem; line-height: 1.18; margin-bottom: 10px; }
+        .muted { color: var(--text-light); }
+        .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; font-weight: 900; font-size: .87rem; margin-bottom: 16px; }
+        .status-active { background: rgba(29,143,91,.12); color: var(--success); }
+        .status-cancelled { background: rgba(180,35,24,.12); color: var(--danger); }
+        .status-past_due { background: rgba(183,121,31,.14); color: var(--warning); }
+        .status-unknown { background: rgba(26,60,46,.09); color: var(--primary-dark); }
+        .summary-grid { display: grid; gap: 12px; margin: 22px 0; }
+        .summary-row { display: flex; justify-content: space-between; gap: 14px; padding: 16px; border-radius: 18px; background: #f8faf9; border: 1px solid rgba(26,60,46,.08); }
+        .summary-row span { color: var(--text-light); }
+        .summary-row strong { color: var(--primary-dark); text-align: right; }
+        .renewal-note { padding: 16px; border-radius: 18px; background: linear-gradient(135deg, rgba(212,168,67,.18), rgba(26,60,46,.07)); border: 1px solid rgba(212,168,67,.28); color: var(--primary-dark); font-weight: 700; }
+
+        .product-form-card { margin-bottom: 24px; }
+        .listings-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+        .listing-count { padding: 8px 12px; border-radius: 999px; background: rgba(26,60,46,.08); color: var(--primary-dark); font-weight: 900; font-size: .88rem; }
+        .listings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .listing-card { overflow: hidden; border-radius: 22px; border: 1px solid rgba(26,60,46,.10); background: #fff; box-shadow: 0 12px 28px rgba(13,47,33,.06); }
+        .listing-image { aspect-ratio: 16 / 10; background: linear-gradient(135deg, rgba(26,60,46,.12), rgba(212,168,67,.24)); display: grid; place-items: center; color: var(--primary-dark); font-weight: 900; }
+        .listing-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .listing-body { padding: 18px; }
+        .listing-meta { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+        .listing-meta h3 { color: var(--primary-dark); font-size: 1.05rem; line-height: 1.25; }
+        .price { color: var(--accent-dark); font-weight: 900; white-space: nowrap; }
+        .category-tag { display: inline-flex; margin: 10px 0; padding: 6px 10px; border-radius: 999px; background: rgba(26,60,46,.08); color: var(--primary-dark); font-size: .78rem; font-weight: 800; }
+        .empty-listings { padding: 26px; border-radius: 22px; border: 1px dashed rgba(26,60,46,.24); color: var(--text-light); background: #fbfdfb; text-align: center; }
+        .spinner { width: 44px; height: 44px; border-radius: 50%; border: 4px solid rgba(26,60,46,.12); border-top-color: var(--accent); animation: spin 1s linear infinite; }
+        .centered { min-height: 220px; display: grid; place-items: center; text-align: center; gap: 14px; }
+
+        .footer { padding: 34px 0; background: var(--primary-deep); color: rgba(255,255,255,.68); text-align: center; font-size: .92rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 980px) {
+            .auth-layout, .dashboard-grid { grid-template-columns: 1fr; }
+            .dashboard-top { flex-direction: column; }
+            .dashboard-actions { justify-content: flex-start; }
+        }
+        @media (max-width: 760px) {
+            .navbar .container { flex-wrap: wrap; }
+            .nav-links, .nav-actions { display: none; }
+            .mobile-menu-btn { display: block; margin-left: auto; }
+            .nav-active .nav-links, .nav-active .nav-actions { display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding: 0 0 20px; }
+            .nav-active .nav-actions { gap: 12px; }
+            .user-chip.show { max-width: 100%; }
+            .hero { padding: 126px 0 62px; }
+            .panel, .card { padding: 22px; border-radius: 22px; }
+            .form-grid, .listings-grid { grid-template-columns: 1fr; }
+            .summary-row { flex-direction: column; }
+            .summary-row strong { text-align: left; }
+            .tabs { border-radius: 18px; }
+            .tab-btn { border-radius: 14px; }
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
-            <a href="index.html" aria-label="AfroMkt homepage"><svg class="brand-logo" viewBox="0 0 220 68" role="img" aria-label="AfroMkt logo"><rect width="220" height="68" rx="18" fill="#1a3c2e"/><path d="M18 49C31 21 47 18 58 49" fill="none" stroke="#d4a843" stroke-width="6" stroke-linecap="round"/><path d="M31 39h14" stroke="#d4a843" stroke-width="5" stroke-linecap="round"/><text x="72" y="43" fill="#fff" font-size="30" font-family="Poppins, Arial" font-weight="800">Afro</text><text x="143" y="43" fill="#d4a843" font-size="30" font-family="Poppins, Arial" font-weight="800">Mkt</text></svg></a>
+            <a href="index.html" aria-label="AfroMkt homepage">
+                <svg class="brand-logo" viewBox="0 0 220 68" role="img" aria-label="AfroMkt logo"><rect width="220" height="68" rx="18" fill="#1a3c2e"/><path d="M18 49C31 21 47 18 58 49" fill="none" stroke="#d4a843" stroke-width="6" stroke-linecap="round"/><path d="M31 39h14" stroke="#d4a843" stroke-width="5" stroke-linecap="round"/><text x="72" y="43" fill="#fff" font-size="30" font-family="Poppins, Arial" font-weight="800">Afro</text><text x="143" y="43" fill="#d4a843" font-size="30" font-family="Poppins, Arial" font-weight="800">Mkt</text></svg>
+            </a>
             <ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="shop.html">Shop</a></li><li><a href="sell.html">Seller Plans</a></li><li><a href="dashboard.html" class="active">Dashboard</a></li></ul>
+            <div class="nav-actions" id="navActions"><div class="user-chip" id="userChip">👤 <span id="userEmailChip"></span></div><button class="btn btn-green hidden" id="navLogoutBtn" type="button">Logout</button></div>
             <button class="mobile-menu-btn" id="mobileBtn" aria-label="Open menu">☰</button>
         </div>
     </nav>
 
-    <header class="dashboard-hero">
-        <div class="container">
-            <h1>Your Seller Dashboard</h1>
-            <p>Check your real AfroMkt subscription status, confirm your plan details, and keep your seller launch moving.</p>
+    <header class="hero">
+        <div class="container hero-content">
+            <div class="hero-kicker">🌍 Seller subscriptions now open</div>
+            <h1>Manage your AfroMkt seller storefront.</h1>
+            <p>Sign in with Supabase Auth, check your live subscription status, submit products, and manage the listings connected to your seller email.</p>
+            <div class="hero-stats"><span class="hero-pill">Basic €9.99/mo</span><span class="hero-pill">Premium €24.99/mo</span><span class="hero-pill">Portugal-first marketplace</span></div>
         </div>
     </header>
 
-    <main class="dashboard-main">
+    <main class="main">
         <div class="container">
-            <section id="loadingState" class="state-card loading-state hidden">
+            <section id="loadingState" class="panel centered">
                 <div class="spinner" aria-hidden="true"></div>
-                <h2 style="margin:0;">Loading your subscription</h2>
-                <p style="margin:0;max-width:420px;">We’re checking your AfroMkt subscription details and preparing your seller dashboard.</p>
+                <div><h2 class="panel-title">Loading your dashboard</h2><p class="panel-copy">Checking your Supabase Auth session.</p></div>
             </section>
 
-            <section id="emailState" class="state-card hidden">
-                <h2>Enter your seller email to view your dashboard</h2>
-                <p>Use the same email address you used for your Stripe checkout. We’ll save it on this device so it’s quicker next time.</p>
-                <form id="emailForm" class="email-form">
-                    <input id="sellerEmailInput" class="input" type="email" placeholder="seller@example.com" required>
-                    <button class="btn btn-gold" type="submit">View Dashboard</button>
-                </form>
-                <div class="helper-text">Your email is stored locally in <code>afromkt_seller_email</code> so the dashboard can reload faster.</div>
+            <section id="authState" class="auth-layout hidden">
+                <article class="panel auth-promo">
+                    <h2>Bring your products into the community marketplace.</h2>
+                    <p>Create a seller login, connect your subscription email, and start building listings customers can discover across AfroMkt.</p>
+                    <div class="feature-list">
+                        <div class="feature-item"><strong>01</strong><div><strong>Secure login</strong><span>Email and password authentication powered by Supabase Auth.</span></div></div>
+                        <div class="feature-item"><strong>02</strong><div><strong>Live plan check</strong><span>Your plan status syncs from the seller subscription edge function.</span></div></div>
+                        <div class="feature-item"><strong>03</strong><div><strong>Product listings</strong><span>Add name, price, description, category, and image URL from one simple form.</span></div></div>
+                    </div>
+                </article>
+                <article class="panel">
+                    <h2 class="panel-title">Seller access</h2>
+                    <p class="panel-copy">Use the same email you used for your AfroMkt seller subscription when possible.</p>
+                    <div class="tabs" role="tablist" aria-label="Authentication tabs"><button class="tab-btn active" id="loginTab" type="button">Log in</button><button class="tab-btn" id="signupTab" type="button">Sign up</button></div>
+                    <form id="loginForm" class="form">
+                        <div class="field"><label for="loginEmail">Email address</label><input id="loginEmail" class="input" type="email" autocomplete="email" placeholder="seller@example.com" required></div>
+                        <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" class="input" type="password" autocomplete="current-password" minlength="6" placeholder="Your password" required></div>
+                        <button class="btn btn-green" id="loginBtn" type="submit">Log in to dashboard</button>
+                    </form>
+                    <form id="signupForm" class="form hidden">
+                        <div class="field"><label for="signupEmail">Email address</label><input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="seller@example.com" required></div>
+                        <div class="field"><label for="signupPassword">Password</label><input id="signupPassword" class="input" type="password" autocomplete="new-password" minlength="6" placeholder="Minimum 6 characters" required></div>
+                        <button class="btn btn-gold" id="signupBtn" type="submit">Create seller account</button>
+                        <p class="form-help">If email confirmation is enabled in Supabase, check your inbox before logging in.</p>
+                    </form>
+                    <div id="authMessage" class="message" aria-live="polite"></div>
+                </article>
             </section>
 
-            <section id="emptyState" class="state-card hidden empty-card">
-                <h2>No active subscription found. Start selling today!</h2>
-                <p id="emptyCopy">We couldn’t find a seller subscription for this email yet. You can start a plan now or try a different seller email.</p>
-                <div class="summary-actions">
-                    <a class="btn btn-gold" href="sell.html">Go to Seller Plans</a>
-                    <button class="btn btn-outline" id="changeEmailEmpty" type="button">Use another email</button>
+            <section id="dashboardState" class="hidden">
+                <div class="dashboard-top">
+                    <div><h2 class="panel-title">Seller dashboard</h2><p class="panel-copy">Products and subscription status are tied to <strong id="sellerEmailHeading">your account</strong>.</p></div>
+                    <div class="dashboard-actions"><a class="btn btn-soft" href="sell.html">Upgrade or manage plan</a><button class="btn btn-green" id="logoutBtn" type="button">Logout</button></div>
                 </div>
-            </section>
 
-            <section id="dashboardState" class="dashboard-grid hidden">
-                <article class="card">
-                    <div id="statusBadge" class="status-pill status-active">Active</div>
-                    <h2 class="summary-title" id="planHeading">AfroMkt Seller Plan</h2>
-                    <p class="summary-subtitle" id="summaryText">Your live subscription details are shown below.</p>
-                    <div class="summary-grid">
-                        <div class="summary-row"><span>Seller email</span><strong id="sellerEmailValue">—</strong></div>
-                        <div class="summary-row"><span>Current plan</span><strong id="planValue">—</strong></div>
-                        <div class="summary-row"><span>Subscription status</span><strong id="statusValue">—</strong></div>
-                        <div class="summary-row"><span>Subscribed since</span><strong id="createdAtValue">—</strong></div>
-                    </div>
-                    <div class="summary-actions">
-                        <a class="btn btn-gold" href="sell.html">Manage Seller Plans</a>
-                        <button class="btn btn-outline" id="changeEmailDashboard" type="button">Use another email</button>
-                    </div>
-                </article>
+                <div class="dashboard-grid">
+                    <aside>
+                        <article class="card" id="planCard">
+                            <div id="statusBadge" class="status-pill status-unknown">Checking</div>
+                            <h2 id="planHeading">Subscription status</h2>
+                            <p class="muted" id="planSummary">Loading your plan details from Supabase.</p>
+                            <div class="summary-grid">
+                                <div class="summary-row"><span>Seller email</span><strong id="sellerEmailValue">—</strong></div>
+                                <div class="summary-row"><span>Current plan</span><strong id="planValue">—</strong></div>
+                                <div class="summary-row"><span>Status</span><strong id="statusValue">—</strong></div>
+                                <div class="summary-row"><span>Subscribed since</span><strong id="createdAtValue">—</strong></div>
+                            </div>
+                            <div class="renewal-note" id="renewalNote">Stripe manages renewals and billing updates from the seller plan flow.</div>
+                        </article>
+                    </aside>
 
-                <article class="card">
-                    <h2 class="summary-title" style="font-size:1.75rem;">Next steps for your storefront</h2>
-                    <p class="summary-subtitle">Now that your seller subscription is connected, here are the most useful launch moves to make next.</p>
-                    <div class="tips-list">
-                        <div class="tip-item"><h3>Upload your first 5 products</h3><p>Start with your strongest products, clear hero images, and pricing in euros so buyers can trust the listing instantly.</p></div>
-                        <div class="tip-item"><h3>Write a memorable brand story</h3><p>Tell customers what makes your products special, where they come from, and why your shop belongs in the AfroMkt marketplace.</p></div>
-                        <div class="tip-item"><h3>Prepare delivery details</h3><p>Have your packaging, delivery timeline, and return notes ready so your storefront feels polished from day one.</p></div>
-                    </div>
-                </article>
+                    <section>
+                        <article class="card product-form-card">
+                            <h2>Submit a product</h2>
+                            <p class="muted">Add a listing for the marketplace. Keep images clear, prices in EUR, and descriptions buyer-friendly.</p>
+                            <form id="productForm" class="form" style="margin-top:20px;">
+                                <div class="form-grid">
+                                    <div class="field"><label for="productName">Product name</label><input id="productName" class="input" type="text" maxlength="120" placeholder="Jollof spice mix" required></div>
+                                    <div class="field"><label for="productPrice">Price (EUR)</label><input id="productPrice" class="input" type="number" min="0" step="0.01" placeholder="19.99" required></div>
+                                </div>
+                                <div class="field"><label for="productDescription">Description</label><textarea id="productDescription" class="textarea" maxlength="1000" placeholder="Tell buyers what makes this product special..." required></textarea></div>
+                                <div class="form-grid">
+                                    <div class="field"><label for="productCategory">Category</label><select id="productCategory" class="select" required><option value="">Choose category</option><option>Food & Drinks</option><option>Fashion & Clothing</option><option>Beauty & Hair</option><option>Art & Crafts</option><option>Music & Culture</option><option>Other</option></select></div>
+                                    <div class="field"><label for="productImageUrl">Image URL</label><input id="productImageUrl" class="input" type="url" placeholder="https://example.com/product.jpg"></div>
+                                </div>
+                                <button class="btn btn-gold" id="productSubmitBtn" type="submit">Save product listing</button>
+                            </form>
+                            <div id="productMessage" class="message" aria-live="polite"></div>
+                        </article>
+
+                        <article class="card">
+                            <div class="listings-header"><div><h2>My listings</h2><p class="muted">Products submitted by the logged-in seller.</p></div><span class="listing-count" id="listingCount">0 listings</span></div>
+                            <div id="listingsContainer" class="listings-grid"></div>
+                        </article>
+                    </section>
+                </div>
             </section>
         </div>
     </main>
@@ -86,52 +315,135 @@
     <footer class="footer"><div class="container"><p>© 2026 AfroMkt (afro-mkt.com). All rights reserved.</p></div></footer>
 
     <script>
+        const SUPABASE_URL = 'https://nmusxculduptvefgqfjn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tdXN4Y3VsZHVwdHZlZmdxZmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNjcwNDQsImV4cCI6MjEwNTY0MzA0NH0._Nn3nacYJOg2nLcG_kxNSI3vTWtDHUEEH11Lvsera8s';
+        const SUBSCRIPTION_ENDPOINT = `${SUPABASE_URL}/functions/v1/get-subscription-status`;
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const mobileBtn = document.getElementById('mobileBtn');
         const navbar = document.querySelector('.navbar');
         const loadingState = document.getElementById('loadingState');
-        const emailState = document.getElementById('emailState');
-        const emptyState = document.getElementById('emptyState');
+        const authState = document.getElementById('authState');
         const dashboardState = document.getElementById('dashboardState');
-        const emailForm = document.getElementById('emailForm');
-        const sellerEmailInput = document.getElementById('sellerEmailInput');
-        const statusEndpoint = 'https://nmusxculduptvefgqfjn.supabase.co/functions/v1/get-subscription-status';
-        const params = new URLSearchParams(window.location.search);
-
-        const statusBadge = document.getElementById('statusBadge');
-        const planHeading = document.getElementById('planHeading');
-        const summaryText = document.getElementById('summaryText');
-        const sellerEmailValue = document.getElementById('sellerEmailValue');
-        const planValue = document.getElementById('planValue');
-        const statusValue = document.getElementById('statusValue');
-        const createdAtValue = document.getElementById('createdAtValue');
-        const emptyCopy = document.getElementById('emptyCopy');
-        const changeEmailButtons = [document.getElementById('changeEmailEmpty'), document.getElementById('changeEmailDashboard')];
+        const loginTab = document.getElementById('loginTab');
+        const signupTab = document.getElementById('signupTab');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const authMessage = document.getElementById('authMessage');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const productForm = document.getElementById('productForm');
+        const productSubmitBtn = document.getElementById('productSubmitBtn');
+        const productMessage = document.getElementById('productMessage');
+        const listingsContainer = document.getElementById('listingsContainer');
+        const listingCount = document.getElementById('listingCount');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        const userChip = document.getElementById('userChip');
+        const userEmailChip = document.getElementById('userEmailChip');
+        let currentUser = null;
 
         mobileBtn.addEventListener('click', () => {
             navbar.classList.toggle('nav-active');
-            mobileBtn.innerHTML = navbar.classList.contains('nav-active') ? '✕' : '☰';
+            mobileBtn.textContent = navbar.classList.contains('nav-active') ? '✕' : '☰';
         });
 
+        function setState(state) {
+            loadingState.classList.toggle('hidden', state !== 'loading');
+            authState.classList.toggle('hidden', state !== 'auth');
+            dashboardState.classList.toggle('hidden', state !== 'dashboard');
+        }
+
+        function setMessage(element, text, type = 'info') {
+            element.textContent = text || '';
+            element.className = text ? `message show ${type}` : 'message';
+        }
+
         function normalizeEmail(value) {
-            return typeof value === 'string' && value.trim() ? value.trim().toLowerCase() : '';
+            return typeof value === 'string' ? value.trim().toLowerCase() : '';
         }
 
-        function showState(target) {
-            [loadingState, emailState, emptyState, dashboardState].forEach((element) => element.classList.add('hidden'));
-            target.classList.remove('hidden');
+        function setAuthTab(tab) {
+            const isLogin = tab === 'login';
+            loginTab.classList.toggle('active', isLogin);
+            signupTab.classList.toggle('active', !isLogin);
+            loginForm.classList.toggle('hidden', !isLogin);
+            signupForm.classList.toggle('hidden', isLogin);
+            setMessage(authMessage, '');
         }
 
-        function formatPlanName(plan) {
-            if (plan === 'premium') return 'AfroMkt Premium Plan';
-            if (plan === 'basic') return 'AfroMkt Basic Plan';
-            return 'AfroMkt Seller Plan';
+        loginTab.addEventListener('click', () => setAuthTab('login'));
+        signupTab.addEventListener('click', () => setAuthTab('signup'));
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            setMessage(authMessage, '');
+            try {
+                const email = normalizeEmail(document.getElementById('loginEmail').value);
+                const password = document.getElementById('loginPassword').value;
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                await renderDashboard(data.user);
+            } catch (error) {
+                setMessage(authMessage, error.message || 'Login failed. Please check your details and try again.', 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Log in to dashboard';
+            }
+        });
+
+        signupForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Creating account...';
+            setMessage(authMessage, '');
+            try {
+                const email = normalizeEmail(document.getElementById('signupEmail').value);
+                const password = document.getElementById('signupPassword').value;
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: { data: { role: 'seller' } }
+                });
+                if (error) throw error;
+                if (data.session?.user) {
+                    await renderDashboard(data.session.user);
+                } else {
+                    setAuthTab('login');
+                    setMessage(authMessage, 'Account created. Please check your email to confirm your account, then log in.', 'success');
+                }
+            } catch (error) {
+                setMessage(authMessage, error.message || 'Signup failed. Please try again.', 'error');
+            } finally {
+                signupBtn.disabled = false;
+                signupBtn.textContent = 'Create seller account';
+            }
+        });
+
+        async function signOut() {
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            userChip.classList.remove('show');
+            navLogoutBtn.classList.add('hidden');
+            setState('auth');
+        }
+
+        logoutBtn.addEventListener('click', signOut);
+        navLogoutBtn.addEventListener('click', signOut);
+
+        function formatPlan(plan) {
+            if (plan === 'premium') return 'Premium';
+            if (plan === 'basic') return 'Basic';
+            return 'No paid plan found';
         }
 
         function formatStatus(status) {
             if (status === 'active') return 'Active';
             if (status === 'cancelled') return 'Cancelled';
-            if (status === 'past_due') return 'Past Due';
-            return 'Unknown';
+            if (status === 'past_due') return 'Past due';
+            return 'Not found';
         }
 
         function formatDate(value) {
@@ -141,85 +453,155 @@
             return date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
         }
 
-        function applyStatusBadge(status) {
-            statusBadge.className = 'status-pill';
-            if (status === 'active') statusBadge.classList.add('status-active');
-            else if (status === 'cancelled') statusBadge.classList.add('status-cancelled');
-            else statusBadge.classList.add('status-past_due');
-            statusBadge.textContent = formatStatus(status);
+        function renewalCopy(status, plan) {
+            if (status === 'active') return `Your ${formatPlan(plan)} subscription is active. Stripe will handle renewal automatically based on your billing cycle.`;
+            if (status === 'cancelled') return 'Your subscription is cancelled. You can restart or change your plan from the seller plans page.';
+            if (status === 'past_due') return 'Your subscription is past due. Please update payment details through Stripe or choose a seller plan again.';
+            return 'No active subscription record was found for this email. You can still prepare listings, but upgrade from Seller Plans before launch.';
         }
-
-        function clearSavedEmail() {
-            localStorage.removeItem('afromkt_seller_email');
-            const cleanUrl = `${window.location.pathname}`;
-            window.location.href = cleanUrl;
-        }
-
-        changeEmailButtons.forEach((button) => button.addEventListener('click', clearSavedEmail));
-
-        emailForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const email = normalizeEmail(sellerEmailInput.value);
-            if (!email) return;
-            localStorage.setItem('afromkt_seller_email', email);
-            window.location.reload();
-        });
 
         async function fetchSubscription(email) {
-            const response = await fetch(statusEndpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
+            const { data } = await supabaseClient.auth.getSession();
+            const headers = { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY };
+            if (data.session?.access_token) headers.Authorization = `Bearer ${data.session.access_token}`;
+            const response = await fetch(SUBSCRIPTION_ENDPOINT, { method: 'POST', headers, body: JSON.stringify({ email }) });
             if (!response.ok) throw new Error('Subscription lookup failed');
             return response.json();
         }
 
-        function renderEmpty(email) {
-            emptyCopy.textContent = `We couldn’t find a seller subscription for ${email} yet. You can start a plan now or try a different seller email.`;
-            showState(emptyState);
-        }
-
-        function renderDashboard(email, data) {
-            const planName = formatPlanName(data.plan);
+        async function renderPlan(email) {
+            const statusBadge = document.getElementById('statusBadge');
+            const planHeading = document.getElementById('planHeading');
+            const planSummary = document.getElementById('planSummary');
+            const sellerEmailValue = document.getElementById('sellerEmailValue');
+            const planValue = document.getElementById('planValue');
+            const statusValue = document.getElementById('statusValue');
+            const createdAtValue = document.getElementById('createdAtValue');
+            const renewalNote = document.getElementById('renewalNote');
             sellerEmailValue.textContent = email;
-            planHeading.textContent = planName;
-            planValue.textContent = data.plan ? (data.plan === 'premium' ? 'Premium' : 'Basic') : '—';
-            statusValue.textContent = formatStatus(data.status);
-            createdAtValue.textContent = formatDate(data.created_at);
-            summaryText.textContent = `Your live ${planName} details are synced from Supabase.`;
-            applyStatusBadge(data.status || 'past_due');
-            showState(dashboardState);
+            try {
+                const data = await fetchSubscription(email);
+                const plan = data?.plan || null;
+                const status = data?.status || null;
+                const statusClass = status === 'active' ? 'status-active' : status === 'cancelled' ? 'status-cancelled' : status === 'past_due' ? 'status-past_due' : 'status-unknown';
+                statusBadge.className = `status-pill ${statusClass}`;
+                statusBadge.textContent = formatStatus(status);
+                planHeading.textContent = plan ? `AfroMkt ${formatPlan(plan)} Plan` : 'Subscription status';
+                planSummary.textContent = plan ? 'Your live seller subscription details are synced from Supabase.' : 'No paid seller subscription record was found for this login email.';
+                planValue.textContent = formatPlan(plan);
+                statusValue.textContent = formatStatus(status);
+                createdAtValue.textContent = formatDate(data?.created_at);
+                renewalNote.textContent = renewalCopy(status, plan);
+            } catch (error) {
+                statusBadge.className = 'status-pill status-unknown';
+                statusBadge.textContent = 'Unavailable';
+                planHeading.textContent = 'Subscription status unavailable';
+                planSummary.textContent = 'The dashboard could not reach the subscription status function.';
+                planValue.textContent = '—';
+                statusValue.textContent = 'Check failed';
+                createdAtValue.textContent = '—';
+                renewalNote.textContent = 'Confirm the get-subscription-status edge function is deployed, public CORS is enabled, and JWT verification is configured as intended.';
+            }
         }
 
-        async function initializeDashboard() {
-            const queryEmail = normalizeEmail(params.get('email'));
-            if (queryEmail) {
-                localStorage.setItem('afromkt_seller_email', queryEmail);
-            }
-
-            const sellerEmail = queryEmail || normalizeEmail(localStorage.getItem('afromkt_seller_email'));
-            if (!sellerEmail) {
-                showState(emailState);
-                return;
-            }
-
-            showState(loadingState);
-
+        productForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!currentUser?.email) return;
+            productSubmitBtn.disabled = true;
+            productSubmitBtn.textContent = 'Saving product...';
+            setMessage(productMessage, '');
+            const payload = {
+                seller_email: normalizeEmail(currentUser.email),
+                name: document.getElementById('productName').value.trim(),
+                price: Number(document.getElementById('productPrice').value),
+                description: document.getElementById('productDescription').value.trim(),
+                category: document.getElementById('productCategory').value,
+                image_url: document.getElementById('productImageUrl').value.trim() || null,
+                is_active: true
+            };
             try {
-                const data = await fetchSubscription(sellerEmail);
-                const hasSubscription = Boolean(data && (data.plan || data.status || data.created_at));
-                if (!hasSubscription) {
-                    renderEmpty(sellerEmail);
+                const { error } = await supabaseClient.from('products').insert(payload);
+                if (error) throw error;
+                productForm.reset();
+                setMessage(productMessage, 'Product saved successfully.', 'success');
+                await loadListings(payload.seller_email);
+            } catch (error) {
+                setMessage(productMessage, error.message || 'Product could not be saved. Check your products table and RLS policies.', 'error');
+            } finally {
+                productSubmitBtn.disabled = false;
+                productSubmitBtn.textContent = 'Save product listing';
+            }
+        });
+
+        function listingImage(product) {
+            if (product.image_url) return `<img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.parentElement.textContent='Image unavailable'">`;
+            return 'No image yet';
+        }
+
+        function escapeHtml(value) {
+            return String(value || '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+        }
+
+        async function loadListings(email) {
+            listingsContainer.innerHTML = '<div class="empty-listings">Loading your products...</div>';
+            listingCount.textContent = 'Loading';
+            try {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('id,seller_email,name,price,description,category,image_url,created_at,is_active')
+                    .eq('seller_email', email)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                const products = data || [];
+                listingCount.textContent = `${products.length} ${products.length === 1 ? 'listing' : 'listings'}`;
+                if (!products.length) {
+                    listingsContainer.innerHTML = '<div class="empty-listings">No listings yet. Add your first product above and it will appear here.</div>';
                     return;
                 }
-                renderDashboard(sellerEmail, data);
+                listingsContainer.innerHTML = products.map((product) => `
+                    <article class="listing-card">
+                        <div class="listing-image">${listingImage(product)}</div>
+                        <div class="listing-body">
+                            <div class="listing-meta"><h3>${escapeHtml(product.name)}</h3><div class="price">€${Number(product.price || 0).toFixed(2)}</div></div>
+                            <span class="category-tag">${escapeHtml(product.category || 'Other')}</span>
+                            <p class="muted">${escapeHtml(product.description || '')}</p>
+                        </div>
+                    </article>
+                `).join('');
             } catch (error) {
-                renderEmpty(sellerEmail);
+                listingCount.textContent = 'Error';
+                listingsContainer.innerHTML = `<div class="empty-listings">Could not load listings: ${escapeHtml(error.message || 'Unknown error')}</div>`;
             }
         }
 
-        initializeDashboard();
+        async function renderDashboard(user) {
+            currentUser = user;
+            const email = normalizeEmail(user?.email);
+            document.getElementById('sellerEmailHeading').textContent = email;
+            userEmailChip.textContent = email;
+            userChip.classList.add('show');
+            navLogoutBtn.classList.remove('hidden');
+            setState('dashboard');
+            await Promise.all([renderPlan(email), loadListings(email)]);
+        }
+
+        async function init() {
+            setState('loading');
+            const { data } = await supabaseClient.auth.getSession();
+            if (data.session?.user) await renderDashboard(data.session.user);
+            else setState('auth');
+            supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+                if (session?.user) await renderDashboard(session.user);
+                else {
+                    currentUser = null;
+                    userChip.classList.remove('show');
+                    navLogoutBtn.classList.add('hidden');
+                    setState('auth');
+                }
+            });
+        }
+
+        init();
     </script>
 </body>
 </html>
