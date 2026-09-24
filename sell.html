@@ -6,7 +6,6 @@
     <title>Sell on AfroMkt - Seller Plans</title>
     <meta name="description" content="Start selling on AfroMkt and reach African communities across Portugal and beyond.">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://js.stripe.com/v3/"></script>
     <style>
         :root {
             --primary: #1a3c2e;
@@ -742,9 +741,9 @@
     </footer>
 
     <script>
-        const stripe = Stripe('pk_live_51UIsuZ4Poh3P3YxvzanLlw1xH2kQylMLTR1P6n6y1nD6r4mkE5WQsdbOhGoGpReT6lDHg3dmyQe2Idjbn6Y8jMzJ00zOsJ9vYf');
         const mobileBtn = document.getElementById('mobileBtn');
         const navbar = document.querySelector('.navbar');
+        const checkoutEndpoint = 'https://nmusxculduptvefgqfjn.supabase.co/functions/v1/create-checkout-session';
 
         mobileBtn.addEventListener('click', () => {
             navbar.classList.toggle('nav-active');
@@ -758,32 +757,39 @@
             });
         });
 
-        document.querySelectorAll('.checkout-btn').forEach(button => {
-            button.addEventListener('click', async () => {
-                const message = button.parentElement.querySelector('.checkout-message');
-                const originalText = button.textContent;
-                button.disabled = true;
-                button.textContent = 'Redirecting...';
-                message.textContent = '';
+        async function startCheckout(priceId, button) {
+            const message = button.parentElement.querySelector('.checkout-message');
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Redirecting...';
+            message.textContent = '';
 
-                try {
-                    const result = await stripe.redirectToCheckout({
-                        lineItems: [{ price: button.dataset.priceId, quantity: 1 }],
-                        mode: 'subscription',
-                        successUrl: 'https://afro-mkt.com/success.html',
-                        cancelUrl: 'https://afro-mkt.com/sell.html'
-                    });
+            try {
+                const response = await fetch(checkoutEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ priceId })
+                });
+                const data = await response.json();
 
-                    if (result.error) {
-                        message.textContent = result.error.message || 'Checkout could not start. Please try again.';
-                    }
-                } catch (error) {
-                    console.error('Stripe Checkout redirect failed:', error);
-                    message.textContent = 'Checkout could not start. Please try again.';
-                } finally {
-                    button.disabled = false;
-                    button.textContent = originalText;
+                if (data.url) {
+                    window.location.href = data.url;
+                    return;
                 }
+
+                message.textContent = `Checkout could not start: ${data.error || 'Unknown error'}`;
+            } catch (error) {
+                console.error('Checkout session creation failed:', error);
+                message.textContent = 'Checkout could not start. Please try again.';
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+
+        document.querySelectorAll('.checkout-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                startCheckout(button.dataset.priceId, button);
             });
         });
     </script>
