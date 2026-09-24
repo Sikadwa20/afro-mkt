@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell on AfroMkt - Seller Plans</title>
+    <meta name="description" content="Start selling on AfroMkt and reach African communities across Portugal and beyond.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        :root {
+            --primary: #1a3c2e;
+            --primary-dark: #0d2f21;
+            --accent: #d4a843;
+            --accent-dark: #b88b24;
+            --white: #ffffff;
+            --light-bg: #f4f6f5;
+            --text-main: #2f352f;
+            --text-light: #66706a;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            color: var(--text-main);
+            background-color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .btn-gold {
+            background-color: var(--accent);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(212, 168, 67, 0.3);
+        }
+
+        .btn-gold:hover {
+            background-color: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 168, 67, 0.4);
+        }
+
+        .btn-green {
+            background-color: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(26, 60, 46, 0.24);
+        }
+
+        .btn-green:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+        }
+
+        .navbar-brand img {
+            height: 45px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-buttons .sign-in {
+            font-weight: 600;
+            color: var(--primary-dark);
+            transition: var(--transition);
+        }
+
+        .nav-buttons .sign-in:hover {
+            color: var(--accent);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--primary-dark);
+            cursor: pointer;
+        }
+
+        .hero {
+            padding: 170px 0 90px;
+            position: relative;
+            background-color: var(--primary-dark);
+            background-image:
+                linear-gradient(135deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+                linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+                linear-gradient(315deg, rgba(255,255,255,0.04) 25%, var(--primary-dark) 25%);
+            background-position: 20px 0, 20px 0, 0 0, 0 0;
+            background-size: 40px 40px;
+            background-repeat: repeat;
+            color: var(--white);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(212,168,67,0.18) 0%, rgba(13,47,33,0.95) 66%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #f6e7bd;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #ffffff, #f4e8c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            font-weight: 300;
+            color: #e8eee9;
+            max-width: 720px;
+            margin: 0 auto 36px;
+        }
+
+        .trust-row {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+        }
+
+        .trust-pill {
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 4px;
+            background-color: var(--accent);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .section-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .pricing-section {
+            padding: 100px 0;
+            background: var(--light-bg);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 34px;
+            align-items: stretch;
+        }
+
+        .plan-card {
+            position: relative;
+            background: var(--white);
+            border-radius: 24px;
+            padding: 42px;
+            border: 1px solid rgba(26,60,46,0.1);
+            box-shadow: 0 16px 45px rgba(0,0,0,0.06);
+            transition: var(--transition);
+        }
+
+        .plan-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.1);
+        }
+
+        .plan-card.featured {
+            border: 2px solid var(--accent);
+            box-shadow: 0 22px 70px rgba(212,168,67,0.2);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 22px;
+            right: 22px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--accent);
+            color: var(--white);
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .plan-name {
+            color: var(--primary-dark);
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .plan-price {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            color: var(--primary);
+            margin-bottom: 22px;
+        }
+
+        .plan-price strong {
+            font-size: 3rem;
+            line-height: 1;
+        }
+
+        .plan-price span {
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .plan-features {
+            display: grid;
+            gap: 14px;
+            margin: 30px 0 34px;
+        }
+
+        .plan-features li {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            color: var(--text-main);
+        }
+
+        .check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(212,168,67,0.18);
+            color: var(--accent-dark);
+            font-weight: 800;
+        }
+
+        .checkout-message {
+            margin-top: 16px;
+            min-height: 24px;
+            color: #b42318;
+            font-size: 0.95rem;
+        }
+
+        .community-section {
+            padding: 90px 0;
+            background: var(--white);
+        }
+
+        .community-panel {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 38px;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 28px;
+            padding: 48px;
+            color: var(--white);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .community-panel::after {
+            content: '';
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            right: -80px;
+            bottom: -90px;
+            border-radius: 50%;
+            background: rgba(212,168,67,0.18);
+        }
+
+        .community-panel h2 {
+            font-size: 2.2rem;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+
+        .community-panel p {
+            color: rgba(255,255,255,0.88);
+            font-size: 1.05rem;
+        }
+
+        .mini-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .mini-stat {
+            padding: 22px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+
+        .mini-stat strong {
+            display: block;
+            color: #f6e7bd;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .footer {
+            background-color: #08301a;
+            color: #d1d5d3;
+            padding: 80px 0 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        .footer-brand img {
+            height: 50px;
+            margin-bottom: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-brand p {
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .footer-heading {
+            color: var(--white);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            .pricing-grid,
+            .community-panel {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links, .nav-buttons {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .hero {
+                padding: 140px 0 80px;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .plan-card,
+            .community-panel {
+                padding: 30px;
+            }
+            .mini-stats {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .social-links {
+                justify-content: center;
+            }
+            .footer-brand img {
+                margin: 0 auto 20px;
+            }
+            .footer-brand p {
+                margin: 0 auto 20px;
+            }
+        }
+
+        .nav-active .nav-links {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            padding: 30px 20px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+            align-items: flex-start;
+        }
+        .nav-active .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 260px;
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            padding: 0 20px 30px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+            align-items: flex-start;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-brand">
+                <img src="afromkt-profile-avatar.png" alt="AfroMkt Logo">
+                AfroMkt
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#categories">Categories</a></li>
+                <li><a href="index.html#how-it-works">How it Works</a></li>
+                <li><a href="sell.html" class="active">Sell on AfroMkt</a></li>
+            </ul>
+
+            <div class="nav-buttons" id="navButtons">
+                <a href="index.html#waitlist" class="sign-in">Sign In</a>
+                <a href="#pricing" class="btn btn-gold">Get Started</a>
+            </div>
+
+            <button class="mobile-menu-btn" id="mobileBtn" aria-label="Open menu">☰</button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-kicker">Seller subscriptions now open</div>
+                    <h1>Start Selling on AfroMkt</h1>
+                    <p>Reach African communities across Portugal and beyond.</p>
+                    <div class="trust-row" aria-label="Seller benefits">
+                        <span class="trust-pill">Built for local African businesses</span>
+                        <span class="trust-pill">Simple monthly pricing</span>
+                        <span class="trust-pill">Stripe-powered checkout</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pricing-section" id="pricing">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Choose Your Seller Plan</h2>
+                    <p>Start small or go premium with boosted visibility. Pick the plan that fits your products, services, and growth goals.</p>
+                </div>
+
+                <div class="pricing-grid">
+                    <article class="plan-card">
+                        <h3 class="plan-name">Basic Plan</h3>
+                        <div class="plan-price"><strong>€9.99</strong><span>/month</span></div>
+                        <ul class="plan-features">
+                            <li><span class="check">✓</span><span>List up to 10 products</span></li>
+                            <li><span class="check">✓</span><span>Standard visibility</span></li>
+                            <li><span class="check">✓</span><span>Email support</span></li>
+                            <li><span class="check">✓</span><span>Join the community</span></li>
+                        </ul>
+                        <button class="btn btn-green checkout-btn" type="button" data-price-id="price_1UJ7Pp4Poh3P3Yxvs6XGZQz0">Get Started</button>
+                        <p class="checkout-message" aria-live="polite"></p>
+                    </article>
+
+                    <article class="plan-card featured">
+                        <div class="featured-badge">Featured</div>
+                        <h3 class="plan-name">Premium Plan</h3>
+                        <div class="plan-price"><strong>€24.99</strong><span>/month</span></div>
+                        <ul class="plan-features">
+                            <li><span class="check">✓</span><span>Unlimited product listings</span></li>
+                            <li><span class="check">✓</span><span>Featured &amp; boosted visibility</span></li>
+                            <li><span class="check">✓</span><span>Priority support</span></li>
+                            <li><span class="check">✓</span><span>Analytics dashboard (coming soon)</span></li>
+                        </ul>
+                        <button class="btn btn-gold checkout-btn" type="button" data-price-id="price_1UJ7Qk4Poh3P3YxvDnZ1nDsT">Get Started</button>
+                        <p class="checkout-message" aria-live="polite"></p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="community-section">
+            <div class="container">
+                <div class="community-panel">
+                    <div>
+                        <h2>Turn your products into a community storefront.</h2>
+                        <p>AfroMkt helps African-owned shops, food vendors, beauty professionals, fashion sellers, and service providers get discovered by customers who already want to support the culture.</p>
+                    </div>
+                    <div class="mini-stats">
+                        <div class="mini-stat"><strong>Portugal-first</strong><span>Built around the first launch market.</span></div>
+                        <div class="mini-stat"><strong>Global-ready</strong><span>Designed to grow beyond borders.</span></div>
+                        <div class="mini-stat"><strong>Community-led</strong><span>Focused on trust, culture, and visibility.</span></div>
+                        <div class="mini-stat"><strong>Easy start</strong><span>Subscribe and begin onboarding.</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="afromkt-profile-avatar.png" alt="AfroMkt Logo">
+                    <p>The premier African Community Marketplace. Launching in Portugal, expanding globally to connect our vibrant culture.</p>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/profile.php?id=61594427231294" target="_blank" rel="noopener noreferrer">FB</a>
+                        <a href="https://www.instagram.com/afro_mkt/" target="_blank" rel="noopener noreferrer">IG</a>
+                        <a href="#">TW</a>
+                    </div>
+                </div>
+
+                <div class="footer-links-group">
+                    <h4 class="footer-heading">Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html#categories">Shop Categories</a></li>
+                        <li><a href="sell.html">Become a Seller</a></li>
+                        <li><a href="index.html#how-it-works">Delivery Info</a></li>
+                        <li><a href="index.html#why-us">Buyer Protection</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links-group">
+                    <h4 class="footer-heading">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html#why-us">About Us</a></li>
+                        <li><a href="index.html#waitlist">Careers</a></li>
+                        <li><a href="index.html#waitlist">Press</a></li>
+                        <li><a href="index.html#waitlist">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links-group">
+                    <h4 class="footer-heading">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Seller Agreement</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 AfroMkt (afro-mkt.com). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const stripe = Stripe('pk_live_51UIsuZ4Poh3P3YxvzanLlw1xH2kQylMLTR1P6n6y1nD6r4mkE5WQsdbOhGoGpReT6lDHg3dmyQe2Idjbn6Y8jMzJ00zOsJ9vYf');
+        const mobileBtn = document.getElementById('mobileBtn');
+        const navbar = document.querySelector('.navbar');
+
+        mobileBtn.addEventListener('click', () => {
+            navbar.classList.toggle('nav-active');
+            mobileBtn.innerHTML = navbar.classList.contains('nav-active') ? '✕' : '☰';
+        });
+
+        document.querySelectorAll('.nav-links a, .nav-buttons a').forEach(link => {
+            link.addEventListener('click', () => {
+                navbar.classList.remove('nav-active');
+                mobileBtn.innerHTML = '☰';
+            });
+        });
+
+        document.querySelectorAll('.checkout-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const message = button.parentElement.querySelector('.checkout-message');
+                const originalText = button.textContent;
+                button.disabled = true;
+                button.textContent = 'Redirecting...';
+                message.textContent = '';
+
+                try {
+                    const result = await stripe.redirectToCheckout({
+                        lineItems: [{ price: button.dataset.priceId, quantity: 1 }],
+                        mode: 'subscription',
+                        successUrl: 'https://afro-mkt.com/success.html',
+                        cancelUrl: 'https://afro-mkt.com/sell.html'
+                    });
+
+                    if (result.error) {
+                        message.textContent = result.error.message || 'Checkout could not start. Please try again.';
+                    }
+                } catch (error) {
+                    console.error('Stripe Checkout redirect failed:', error);
+                    message.textContent = 'Checkout could not start. Please try again.';
+                } finally {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

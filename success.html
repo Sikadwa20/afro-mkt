@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to AfroMkt</title>
+    <meta name="description" content="Your AfroMkt seller subscription is active.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3c2e;
+            --primary-dark: #0d2f21;
+            --accent: #d4a843;
+            --accent-dark: #b88b24;
+            --white: #ffffff;
+            --text-light: #e8eee9;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--white);
+            background-color: var(--primary-dark);
+            background-image:
+                linear-gradient(135deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+                linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+                linear-gradient(315deg, rgba(255,255,255,0.04) 25%, var(--primary-dark) 25%);
+            background-position: 20px 0, 20px 0, 0 0, 0 0;
+            background-size: 40px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .success-card {
+            width: 100%;
+            max-width: 680px;
+            padding: 54px 42px;
+            border-radius: 28px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: 0 30px 90px rgba(0,0,0,0.25);
+            backdrop-filter: blur(12px);
+        }
+
+        .success-card img {
+            width: 86px;
+            height: 86px;
+            object-fit: contain;
+            margin-bottom: 24px;
+            filter: drop-shadow(0 12px 30px rgba(0,0,0,0.18));
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            line-height: 1.1;
+            margin-bottom: 18px;
+            background: linear-gradient(to right, #ffffff, #f4e8c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: var(--text-light);
+            font-size: 1.15rem;
+            margin: 0 auto 32px;
+            max-width: 540px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 30px;
+            border-radius: 50px;
+            background-color: var(--accent);
+            color: var(--white);
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(212,168,67,0.3);
+        }
+
+        .btn:hover {
+            background-color: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212,168,67,0.42);
+        }
+
+        @media (max-width: 640px) {
+            .success-card {
+                padding: 42px 24px;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+            p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="success-card">
+        <img src="afromkt-profile-avatar.png" alt="AfroMkt Logo">
+        <h1>You're in! 🎉</h1>
+        <p>Welcome to AfroMkt. Your seller subscription is active. We'll be in touch soon.</p>
+        <a href="index.html" class="btn">Back to Homepage</a>
+    </main>
+</body>
+</html>
