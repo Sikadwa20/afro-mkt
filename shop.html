@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfroMkt Shop - African Products Across Europe</title>
+    <meta name="description" content="Discover African products from AfroMkt sellers across Europe.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3c2e;
+            --primary-dark: #0d2f21;
+            --accent: #d4a843;
+            --accent-dark: #b88b24;
+            --white: #ffffff;
+            --light-bg: #f4f6f5;
+            --text-main: #2f352f;
+            --text-light: #66706a;
+            --transition: all .3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { color: var(--text-main); background: var(--white); line-height: 1.6; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .btn { display: inline-block; padding: 12px 28px; border-radius: 50px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: var(--transition); text-align: center; border: 2px solid transparent; }
+        .btn-gold { background: var(--accent); color: var(--white); box-shadow: 0 4px 15px rgba(212,168,67,.3); }
+        .btn-gold:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212,168,67,.4); }
+        .btn-outline-light { background: rgba(255,255,255,.08); color: var(--white); border-color: rgba(255,255,255,.84); }
+        .btn-outline-light:hover { background: var(--white); color: var(--primary-dark); }
+        .navbar { background: rgba(255,255,255,.96); backdrop-filter: blur(12px); box-shadow: 0 2px 10px rgba(0,0,0,.05); position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; min-height: 80px; gap: 18px; }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .brand-logo { width: 148px; height: 45px; display: block; }
+        .nav-links, .nav-buttons { display: flex; align-items: center; gap: 26px; }
+        .nav-links a { font-weight: 600; font-size: .95rem; transition: var(--transition); position: relative; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0; background: var(--accent); transition: var(--transition); }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+        .sign-in { font-weight: 700; color: var(--primary-dark); transition: var(--transition); }
+        .sign-in:hover { color: var(--accent); }
+        .language-selector { position: relative; }
+        .language-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; border: 1px solid rgba(26,60,46,.18); background: var(--primary-dark); color: var(--white); font-weight: 800; cursor: pointer; transition: var(--transition); }
+        .language-btn:hover, .language-selector.open .language-btn { background: var(--accent); }
+        .language-menu { position: absolute; top: calc(100% + 10px); right: 0; min-width: 150px; background: var(--white); border-radius: 16px; box-shadow: 0 18px 40px rgba(0,0,0,.12); padding: 8px; display: none; z-index: 1001; }
+        .language-selector.open .language-menu { display: block; }
+        .language-option { width: 100%; display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 11px 12px; border-radius: 12px; color: var(--text-main); cursor: pointer; font-weight: 700; text-align: left; transition: var(--transition); }
+        .language-option:hover, .language-option.active { background: rgba(26,60,46,.08); color: var(--primary-dark); }
+        .mobile-menu-btn { display: none; font-size: 1.6rem; background: none; border: 0; color: var(--primary-dark); cursor: pointer; }
+        .hero { padding: 170px 0 92px; position: relative; color: var(--white); background: linear-gradient(135deg, rgba(13,47,33,.95), rgba(26,60,46,.78)), radial-gradient(circle at top right, rgba(212,168,67,.28), transparent 36%), url('https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1800&q=80'); background-size: cover; background-position: center; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at left center, rgba(212,168,67,.18), transparent 42%); }
+        .hero .container { position: relative; z-index: 2; }
+        .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 34px; align-items: center; }
+        .hero-badge { display: inline-flex; padding: 10px 16px; border-radius: 999px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); color: #f7e7ba; font-weight: 800; margin-bottom: 18px; }
+        .hero h1 { font-size: 3.7rem; font-weight: 800; line-height: 1.08; margin-bottom: 18px; background: linear-gradient(to right,#fff,#f4e8c1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.15rem; color: #eef4ef; max-width: 620px; margin-bottom: 34px; }
+        .hero-buttons { display: flex; gap: 18px; flex-wrap: wrap; }
+        .hero-panel { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 28px; padding: 28px; backdrop-filter: blur(12px); box-shadow: 0 22px 60px rgba(0,0,0,.18); }
+        .hero-panel h3 { font-size: 1.25rem; margin-bottom: 12px; }
+        .hero-panel p { margin: 0 0 18px; font-size: .98rem; color: rgba(255,255,255,.84); }
+        .mini-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .mini-card { padding: 16px; border-radius: 20px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.12); }
+        .mini-card strong { display: block; color: #f6e7bd; font-size: 1.25rem; margin-bottom: 6px; }
+        .mini-card span { color: rgba(255,255,255,.85); font-size: .92rem; }
+        .products-section { padding: 96px 0; background: var(--light-bg); }
+        .section-header { text-align: center; margin-bottom: 30px; }
+        .section-header h2 { font-size: 2.6rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 14px; }
+        .section-header p { color: var(--text-light); font-size: 1.05rem; max-width: 760px; margin: 0 auto; }
+        .filter-bar { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 34px 0 22px; }
+        .filter-btn { border: 0; border-radius: 999px; padding: 12px 18px; background: #ffffff; color: var(--primary-dark); font-weight: 700; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.05); transition: var(--transition); }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary-dark); color: #ffffff; transform: translateY(-2px); }
+        .grid-intro { text-align: center; color: var(--text-light); font-weight: 600; margin-bottom: 26px; }
+        .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
+        .product-card { background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 40px rgba(0,0,0,.06); border: 1px solid rgba(26,60,46,.08); transition: var(--transition); display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 22px 48px rgba(0,0,0,.1); }
+        .product-visual { min-height: 180px; display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; color: #ffffff; }
+        .visual-1 { background: linear-gradient(135deg, #da7f41, #9c3b2f); }
+        .visual-2 { background: linear-gradient(135deg, #c84a30, #7c1f16); }
+        .visual-3 { background: linear-gradient(135deg, #9c7b2c, #4f5f12); }
+        .visual-4 { background: linear-gradient(135deg, #bb8a3d, #5c3620); }
+        .visual-5 { background: linear-gradient(135deg, #2f6382, #1b2f57); }
+        .visual-6 { background: linear-gradient(135deg, #7c5a3c, #2b3f30); }
+        .product-category { position: absolute; top: 16px; left: 16px; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.22); font-size: .78rem; font-weight: 800; letter-spacing: .03em; backdrop-filter: blur(10px); }
+        .product-body { padding: 24px; display: flex; flex-direction: column; flex: 1; }
+        .product-body h3 { color: var(--primary-dark); font-size: 1.28rem; margin-bottom: 10px; }
+        .product-body p { color: var(--text-light); font-size: .96rem; margin-bottom: 18px; }
+        .product-meta { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-top: auto; margin-bottom: 18px; }
+        .seller-pill { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; background: #f7faf8; color: var(--primary-dark); font-size: .86rem; font-weight: 700; }
+        .price-tag { font-size: 1.25rem; font-weight: 800; color: var(--primary-dark); }
+        .add-cart-btn { width: 100%; border: 0; border-radius: 16px; padding: 14px 18px; background: var(--accent); color: #ffffff; font-size: .98rem; font-weight: 800; cursor: pointer; transition: var(--transition); }
+        .add-cart-btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
+        .seller-cta { padding: 94px 0; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); text-align: center; position: relative; overflow: hidden; }
+        .seller-cta::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(212,168,67,.14), transparent 58%); }
+        .seller-cta .container { position: relative; z-index: 2; }
+        .seller-cta h2 { font-size: 2.9rem; margin-bottom: 16px; }
+        .seller-cta p { max-width: 720px; margin: 0 auto 30px; color: rgba(255,255,255,.88); font-size: 1.08rem; }
+        .footer { background: #08301a; color: #d1d5d3; padding: 80px 0 40px; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 50px; margin-bottom: 50px; }
+        .footer-brand p { margin: 18px 0 20px; max-width: 320px; }
+        .footer-heading { color: #ffffff; font-size: 1.2rem; margin-bottom: 20px; font-weight: 700; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a:hover { color: var(--accent); padding-left: 5px; }
+        .social-links { display: flex; gap: 15px; }
+        .social-links a { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.1); color: #ffffff; transition: var(--transition); }
+        .social-links a:hover { background: var(--accent); transform: translateY(-3px); }
+        .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid rgba(255,255,255,.1); font-size: .9rem; }
+        .toast { position: fixed; right: 20px; bottom: 20px; background: var(--primary-dark); color: #ffffff; padding: 14px 18px; border-radius: 16px; box-shadow: 0 18px 42px rgba(13,47,33,.25); opacity: 0; transform: translateY(18px); pointer-events: none; transition: var(--transition); z-index: 1200; font-weight: 700; }
+        .toast.visible { opacity: 1; transform: translateY(0); }
+        @media (max-width: 992px) {
+            .hero-grid, .product-grid, .footer-grid { grid-template-columns: 1fr 1fr; }
+            .hero-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .navbar .container { flex-wrap: wrap; }
+            .nav-links, .nav-buttons { display: none; }
+            .mobile-menu-btn { display: block; margin-left: auto; }
+            .hero { padding: 138px 0 76px; }
+            .hero h1 { font-size: 2.55rem; }
+            .hero-buttons { flex-direction: column; }
+            .mini-cards, .product-grid, .footer-grid { grid-template-columns: 1fr; }
+            .products-section, .seller-cta { padding: 72px 0; }
+            .seller-cta h2 { font-size: 2.2rem; }
+            .footer-grid { text-align: center; }
+            .social-links { justify-content: center; }
+            .footer-brand p { margin-left: auto; margin-right: auto; }
+            .nav-active .nav-links, .nav-active .nav-buttons { display: flex; flex-direction: column; position: absolute; left: 0; width: 100%; background: var(--white); padding: 24px 20px; box-shadow: 0 10px 15px rgba(0,0,0,.05); align-items: flex-start; }
+            .nav-active .nav-links { top: 80px; }
+            .nav-active .nav-buttons { top: 316px; }
+            .language-selector, .language-btn { width: 100%; }
+            .language-btn { justify-content: center; }
+            .language-menu { position: static; margin-top: 10px; box-shadow: none; border: 1px solid rgba(26,60,46,.12); }
+            .toast { left: 20px; right: 20px; bottom: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-brand" aria-label="AfroMkt homepage">
+                <svg class="brand-logo" viewBox="0 0 220 68" role="img" aria-label="AfroMkt logo"><rect width="220" height="68" rx="18" fill="#1a3c2e"/><path d="M18 49C31 21 47 18 58 49" fill="none" stroke="#d4a843" stroke-width="6" stroke-linecap="round"/><path d="M31 39h14" stroke="#d4a843" stroke-width="5" stroke-linecap="round"/><text x="72" y="43" fill="#fff" font-size="30" font-family="Poppins, Arial" font-weight="800">Afro</text><text x="143" y="43" fill="#d4a843" font-size="30" font-family="Poppins, Arial" font-weight="800">Mkt</text></svg>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" data-i18n="navHome">Home</a></li>
+                <li><a href="shop.html" class="active" data-i18n="navShop">Shop</a></li>
+                <li><a href="sell.html" data-i18n="navSell">Sell on AfroMkt</a></li>
+            </ul>
+            <div class="nav-buttons" id="navButtons">
+                <a href="dashboard.html" class="sign-in" data-i18n="navSignIn">Sign In</a>
+                <div class="language-selector" id="languageSelector">
+                    <button class="language-btn" id="languageBtn" type="button" aria-haspopup="true" aria-expanded="false">🇬🇧 EN</button>
+                    <div class="language-menu">
+                        <button class="language-option" type="button" data-lang="pt">🇵🇹 PT</button>
+                        <button class="language-option" type="button" data-lang="fr">🇫🇷 FR</button>
+                        <button class="language-option" type="button" data-lang="es">🇪🇸 ES</button>
+                        <button class="language-option" type="button" data-lang="en">🇬🇧 EN</button>
+                    </div>
+                </div>
+                <a href="sell.html" class="btn btn-gold" data-i18n="navGetStarted">Get Started</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileBtn" aria-label="Open menu">☰</button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-grid">
+                    <div>
+                        <div class="hero-badge" data-i18n="heroBadge">Curated picks from AfroMkt sellers</div>
+                        <h1 data-i18n="heroTitle">Shop African Products</h1>
+                        <p data-i18n="heroSubtitle">Discover authentic products from African sellers across Europe.</p>
+                        <div class="hero-buttons">
+                            <a href="#products" class="btn btn-gold" data-i18n="heroExplore">Explore Products</a>
+                            <a href="sell.html" class="btn btn-outline-light" data-i18n="heroSell">List Your Products</a>
+                        </div>
+                    </div>
+                    <aside class="hero-panel">
+                        <h3 data-i18n="heroPanelTitle">Why buyers will love AfroMkt</h3>
+                        <p data-i18n="heroPanelText">From pantry staples to fashion, beauty, decor, and tech essentials, AfroMkt helps customers support trusted African sellers in one beautiful storefront.</p>
+                        <div class="mini-cards">
+                            <div class="mini-card"><strong data-i18n="miniOneTitle">Diaspora-first</strong><span data-i18n="miniOneText">Products chosen for African communities living across Europe.</span></div>
+                            <div class="mini-card"><strong data-i18n="miniTwoTitle">Authentic finds</strong><span data-i18n="miniTwoText">Culture-led products with real seller stories behind them.</span></div>
+                            <div class="mini-card"><strong data-i18n="miniThreeTitle">Growing weekly</strong><span data-i18n="miniThreeText">New shops and categories joining the marketplace.</span></div>
+                            <div class="mini-card"><strong data-i18n="miniFourTitle">Portugal launch</strong><span data-i18n="miniFourText">Launching locally, designed to scale across Europe.</span></div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <section class="products-section" id="products">
+            <div class="container">
+                <div class="section-header">
+                    <h2 data-i18n="productsTitle">Browse by Category</h2>
+                    <p data-i18n="productsSubtitle">Filter by category and discover sample AfroMkt listings inspired by the kinds of products buyers will soon find on the marketplace.</p>
+                </div>
+                <div class="filter-bar" id="filterBar">
+                    <button class="filter-btn active" type="button" data-category="all" data-i18n="filterAll">All</button>
+                    <button class="filter-btn" type="button" data-category="fashion" data-i18n="filterFashion">Fashion</button>
+                    <button class="filter-btn" type="button" data-category="food" data-i18n="filterFood">Food &amp; Spices</button>
+                    <button class="filter-btn" type="button" data-category="beauty" data-i18n="filterBeauty">Beauty</button>
+                    <button class="filter-btn" type="button" data-category="art" data-i18n="filterArt">Art &amp; Crafts</button>
+                    <button class="filter-btn" type="button" data-category="electronics" data-i18n="filterElectronics">Electronics</button>
+                    <button class="filter-btn" type="button" data-category="home" data-i18n="filterHome">Home</button>
+                </div>
+                <p class="grid-intro" data-i18n="gridIntro">6 sample listings inspired by AfroMkt sellers</p>
+                <div class="product-grid" id="productGrid"></div>
+            </div>
+        </section>
+
+        <section class="seller-cta">
+            <div class="container">
+                <h2 data-i18n="sellerCtaTitle">Are you a seller? List your products</h2>
+                <p data-i18n="sellerCtaText">Launch your AfroMkt storefront and start reaching diaspora customers across Europe with a marketplace built around culture, trust, and visibility.</p>
+                <a href="sell.html" class="btn btn-gold" data-i18n="sellerCtaButton">Start Selling Today</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <svg class="brand-logo" viewBox="0 0 220 68" aria-label="AfroMkt logo"><rect width="220" height="68" rx="18" fill="#1a3c2e"/><path d="M18 49C31 21 47 18 58 49" fill="none" stroke="#d4a843" stroke-width="6" stroke-linecap="round"/><path d="M31 39h14" stroke="#d4a843" stroke-width="5" stroke-linecap="round"/><text x="72" y="43" fill="#fff" font-size="30" font-family="Poppins, Arial" font-weight="800">Afro</text><text x="143" y="43" fill="#d4a843" font-size="30" font-family="Poppins, Arial" font-weight="800">Mkt</text></svg>
+                    <p data-i18n="footerBrand">The premier African Community Marketplace. Launching in Portugal and growing across Europe to connect culture, commerce, and community.</p>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/profile.php?id=61594427231294" target="_blank" rel="noopener noreferrer">FB</a>
+                        <a href="https://www.instagram.com/afro_mkt/" target="_blank" rel="noopener noreferrer">IG</a>
+                        <a href="#">TW</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-heading" data-i18n="footerMarketplace">Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="shop.html" data-i18n="footerShop">Shop Products</a></li>
+                        <li><a href="sell.html" data-i18n="footerSeller">Become a Seller</a></li>
+                        <li><a href="index.html#how-it-works" data-i18n="footerDelivery">Delivery Info</a></li>
+                        <li><a href="index.html#why-us" data-i18n="footerProtection">Buyer Protection</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-heading" data-i18n="footerCompany">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html#why-us" data-i18n="footerAbout">About Us</a></li>
+                        <li><a href="index.html#waitlist" data-i18n="footerCareers">Careers</a></li>
+                        <li><a href="index.html#waitlist" data-i18n="footerPress">Press</a></li>
+                        <li><a href="index.html#waitlist" data-i18n="footerContact">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-heading" data-i18n="footerLegal">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" data-i18n="footerTerms">Terms of Service</a></li>
+                        <li><a href="#" data-i18n="footerPrivacy">Privacy Policy</a></li>
+                        <li><a href="#" data-i18n="footerCookies">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom"><p data-i18n="footerBottom">© 2026 AfroMkt (afro-mkt.com). All rights reserved.</p></div>
+        </div>
+    </footer>
+
+    <div class="toast" id="shopToast" aria-live="polite"></div>
+
+    <script>
+        const translations = {
+            en: {
+                navHome: 'Home', navShop: 'Shop', navSell: 'Sell on AfroMkt', navSignIn: 'Sign In', navGetStarted: 'Get Started',
+                heroBadge: 'Curated picks from AfroMkt sellers', heroTitle: 'Shop African Products', heroSubtitle: 'Discover authentic products from African sellers across Europe.', heroExplore: 'Explore Products', heroSell: 'List Your Products',
+                heroPanelTitle: 'Why buyers will love AfroMkt', heroPanelText: 'From pantry staples to fashion, beauty, decor, and tech essentials, AfroMkt helps customers support trusted African sellers in one beautiful storefront.',
+                miniOneTitle: 'Diaspora-first', miniOneText: 'Products chosen for African communities living across Europe.', miniTwoTitle: 'Authentic finds', miniTwoText: 'Culture-led products with real seller stories behind them.', miniThreeTitle: 'Growing weekly', miniThreeText: 'New shops and categories joining the marketplace.', miniFourTitle: 'Portugal launch', miniFourText: 'Launching locally, designed to scale across Europe.',
+                productsTitle: 'Browse by Category', productsSubtitle: 'Filter by category and discover sample AfroMkt listings inspired by the kinds of products buyers will soon find on the marketplace.', gridIntro: '6 sample listings inspired by AfroMkt sellers',
+                filterAll: 'All', filterFashion: 'Fashion', filterFood: 'Food & Spices', filterBeauty: 'Beauty', filterArt: 'Art & Crafts', filterElectronics: 'Electronics', filterHome: 'Home', sellerLabel: 'Seller', addToCart: 'Add to Cart', toastMessage: "Coming soon! We're launching soon 🛍️",
+                sellerCtaTitle: 'Are you a seller? List your products', sellerCtaText: 'Launch your AfroMkt storefront and start reaching diaspora customers across Europe with a marketplace built around culture, trust, and visibility.', sellerCtaButton: 'Start Selling Today',
+                footerBrand: 'The premier African Community Marketplace. Launching in Portugal and growing across Europe to connect culture, commerce, and community.', footerMarketplace: 'Marketplace', footerShop: 'Shop Products', footerSeller: 'Become a Seller', footerDelivery: 'Delivery Info', footerProtection: 'Buyer Protection', footerCompany: 'Company', footerAbout: 'About Us', footerCareers: 'Careers', footerPress: 'Press', footerContact: 'Contact', footerLegal: 'Legal', footerTerms: 'Terms of Service', footerPrivacy: 'Privacy Policy', footerCookies: 'Cookie Policy', footerBottom: '© 2026 AfroMkt (afro-mkt.com). All rights reserved.',
+                fashion: 'Fashion', food: 'Food & Spices', beauty: 'Beauty', art: 'Art & Crafts', electronics: 'Electronics', home: 'Home',
+                ankaraBagName: 'Ankara Print Tote Bag', ankaraBagDesc: 'Bold everyday tote with vibrant wax-print panels.', berbereKitName: 'Berbere Spice Kit', berbereKitDesc: 'A fragrant Ethiopian spice blend set for home cooks.', sheaButterName: 'Shea Butter Glow Cream', sheaButterDesc: 'Rich body cream made for soft, nourished skin.', beadedArtName: 'Handmade Beaded Wall Art', beadedArtDesc: 'Statement decor piece crafted with colorful beadwork.', solarBankName: 'Solar Power Bank', solarBankDesc: 'Portable charging essential for busy days on the go.', mudClothName: 'Mud Cloth Cushion Cover', mudClothDesc: 'Textured home accent inspired by classic Malian prints.'
+            },
+            pt: {
+                navHome: 'Início', navShop: 'Loja', navSell: 'Vender no AfroMkt', navSignIn: 'Entrar', navGetStarted: 'Começar',
+                heroBadge: 'Escolhas selecionadas de vendedores AfroMkt', heroTitle: 'Compre Produtos Africanos', heroSubtitle: 'Descubra produtos autênticos de vendedores africanos por toda a Europa.', heroExplore: 'Explorar produtos', heroSell: 'Liste os seus produtos',
+                heroPanelTitle: 'Porque os compradores vão adorar o AfroMkt', heroPanelText: 'De produtos alimentares a moda, beleza, decoração e tecnologia, o AfroMkt ajuda clientes a apoiar vendedores africanos confiáveis num só espaço.',
+                miniOneTitle: 'Feito para a diáspora', miniOneText: 'Produtos escolhidos para comunidades africanas que vivem na Europa.', miniTwoTitle: 'Descobertas autênticas', miniTwoText: 'Produtos com identidade cultural e histórias reais de vendedores.', miniThreeTitle: 'A crescer semanalmente', miniThreeText: 'Novas lojas e categorias a entrar no marketplace.', miniFourTitle: 'Lançamento em Portugal', miniFourText: 'A começar localmente, desenhado para crescer pela Europa.',
+                productsTitle: 'Explorar por categoria', productsSubtitle: 'Filtre por categoria e descubra exemplos de listagens AfroMkt inspiradas nos produtos que os compradores encontrarão em breve no marketplace.', gridIntro: '6 listagens de exemplo inspiradas em vendedores AfroMkt',
+                filterAll: 'Todos', filterFashion: 'Moda', filterFood: 'Comida e especiarias', filterBeauty: 'Beleza', filterArt: 'Arte e artesanato', filterElectronics: 'Eletrónica', filterHome: 'Casa', sellerLabel: 'Vendedor', addToCart: 'Adicionar ao carrinho', toastMessage: 'Em breve! Estamos quase a lançar 🛍️',
+                sellerCtaTitle: 'É vendedor? Liste os seus produtos', sellerCtaText: 'Abra a sua loja AfroMkt e comece a alcançar clientes da diáspora em toda a Europa com um marketplace focado em cultura, confiança e visibilidade.', sellerCtaButton: 'Comece a vender hoje',
+                footerBrand: 'O principal marketplace da comunidade africana. A lançar em Portugal e a crescer pela Europa para ligar cultura, comércio e comunidade.', footerMarketplace: 'Marketplace', footerShop: 'Comprar produtos', footerSeller: 'Tornar-se vendedor', footerDelivery: 'Info de entrega', footerProtection: 'Proteção do comprador', footerCompany: 'Empresa', footerAbout: 'Sobre nós', footerCareers: 'Carreiras', footerPress: 'Imprensa', footerContact: 'Contacto', footerLegal: 'Legal', footerTerms: 'Termos de serviço', footerPrivacy: 'Política de privacidade', footerCookies: 'Política de cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Todos os direitos reservados.',
+                fashion: 'Moda', food: 'Comida e especiarias', beauty: 'Beleza', art: 'Arte e artesanato', electronics: 'Eletrónica', home: 'Casa',
+                ankaraBagName: 'Mala Tote com Estampa Ankara', ankaraBagDesc: 'Mala do dia a dia com painéis vibrantes em tecido wax.', berbereKitName: 'Kit de Especiarias Berbere', berbereKitDesc: 'Conjunto aromático de mistura etíope para cozinhar em casa.', sheaButterName: 'Creme Glow de Manteiga de Karité', sheaButterDesc: 'Creme rico para uma pele macia e nutrida.', beadedArtName: 'Arte de Parede em Missangas Feita à Mão', beadedArtDesc: 'Peça decorativa marcante criada com missangas coloridas.', solarBankName: 'Power Bank Solar', solarBankDesc: 'Essencial portátil para carregar dispositivos em dias agitados.', mudClothName: 'Capa de Almofada Mud Cloth', mudClothDesc: 'Peça de casa texturizada inspirada em estampados clássicos do Mali.'
+            },
+            fr: {
+                navHome: 'Accueil', navShop: 'Boutique', navSell: 'Vendre sur AfroMkt', navSignIn: 'Connexion', navGetStarted: 'Commencer',
+                heroBadge: 'Sélection de vendeurs AfroMkt', heroTitle: 'Achetez des Produits Africains', heroSubtitle: 'Découvrez des produits authentiques proposés par des vendeurs africains à travers l’Europe.', heroExplore: 'Explorer les produits', heroSell: 'Lister vos produits',
+                heroPanelTitle: 'Pourquoi les acheteurs vont aimer AfroMkt', heroPanelText: 'Des essentiels du quotidien à la mode, la beauté, la déco et la tech, AfroMkt aide les clients à soutenir des vendeurs africains de confiance en un seul lieu.',
+                miniOneTitle: 'Pensé pour la diaspora', miniOneText: 'Des produits choisis pour les communautés africaines vivant en Europe.', miniTwoTitle: 'Trouvailles authentiques', miniTwoText: 'Des articles portés par la culture et l’histoire réelle des vendeurs.', miniThreeTitle: 'En croissance chaque semaine', miniThreeText: 'De nouvelles boutiques et catégories rejoignent la marketplace.', miniFourTitle: 'Lancement au Portugal', miniFourText: 'Lancement local, conçu pour grandir partout en Europe.',
+                productsTitle: 'Parcourir par catégorie', productsSubtitle: 'Filtrez par catégorie et découvrez des exemples de listings AfroMkt inspirés des produits que les acheteurs trouveront bientôt sur la marketplace.', gridIntro: '6 exemples de listings inspirés des vendeurs AfroMkt',
+                filterAll: 'Tous', filterFashion: 'Mode', filterFood: 'Alimentation & épices', filterBeauty: 'Beauté', filterArt: 'Art & artisanat', filterElectronics: 'Électronique', filterHome: 'Maison', sellerLabel: 'Vendeur', addToCart: 'Ajouter au panier', toastMessage: 'Bientôt disponible ! Le lancement arrive 🛍️',
+                sellerCtaTitle: 'Vous êtes vendeur ? Listez vos produits', sellerCtaText: 'Lancez votre boutique AfroMkt et touchez la diaspora à travers l’Europe avec une marketplace construite autour de la culture, de la confiance et de la visibilité.', sellerCtaButton: 'Commencer à vendre',
+                footerBrand: 'La marketplace africaine de référence. Lancée au Portugal et en croissance en Europe pour connecter culture, commerce et communauté.', footerMarketplace: 'Marketplace', footerShop: 'Acheter des produits', footerSeller: 'Devenir vendeur', footerDelivery: 'Infos livraison', footerProtection: 'Protection acheteur', footerCompany: 'Entreprise', footerAbout: 'À propos', footerCareers: 'Carrières', footerPress: 'Presse', footerContact: 'Contact', footerLegal: 'Juridique', footerTerms: 'Conditions d\'utilisation', footerPrivacy: 'Confidentialité', footerCookies: 'Cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Tous droits réservés.',
+                fashion: 'Mode', food: 'Alimentation & épices', beauty: 'Beauté', art: 'Art & artisanat', electronics: 'Électronique', home: 'Maison',
+                ankaraBagName: 'Sac Tote en Imprimé Ankara', ankaraBagDesc: 'Sac du quotidien avec empiècements vibrants en wax.', berbereKitName: 'Kit d\'Épices Berbere', berbereKitDesc: 'Coffret parfumé d\'épices éthiopiennes pour cuisiner à la maison.', sheaButterName: 'Crème Éclat au Beurre de Karité', sheaButterDesc: 'Crème riche pour une peau douce et nourrie.', beadedArtName: 'Art Mural en Perles Fait Main', beadedArtDesc: 'Pièce déco forte réalisée avec des perles colorées.', solarBankName: 'Batterie Solaire Externe', solarBankDesc: 'Indispensable portable pour recharger vos appareils partout.', mudClothName: 'Housse de Coussin Mud Cloth', mudClothDesc: 'Accent déco texturé inspiré des imprimés classiques du Mali.'
+            },
+            es: {
+                navHome: 'Inicio', navShop: 'Tienda', navSell: 'Vender en AfroMkt', navSignIn: 'Iniciar sesión', navGetStarted: 'Empezar',
+                heroBadge: 'Selección cuidada de vendedores AfroMkt', heroTitle: 'Compra Productos Africanos', heroSubtitle: 'Descubre productos auténticos de vendedores africanos en toda Europa.', heroExplore: 'Explorar productos', heroSell: 'Publica tus productos',
+                heroPanelTitle: 'Por qué a los compradores les encantará AfroMkt', heroPanelText: 'Desde básicos de despensa hasta moda, belleza, decoración y tecnología, AfroMkt ayuda a los clientes a apoyar a vendedores africanos de confianza en un solo espacio.',
+                miniOneTitle: 'Pensado para la diáspora', miniOneText: 'Productos elegidos para comunidades africanas que viven en Europa.', miniTwoTitle: 'Hallazgos auténticos', miniTwoText: 'Productos con identidad cultural y con historias reales detrás.', miniThreeTitle: 'Creciendo cada semana', miniThreeText: 'Nuevas tiendas y categorías llegan al marketplace.', miniFourTitle: 'Lanzamiento en Portugal', miniFourText: 'Nace local, diseñado para crecer por toda Europa.',
+                productsTitle: 'Explora por categoría', productsSubtitle: 'Filtra por categoría y descubre ejemplos de listados AfroMkt inspirados en los productos que pronto encontrarán los compradores en el marketplace.', gridIntro: '6 listados de ejemplo inspirados en vendedores AfroMkt',
+                filterAll: 'Todos', filterFashion: 'Moda', filterFood: 'Comida y especias', filterBeauty: 'Belleza', filterArt: 'Arte y artesanía', filterElectronics: 'Electrónica', filterHome: 'Hogar', sellerLabel: 'Vendedor', addToCart: 'Añadir al carrito', toastMessage: '¡Muy pronto! Ya casi lanzamos 🛍️',
+                sellerCtaTitle: '¿Eres vendedor? Publica tus productos', sellerCtaText: 'Abre tu escaparate en AfroMkt y empieza a llegar a clientes de la diáspora en toda Europa con un marketplace construido alrededor de cultura, confianza y visibilidad.', sellerCtaButton: 'Empieza a vender hoy',
+                footerBrand: 'El marketplace líder de la comunidad africana. Lanzando en Portugal y creciendo por Europa para conectar cultura, comercio y comunidad.', footerMarketplace: 'Marketplace', footerShop: 'Comprar productos', footerSeller: 'Ser vendedor', footerDelivery: 'Información de entrega', footerProtection: 'Protección del comprador', footerCompany: 'Empresa', footerAbout: 'Sobre nosotros', footerCareers: 'Carreras', footerPress: 'Prensa', footerContact: 'Contacto', footerLegal: 'Legal', footerTerms: 'Términos de servicio', footerPrivacy: 'Política de privacidad', footerCookies: 'Política de cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Todos los derechos reservados.',
+                fashion: 'Moda', food: 'Comida y especias', beauty: 'Belleza', art: 'Arte y artesanía', electronics: 'Electrónica', home: 'Hogar',
+                ankaraBagName: 'Bolso Tote con Estampado Ankara', ankaraBagDesc: 'Bolso diario con paneles vibrantes de tela wax.', berbereKitName: 'Kit de Especias Berbere', berbereKitDesc: 'Set aromático de mezcla etíope para cocinar en casa.', sheaButterName: 'Crema Glow de Manteca de Karité', sheaButterDesc: 'Crema rica para una piel suave y nutrida.', beadedArtName: 'Arte de Pared con Cuentas Hecho a Mano', beadedArtDesc: 'Pieza decorativa con cuentas coloridas y mucha personalidad.', solarBankName: 'Batería Solar Portátil', solarBankDesc: 'Esencial portátil para cargar dispositivos durante días largos.', mudClothName: 'Funda de Cojín Mud Cloth', mudClothDesc: 'Acento de hogar con textura inspirado en estampados clásicos de Mali.'
+            }
+        };
+
+        const catalog = [
+            { id: 'ankara-bag', category: 'fashion', price: '24.90', seller: 'Lagos Loom', emoji: '👜', visual: 'visual-1', nameKey: 'ankaraBagName', descKey: 'ankaraBagDesc' },
+            { id: 'berbere-kit', category: 'food', price: '12.90', seller: 'Addis Kitchen', emoji: '🌶️', visual: 'visual-2', nameKey: 'berbereKitName', descKey: 'berbereKitDesc' },
+            { id: 'shea-butter', category: 'beauty', price: '14.50', seller: 'Accra Roots', emoji: '🧴', visual: 'visual-3', nameKey: 'sheaButterName', descKey: 'sheaButterDesc' },
+            { id: 'beaded-art', category: 'art', price: '36.00', seller: 'Dakar Studio', emoji: '🖼️', visual: 'visual-4', nameKey: 'beadedArtName', descKey: 'beadedArtDesc' },
+            { id: 'solar-bank', category: 'electronics', price: '44.90', seller: 'Nairobi Tech Hub', emoji: '🔋', visual: 'visual-5', nameKey: 'solarBankName', descKey: 'solarBankDesc' },
+            { id: 'mud-cloth', category: 'home', price: '32.00', seller: 'Bamako Home', emoji: '🛋️', visual: 'visual-6', nameKey: 'mudClothName', descKey: 'mudClothDesc' }
+        ];
+
+        const languageMeta = { en: '🇬🇧 EN', pt: '🇵🇹 PT', fr: '🇫🇷 FR', es: '🇪🇸 ES' };
+        let activeLanguage = 'en';
+        let activeCategory = 'all';
+
+        const mobileBtn = document.getElementById('mobileBtn');
+        const navbar = document.querySelector('.navbar');
+        const languageSelector = document.getElementById('languageSelector');
+        const languageBtn = document.getElementById('languageBtn');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const productGrid = document.getElementById('productGrid');
+        const shopToast = document.getElementById('shopToast');
+        let toastTimer;
+
+        const getInitialLanguage = () => {
+            const stored = localStorage.getItem('afromkt-language');
+            if (translations[stored]) return stored;
+            const browser = (navigator.language || 'en').slice(0, 2).toLowerCase();
+            return translations[browser] ? browser : 'en';
+        };
+
+        function applyLanguage(lang) {
+            activeLanguage = translations[lang] ? lang : 'en';
+            const dictionary = translations[activeLanguage];
+            document.documentElement.lang = activeLanguage;
+            localStorage.setItem('afromkt-language', activeLanguage);
+            document.querySelectorAll('[data-i18n]').forEach((element) => {
+                const key = element.dataset.i18n;
+                if (dictionary[key]) element.textContent = dictionary[key];
+            });
+            document.getElementById('languageBtn').textContent = languageMeta[activeLanguage];
+            document.querySelectorAll('.language-option').forEach((option) => option.classList.toggle('active', option.dataset.lang === activeLanguage));
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const dictionary = translations[activeLanguage];
+            const visibleProducts = activeCategory === 'all'
+                ? catalog
+                : catalog.filter((product) => product.category === activeCategory);
+
+            productGrid.innerHTML = visibleProducts.map((product) => `
+                <article class="product-card">
+                    <div class="product-visual ${product.visual}">
+                        <span class="product-category">${dictionary[product.category]}</span>
+                        <span aria-hidden="true">${product.emoji}</span>
+                    </div>
+                    <div class="product-body">
+                        <h3>${dictionary[product.nameKey]}</h3>
+                        <p>${dictionary[product.descKey]}</p>
+                        <div class="product-meta">
+                            <span class="seller-pill">${dictionary.sellerLabel}: ${product.seller}</span>
+                            <span class="price-tag">€${product.price}</span>
+                        </div>
+                        <button class="add-cart-btn" type="button" data-product-id="${product.id}">${dictionary.addToCart}</button>
+                    </div>
+                </article>
+            `).join('');
+
+            document.querySelectorAll('.add-cart-btn').forEach((button) => {
+                button.addEventListener('click', () => showToast(translations[activeLanguage].toastMessage));
+            });
+        }
+
+        function showToast(message) {
+            window.clearTimeout(toastTimer);
+            shopToast.textContent = message;
+            shopToast.classList.add('visible');
+            toastTimer = window.setTimeout(() => shopToast.classList.remove('visible'), 2600);
+        }
+
+        mobileBtn.addEventListener('click', () => {
+            navbar.classList.toggle('nav-active');
+            mobileBtn.innerHTML = navbar.classList.contains('nav-active') ? '✕' : '☰';
+        });
+
+        document.querySelectorAll('.nav-links a, .nav-buttons a').forEach((link) => {
+            link.addEventListener('click', () => {
+                navbar.classList.remove('nav-active');
+                mobileBtn.innerHTML = '☰';
+            });
+        });
+
+        languageBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const isOpen = languageSelector.classList.toggle('open');
+            languageBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.querySelectorAll('.language-option').forEach((option) => {
+            option.addEventListener('click', () => {
+                applyLanguage(option.dataset.lang);
+                languageSelector.classList.remove('open');
+                languageBtn.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!languageSelector.contains(event.target)) languageSelector.classList.remove('open');
+        });
+
+        filterButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                activeCategory = button.dataset.category;
+                filterButtons.forEach((item) => item.classList.toggle('active', item === button));
+                renderProducts();
+            });
+        });
+
+        applyLanguage(getInitialLanguage());
+    </script>
+</body>
+</html>
