@@ -24,7 +24,7 @@ serve(async (req) => {
 
     const selectedPriceId = priceId === PREMIUM_PRICE_ID ? PREMIUM_PRICE_ID : BASIC_PRICE_ID;
     const plan = selectedPriceId === PREMIUM_PRICE_ID ? "premium" : "basic";
-    const successUrl = `https://afro-mkt.com/success.html?plan=${plan}`;
+    const successUrl = "https://afro-mkt.com/success.html?session_id={CHECKOUT_SESSION_ID}";
 
     const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
