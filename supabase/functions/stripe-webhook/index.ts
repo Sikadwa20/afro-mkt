@@ -95,7 +95,6 @@ serve(async (req: Request) => {
         await handleSubscriptionDeleted(supabase, event.data.object);
         break;
       default:
-        console.log(`[stripe-webhook] Ignored event type: ${event.type}`);
         break;
     }
   } catch (error) {

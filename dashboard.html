@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Dashboard - AfroMkt</title>
-    <meta name="description" content="Log in to manage your AfroMkt seller plan and product listings.">
+    <meta name="description" content="Log in to manage your AfroMkt seller plan, products, and storefront listings.">
+    <meta property="og:title" content="Seller Dashboard - AfroMkt">
+    <meta property="og:description" content="Manage your AfroMkt seller plan, products, and storefront listings from one dashboard.">
+    <meta property="og:type" content="website">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -256,12 +259,12 @@
                     <p class="panel-copy">Use the same email you used for your AfroMkt seller subscription when possible.</p>
                     <div class="tabs" role="tablist" aria-label="Authentication tabs"><button class="tab-btn active" id="loginTab" type="button">Log in</button><button class="tab-btn" id="signupTab" type="button">Sign up</button></div>
                     <form id="loginForm" class="form">
-                        <div class="field"><label for="loginEmail">Email address</label><input id="loginEmail" class="input" type="email" autocomplete="email" placeholder="seller@example.com" required></div>
+                        <div class="field"><label for="loginEmail">Email address</label><input id="loginEmail" class="input" type="email" autocomplete="email" placeholder="seller@diasporamarket.eu" required></div>
                         <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" class="input" type="password" autocomplete="current-password" minlength="6" placeholder="Your password" required></div>
                         <button class="btn btn-green" id="loginBtn" type="submit">Log in to dashboard</button>
                     </form>
                     <form id="signupForm" class="form hidden">
-                        <div class="field"><label for="signupEmail">Email address</label><input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="seller@example.com" required></div>
+                        <div class="field"><label for="signupEmail">Email address</label><input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="seller@diasporamarket.eu" required></div>
                         <div class="field"><label for="signupPassword">Password</label><input id="signupPassword" class="input" type="password" autocomplete="new-password" minlength="6" placeholder="Minimum 6 characters" required></div>
                         <button class="btn btn-gold" id="signupBtn" type="submit">Create seller account</button>
                         <p class="form-help">If email confirmation is enabled in Supabase, check your inbox before logging in.</p>
