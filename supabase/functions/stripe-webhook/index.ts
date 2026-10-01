@@ -13,7 +13,7 @@ Secrets:
 Stripe dashboard setup:
 1. Go to Developers → Webhooks in Stripe.
 2. Add this endpoint URL:
-   https://lantiwcpwkfjmqjgvhbg.supabase.co/functions/v1/stripe-webhook
+   https://nmusxculduptvefgqfjn.supabase.co/functions/v1/stripe-webhook
 3. Subscribe to these events:
    - checkout.session.completed
    - customer.subscription.updated
