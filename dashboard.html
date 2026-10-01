@@ -5,9 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Dashboard - AfroMkt</title>
     <meta name="description" content="Log in to manage your AfroMkt seller plan, products, and storefront listings.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://afro-mkt.com/dashboard.html">
     <meta property="og:title" content="Seller Dashboard - AfroMkt">
     <meta property="og:description" content="Manage your AfroMkt seller plan, products, and storefront listings from one dashboard.">
     <meta property="og:type" content="website">
+    <meta property="og:image" content="https://afro-mkt.com/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Seller Dashboard - AfroMkt">
+    <meta name="twitter:description" content="Manage your AfroMkt seller plan, products, and storefront listings from one dashboard.">
+    <meta name="twitter:image" content="https://afro-mkt.com/assets/og-image.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -301,16 +308,16 @@
                             <p class="muted">Add a listing for the marketplace. Keep images clear, prices in EUR, and descriptions buyer-friendly.</p>
                             <form id="productForm" class="form" style="margin-top:20px;">
                                 <div class="form-grid">
-                                    <div class="field"><label for="sellerName">Shop / seller name</label><input id="sellerName" class="input" type="text" maxlength="120" placeholder="Afro Taste Lisboa" required></div>
-                                    <div class="field"><label for="productName">Product name</label><input id="productName" class="input" type="text" maxlength="120" placeholder="Jollof spice mix" required></div>
+                                    <div class="field"><label for="sellerName">Shop / seller name</label><input id="sellerName" class="input" type="text" maxlength="120" autocomplete="organization" placeholder="Afro Taste Lisboa" required></div>
+                                    <div class="field"><label for="productName">Product name</label><input id="productName" class="input" type="text" maxlength="120" autocomplete="off" placeholder="Jollof spice mix" required></div>
                                 </div>
                                 <div class="form-grid">
-                                    <div class="field"><label for="productPrice">Price (EUR)</label><input id="productPrice" class="input" type="number" min="0" step="0.01" placeholder="19.99" required></div>
-                                    <div class="field"><label for="productCategory">Category</label><select id="productCategory" class="select" required><option value="">Choose category</option><option>Food & Drinks</option><option>Fashion & Clothing</option><option>Beauty & Hair</option><option>Art & Crafts</option><option>Music & Culture</option><option>Other</option></select></div>
+                                    <div class="field"><label for="productPrice">Price (EUR)</label><input id="productPrice" class="input" type="number" min="0" step="0.01" autocomplete="transaction-amount" placeholder="19.99" required></div>
+                                    <div class="field"><label for="productCategory">Category</label><select id="productCategory" class="select" autocomplete="off" required><option value="">Choose category</option><option>Food & Drinks</option><option>Fashion & Clothing</option><option>Beauty & Hair</option><option>Art & Crafts</option><option>Music & Culture</option><option>Other</option></select></div>
                                 </div>
-                                <div class="field"><label for="productDescription">Description</label><textarea id="productDescription" class="textarea" maxlength="1000" placeholder="Tell buyers what makes this product special..." required></textarea></div>
+                                <div class="field"><label for="productDescription">Description</label><textarea id="productDescription" class="textarea" maxlength="1000" autocomplete="off" placeholder="Tell buyers what makes this product special..." required></textarea></div>
                                 <div class="form-grid">
-                                    <div class="field upload-control"><label for="productImageFile">Product image</label><input id="productImageFile" class="file-input" type="file" accept="image/*"><label class="file-upload-btn" for="productImageFile">📷 Choose product image</label><div class="file-name" id="productImageName">No image selected</div><div class="upload-status" id="uploadStatus" aria-live="polite"></div><div class="image-preview" id="imagePreview"><img id="imagePreviewImg" alt="Selected product image preview"></div></div>
+                                    <div class="field upload-control"><label for="productImageFile">Product image</label><input id="productImageFile" class="file-input" type="file" accept="image/*" autocomplete="off"><label class="file-upload-btn" for="productImageFile">📷 Choose product image</label><div class="file-name" id="productImageName">No image selected</div><div class="upload-status" id="uploadStatus" aria-live="polite"></div><div class="image-preview" id="imagePreview"><img id="imagePreviewImg" alt="Selected product image preview"></div></div>
                                 </div>
                                 <button class="btn btn-gold" id="productSubmitBtn" type="submit">Save product listing</button>
                             </form>
