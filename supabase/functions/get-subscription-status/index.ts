@@ -6,7 +6,7 @@ Deploy:
 4. Turn JWT verification OFF for this function because the storefront calls it directly.
 
 Call it:
-POST https://nmusxculduptvefgqfjn.supabase.co/functions/v1/get-subscription-status
+POST https://lantiwcpwkfjmqjgvhbg.supabase.co/functions/v1/get-subscription-status
 Body: { "email": "seller@example.com" } or { "session_id": "cs_test_..." }
 
 Secrets:

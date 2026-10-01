@@ -5,7 +5,7 @@ Deploy:
 3. Paste this file into `blast-waitlist/index.ts` and deploy.
 
 Call it:
-POST https://nmusxculduptvefgqfjn.supabase.co/functions/v1/blast-waitlist
+POST https://lantiwcpwkfjmqjgvhbg.supabase.co/functions/v1/blast-waitlist
 Optional JSON body: { "test": true }
 
 Important:
