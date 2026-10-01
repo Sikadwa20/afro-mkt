@@ -140,6 +140,15 @@
         .textarea { min-height: 132px; padding: 15px 16px; resize: vertical; }
         .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(212,168,67,.18); }
         .form-help { color: var(--text-light); font-size: .9rem; }
+        .upload-control { display: grid; gap: 12px; }
+        .file-input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+        .file-upload-btn { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 16px; border-radius: 16px; border: 1px dashed rgba(26,60,46,.26); background: linear-gradient(135deg, rgba(212,168,67,.16), rgba(26,60,46,.06)); color: var(--primary-dark); font-weight: 900; cursor: pointer; transition: var(--transition); }
+        .file-upload-btn:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(13,47,33,.08); }
+        .file-name { color: var(--text-light); font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .image-preview { display: none; overflow: hidden; border-radius: 18px; border: 1px solid rgba(26,60,46,.10); background: #f8faf9; max-width: 280px; box-shadow: 0 12px 28px rgba(13,47,33,.08); }
+        .image-preview.show { display: block; }
+        .image-preview img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
+        .upload-status { color: var(--primary-dark); font-size: .9rem; font-weight: 800; }
         .message { display: none; padding: 13px 15px; border-radius: 16px; font-weight: 700; font-size: .92rem; }
         .message.show { display: block; }
         .message.success { background: rgba(29,143,91,.12); color: var(--success); }
@@ -289,13 +298,16 @@
                             <p class="muted">Add a listing for the marketplace. Keep images clear, prices in EUR, and descriptions buyer-friendly.</p>
                             <form id="productForm" class="form" style="margin-top:20px;">
                                 <div class="form-grid">
+                                    <div class="field"><label for="sellerName">Shop / seller name</label><input id="sellerName" class="input" type="text" maxlength="120" placeholder="Afro Taste Lisboa" required></div>
                                     <div class="field"><label for="productName">Product name</label><input id="productName" class="input" type="text" maxlength="120" placeholder="Jollof spice mix" required></div>
+                                </div>
+                                <div class="form-grid">
                                     <div class="field"><label for="productPrice">Price (EUR)</label><input id="productPrice" class="input" type="number" min="0" step="0.01" placeholder="19.99" required></div>
+                                    <div class="field"><label for="productCategory">Category</label><select id="productCategory" class="select" required><option value="">Choose category</option><option>Food & Drinks</option><option>Fashion & Clothing</option><option>Beauty & Hair</option><option>Art & Crafts</option><option>Music & Culture</option><option>Other</option></select></div>
                                 </div>
                                 <div class="field"><label for="productDescription">Description</label><textarea id="productDescription" class="textarea" maxlength="1000" placeholder="Tell buyers what makes this product special..." required></textarea></div>
                                 <div class="form-grid">
-                                    <div class="field"><label for="productCategory">Category</label><select id="productCategory" class="select" required><option value="">Choose category</option><option>Food & Drinks</option><option>Fashion & Clothing</option><option>Beauty & Hair</option><option>Art & Crafts</option><option>Music & Culture</option><option>Other</option></select></div>
-                                    <div class="field"><label for="productImageUrl">Image URL</label><input id="productImageUrl" class="input" type="url" placeholder="https://example.com/product.jpg"></div>
+                                    <div class="field upload-control"><label for="productImageFile">Product image</label><input id="productImageFile" class="file-input" type="file" accept="image/*"><label class="file-upload-btn" for="productImageFile">📷 Choose product image</label><div class="file-name" id="productImageName">No image selected</div><div class="upload-status" id="uploadStatus" aria-live="polite"></div><div class="image-preview" id="imagePreview"><img id="imagePreviewImg" alt="Selected product image preview"></div></div>
                                 </div>
                                 <button class="btn btn-gold" id="productSubmitBtn" type="submit">Save product listing</button>
                             </form>
@@ -315,8 +327,8 @@
     <footer class="footer"><div class="container"><p>© 2026 AfroMkt (afro-mkt.com). All rights reserved.</p></div></footer>
 
     <script>
-        const SUPABASE_URL = 'https://nmusxculduptvefgqfjn.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tdXN4Y3VsZHVwdHZlZmdxZmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNjcwNDQsImV4cCI6MjEwNTY0MzA0NH0._Nn3nacYJOg2nLcG_kxNSI3vTWtDHUEEH11Lvsera8s';
+        const SUPABASE_URL = 'https://lantiwcpwkfjmqjgvhbg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhbnRpd2Nwd2tmam1xamd2aGJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2ODg5NTcsImV4cCI6MjEwNjI2NDk1N30.nRjyqkPBdXDfitneQpapkqtr66avZyVu8HfCq4pakEs';
         const SUBSCRIPTION_ENDPOINT = `${SUPABASE_URL}/functions/v1/get-subscription-status`;
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -335,6 +347,11 @@
         const productForm = document.getElementById('productForm');
         const productSubmitBtn = document.getElementById('productSubmitBtn');
         const productMessage = document.getElementById('productMessage');
+        const productImageFile = document.getElementById('productImageFile');
+        const productImageName = document.getElementById('productImageName');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewImg = document.getElementById('imagePreviewImg');
         const listingsContainer = document.getElementById('listingsContainer');
         const listingCount = document.getElementById('listingCount');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -361,6 +378,53 @@
 
         function normalizeEmail(value) {
             return typeof value === 'string' ? value.trim().toLowerCase() : '';
+        }
+
+        function makeSafeStorageSegment(value) {
+            return normalizeEmail(value).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'seller';
+        }
+
+        function makeSafeFilename(value) {
+            const filename = String(value || 'product-image').toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
+            return filename || 'product-image.jpg';
+        }
+
+        function resetImageUploadPreview() {
+            productImageFile.value = '';
+            productImageName.textContent = 'No image selected';
+            uploadStatus.textContent = '';
+            imagePreview.classList.remove('show');
+            imagePreviewImg.removeAttribute('src');
+        }
+
+        productImageFile.addEventListener('change', () => {
+            const file = productImageFile.files?.[0];
+            uploadStatus.textContent = '';
+            if (!file) {
+                resetImageUploadPreview();
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                setMessage(productMessage, 'Please choose an image file.', 'error');
+                resetImageUploadPreview();
+                return;
+            }
+            productImageName.textContent = file.name;
+            imagePreviewImg.src = URL.createObjectURL(file);
+            imagePreview.classList.add('show');
+        });
+
+        async function uploadProductImage(file, sellerEmail) {
+            if (!file) return null;
+            const sellerFolder = makeSafeStorageSegment(sellerEmail);
+            const filePath = `${sellerFolder}/${Date.now()}-${makeSafeFilename(file.name)}`;
+            uploadStatus.textContent = 'Uploading image...';
+            productSubmitBtn.textContent = 'Uploading image...';
+            const { error } = await supabaseClient.storage.from('product-images').upload(filePath, file);
+            if (error) throw error;
+            const { data } = supabaseClient.storage.from('product-images').getPublicUrl(filePath);
+            uploadStatus.textContent = 'Image uploaded. Saving listing...';
+            return data.publicUrl;
         }
 
         function setAuthTab(tab) {
@@ -510,19 +574,25 @@
             productSubmitBtn.disabled = true;
             productSubmitBtn.textContent = 'Saving product...';
             setMessage(productMessage, '');
+            const sellerEmail = normalizeEmail(currentUser.email);
+            const selectedImage = productImageFile.files?.[0] || null;
             const payload = {
-                seller_email: normalizeEmail(currentUser.email),
+                seller_email: sellerEmail,
+                seller_name: document.getElementById('sellerName').value.trim(),
                 name: document.getElementById('productName').value.trim(),
                 price: Number(document.getElementById('productPrice').value),
                 description: document.getElementById('productDescription').value.trim(),
                 category: document.getElementById('productCategory').value,
-                image_url: document.getElementById('productImageUrl').value.trim() || null,
+                image_url: null,
                 is_active: true
             };
             try {
+                payload.image_url = await uploadProductImage(selectedImage, sellerEmail);
+                productSubmitBtn.textContent = 'Saving listing...';
                 const { error } = await supabaseClient.from('products').insert(payload);
                 if (error) throw error;
                 productForm.reset();
+                resetImageUploadPreview();
                 setMessage(productMessage, 'Product saved successfully.', 'success');
                 await loadListings(payload.seller_email);
             } catch (error) {
@@ -548,7 +618,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('products')
-                    .select('id,seller_email,name,price,description,category,image_url,created_at,is_active')
+                    .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active')
                     .eq('seller_email', email)
                     .order('created_at', { ascending: false });
                 if (error) throw error;
