@@ -15,7 +15,13 @@ serve(async (req) => {
   }
 
   try {
-    const { priceId } = await req.json();
+    const payload = await req.json().catch(() => null);
+    const priceId = typeof payload?.priceId === "string" ? payload.priceId : null;
+
+    if (!priceId) {
+      return jsonResponse({ error: "Missing required fields" }, 400);
+    }
+
     const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
 
     if (!stripeSecretKey) {
