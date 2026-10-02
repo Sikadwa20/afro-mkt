@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { verifiedAdmin } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,6 +26,12 @@ serve(async (req: Request) => {
     return jsonResponse({ error: "Method not allowed. Use POST." }, 405);
   }
 
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") || Deno.env.get("SB_PROJECT_URL");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SB_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceRoleKey) return jsonResponse({ error: "Server configuration unavailable" }, 503);
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
+  if (!await verifiedAdmin(req, supabase)) return jsonResponse({ error: "Administrator access required" }, 403);
+
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
   if (!resendApiKey) {
     return jsonResponse({ error: "Missing RESEND_API_KEY secret" }, 500);
@@ -36,8 +44,8 @@ serve(async (req: Request) => {
     return jsonResponse({ error: "Invalid JSON body", detail: String(error) }, 400);
   }
 
-  const email = body.email?.trim().toLowerCase();
-  const plan = normalizePlan(body.plan);
+  const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+  const plan = normalizePlan(typeof body?.plan === "string" ? body.plan : undefined);
 
   if (!email || !isValidEmail(email)) {
     return jsonResponse({ error: "A valid email is required." }, 400);
