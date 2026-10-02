@@ -21,7 +21,7 @@ interface WaitlistRequest {
 interface WaitlistRow {
   id: string;
   email: string;
-  joined_at: string;
+  created_at: string;
 }
 
 serve(async (req: Request) => {
@@ -34,7 +34,7 @@ serve(async (req: Request) => {
   }
 
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
-  const serviceRoleKey = Deno.env.get("SB_SERVICE_ROLE_KEY");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SB_SERVICE_ROLE_KEY");
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || Deno.env.get("SB_PROJECT_URL");
 
   if (!resendApiKey) {
@@ -57,7 +57,7 @@ serve(async (req: Request) => {
     );
   }
 
-  const email = body.email?.trim().toLowerCase();
+  const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
   if (!email || !isValidEmail(email)) {
     return jsonResponse({ error: "A valid email is required." }, 400);
   }
@@ -69,7 +69,7 @@ serve(async (req: Request) => {
   const { data, error: insertError } = await supabase
     .from("waitlist")
     .insert({ email })
-    .select("id, email, joined_at")
+    .select("id, email, created_at")
     .single();
 
   const waitlistEntry = data as WaitlistRow | null;
@@ -88,7 +88,7 @@ serve(async (req: Request) => {
     );
   }
 
-  const joinedAt = waitlistEntry?.joined_at || new Date().toISOString();
+  const joinedAt = waitlistEntry?.created_at || new Date().toISOString();
 
   try {
     await sendEmail(resendApiKey, {
@@ -109,12 +109,12 @@ serve(async (req: Request) => {
   } catch (error) {
     console.error("[notify-waitlist] Email send failed:", error);
     return jsonResponse(
-      { error: "Failed to send waitlist emails.", detail: String(error) },
-      502,
+      { success: true, email_sent: false },
+      200,
     );
   }
 
-  return jsonResponse({ success: true }, 200);
+  return jsonResponse({ success: true, email_sent: true }, 200);
 });
 
 function jsonResponse(body: unknown, status = 200): Response {
