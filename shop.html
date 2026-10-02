@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AfroMkt Shop - African Products Across Europe</title>
-    <meta name="description" content="Browse live AfroMkt products from African sellers serving shoppers across Portugal and Europe.">
+    <meta name="description" content="Preview African products and join AfroMkt seller onboarding in Portugal. Buyer orders are coming later.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://afro-mkt.com/shop.html">
     <meta property="og:title" content="AfroMkt Shop - African Products Across Europe">
-    <meta property="og:description" content="Browse live AfroMkt products from African sellers serving shoppers across Portugal and Europe.">
+    <meta property="og:description" content="Preview African products and join AfroMkt seller onboarding in Portugal. Buyer orders are coming later.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://afro-mkt.com/assets/og-image.png">
+    <meta property="og:image" content="https://afro-mkt.com/afromkt-facebook-cover.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="AfroMkt Shop - African Products Across Europe">
-    <meta name="twitter:description" content="Browse live AfroMkt products from African sellers serving shoppers across Portugal and Europe.">
-    <meta name="twitter:image" content="https://afro-mkt.com/assets/og-image.png">
+    <meta name="twitter:description" content="Preview African products and join AfroMkt seller onboarding in Portugal. Buyer orders are coming later.">
+    <meta name="twitter:image" content="https://afro-mkt.com/afromkt-facebook-cover.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -151,6 +151,7 @@
             .toast { left: 20px; right: 20px; bottom: 18px; }
         }
     </style>
+    <script src="config.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -185,9 +186,9 @@
             <div class="container">
                 <div class="hero-grid">
                     <div>
-                        <div class="hero-badge" data-i18n="heroBadge">Curated picks from AfroMkt sellers</div>
-                        <h1 data-i18n="heroTitle">Shop African Products</h1>
-                        <p data-i18n="heroSubtitle">Discover authentic products from African sellers across Europe.</p>
+                        <div class="hero-badge" data-i18n="heroBadge">Seller onboarding open · Buyer orders coming later</div>
+                        <h1 data-i18n="heroTitle">Preview African Products</h1>
+                        <p data-i18n="heroSubtitle">Explore approved seller listings. Product purchases are not available yet.</p>
                         <div class="hero-buttons">
                             <a href="#products" class="btn btn-gold" data-i18n="heroExplore">Explore Products</a>
                             <a href="sell.html" class="btn btn-outline-light" data-i18n="heroSell">List Your Products</a>
@@ -211,7 +212,7 @@
             <div class="container">
                 <div class="section-header">
                     <h2 data-i18n="productsTitle">Browse by Category</h2>
-                    <p data-i18n="productsSubtitle">Explore live AfroMkt products from sellers who have already listed on the marketplace.</p>
+                    <p data-i18n="productsSubtitle">Explore approved listings while sellers prepare for the buyer launch.</p>
                 </div>
                 <div class="filter-bar" id="filterBar"></div>
                 <p class="grid-intro" id="gridIntro" data-i18n="gridIntro">Loading marketplace products...</p>
@@ -255,7 +256,7 @@
                         <li><a href="index.html#why-us" data-i18n="footerAbout">About Us</a></li>
                         <li><a href="index.html#waitlist" data-i18n="footerCareers">Careers</a></li>
                         <li><a href="index.html#waitlist" data-i18n="footerPress">Press</a></li>
-                        <li><a href="index.html#waitlist" data-i18n="footerContact">Contact</a></li>
+                        <li><a href="mailto:hello@afro-mkt.com" data-i18n="footerContact">Contact</a></li>
                     </ul>
                 </div>
                 <div>
@@ -274,50 +275,50 @@
     <div class="toast" id="shopToast" aria-live="polite"></div>
 
     <script>
-        const SUPABASE_URL = 'https://nmusxculduptvefgqfjn.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tdXN4Y3VsZHVwdHZlZmdxZmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNjcwNDQsImV4cCI6MjEwNTY0MzA0NH0._Nn3nacYJOg2nLcG_kxNSI3vTWtDHUEEH11Lvsera8s';
+        const SUPABASE_URL = window.AFRO_MKT_CONFIG.supabaseUrl;
+        const SUPABASE_ANON_KEY = window.AFRO_MKT_CONFIG.supabaseAnonKey;
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const translations = {
             en: {
-                navHome: 'Home', navShop: 'Shop', navSell: 'Sell on AfroMkt', navSignIn: 'Sign In', navGetStarted: 'Get Started',
-                heroBadge: 'Curated picks from AfroMkt sellers', heroTitle: 'Shop African Products', heroSubtitle: 'Discover authentic products from African sellers across Europe.', heroExplore: 'Explore Products', heroSell: 'List Your Products',
+                navHome: 'Home', navShop:"Product Preview", navSell: 'Sell on AfroMkt', navSignIn: 'Sign In', navGetStarted: 'Get Started',
+                heroBadge:"Seller onboarding open · Buyer orders coming later", heroTitle:"Preview African Products", heroSubtitle:"Explore approved seller listings. Product purchases are not available yet.", heroExplore: 'Explore Products', heroSell: 'List Your Products',
                 heroPanelTitle: 'Why buyers will love AfroMkt', heroPanelText: 'From pantry staples to fashion, beauty, decor, and tech essentials, AfroMkt helps customers support trusted African sellers in one beautiful storefront.',
                 miniOneTitle: 'Diaspora-first', miniOneText: 'Products chosen for African communities living across Europe.', miniTwoTitle: 'Authentic finds', miniTwoText: 'Culture-led products with real seller stories behind them.', miniThreeTitle: 'Growing weekly', miniThreeText: 'New shops and categories joining the marketplace.', miniFourTitle: 'Portugal launch', miniFourText: 'Launching locally, designed to scale across Europe.',
-                productsTitle: 'Browse by Category', productsSubtitle: 'Explore live AfroMkt products from sellers who have already listed on the marketplace.', gridIntro: 'Loading marketplace products...',
-                filterAll: 'All', sellerLabel: 'Seller', addToCart: 'Add to Cart', toastMessage: 'Cart checkout will open after launch 🛍️', loadingTitle: 'Loading products', loadingBody: 'We are pulling the latest AfroMkt listings from Supabase.', emptyTitle: 'No products live yet', emptyBody: 'As soon as sellers publish approved listings, they will show up here for shoppers to explore.', errorTitle: 'We could not load products', errorBody: 'Please try again in a moment.', showingCount: '{count} live products across {categoryCount} categories', showingFiltered: '{count} products in {category}',
+                productsTitle: 'Browse by Category', productsSubtitle: 'Explore approved listings while sellers prepare for the buyer launch.', gridIntro: 'Loading marketplace products...',
+                filterAll: 'All', sellerLabel: 'Seller', addToCart: 'Preview listing · Orders coming later', toastMessage: 'Cart checkout will open after launch 🛍️', loadingTitle: 'Loading products', loadingBody: 'We are loading the latest approved listings.', emptyTitle: 'No products live yet', emptyBody: 'As soon as sellers publish approved listings, they will show up here for shoppers to explore.', errorTitle: 'We could not load products', errorBody: 'Please try again in a moment.', showingCount: '{count} live products across {categoryCount} categories', showingFiltered: '{count} products in {category}',
                 sellerCtaTitle: 'Are you a seller? List your products', sellerCtaText: 'Launch your AfroMkt storefront and start reaching diaspora customers across Europe with a marketplace built around culture, trust, and visibility.', sellerCtaButton: 'Start Selling Today',
-                footerBrand: 'The premier African Community Marketplace. Launching in Portugal and growing across Europe to connect culture, commerce, and community.', footerMarketplace: 'Marketplace', footerShop: 'Shop Products', footerSeller: 'Become a Seller', footerDelivery: 'Delivery Info', footerProtection: 'Buyer Protection', footerCompany: 'Company', footerAbout: 'About Us', footerCareers: 'Careers', footerPress: 'Press', footerContact: 'Contact', footerLegal: 'Legal', footerTerms: 'Terms of Service', footerPrivacy: 'Privacy Policy', footerCookies: 'Cookie Policy', footerBottom: '© 2026 AfroMkt (afro-mkt.com). All rights reserved.'
+                footerBrand: 'The premier African Community Marketplace. Launching in Portugal and growing across Europe to connect culture, commerce, and community.', footerMarketplace: 'Marketplace', footerShop: 'Shop Products', footerSeller: 'Become a Seller', footerDelivery: 'Delivery Info', footerProtection: 'Buyer Protection', footerCompany: 'Company', footerAbout: 'About Us', footerCareers:"Join the Waitlist", footerPress:"Launch Updates", footerContact: 'Contact', footerLegal: 'Legal', footerTerms: 'Terms of Service', footerPrivacy: 'Privacy Policy', footerCookies: 'Cookie Policy', footerBottom: '© 2026 AfroMkt (afro-mkt.com). All rights reserved.'
             },
             pt: {
-                navHome: 'Início', navShop: 'Loja', navSell: 'Vender no AfroMkt', navSignIn: 'Entrar', navGetStarted: 'Começar',
-                heroBadge: 'Escolhas selecionadas de vendedores AfroMkt', heroTitle: 'Compre Produtos Africanos', heroSubtitle: 'Descubra produtos autênticos de vendedores africanos por toda a Europa.', heroExplore: 'Explorar produtos', heroSell: 'Liste os seus produtos',
+                navHome: 'Início', navShop:"Prévia de produtos", navSell: 'Vender no AfroMkt', navSignIn: 'Entrar', navGetStarted: 'Começar',
+                heroBadge:"Inscrições de vendedores abertas · Compras mais tarde", heroTitle:"Prévia de produtos africanos", heroSubtitle:"Explore listagens aprovadas. As compras ainda não estão disponíveis.", heroExplore: 'Explorar produtos', heroSell: 'Liste os seus produtos',
                 heroPanelTitle: 'Porque os compradores vão adorar o AfroMkt', heroPanelText: 'De produtos alimentares a moda, beleza, decoração e tecnologia, o AfroMkt ajuda clientes a apoiar vendedores africanos confiáveis num só espaço.',
                 miniOneTitle: 'Feito para a diáspora', miniOneText: 'Produtos escolhidos para comunidades africanas que vivem na Europa.', miniTwoTitle: 'Descobertas autênticas', miniTwoText: 'Produtos com identidade cultural e histórias reais de vendedores.', miniThreeTitle: 'A crescer semanalmente', miniThreeText: 'Novas lojas e categorias a entrar no marketplace.', miniFourTitle: 'Lançamento em Portugal', miniFourText: 'A começar localmente, desenhado para crescer pela Europa.',
                 productsTitle: 'Explorar por categoria', productsSubtitle: 'Explore produtos AfroMkt reais já listados pelos vendedores no marketplace.', gridIntro: 'A carregar produtos do marketplace...',
-                filterAll: 'Todos', sellerLabel: 'Vendedor', addToCart: 'Adicionar ao carrinho', toastMessage: 'O checkout do carrinho abre após o lançamento 🛍️', loadingTitle: 'A carregar produtos', loadingBody: 'Estamos a buscar as listagens mais recentes do AfroMkt no Supabase.', emptyTitle: 'Ainda não há produtos disponíveis', emptyBody: 'Assim que os vendedores publicarem listagens aprovadas, elas aparecerão aqui para os compradores.', errorTitle: 'Não foi possível carregar os produtos', errorBody: 'Tente novamente dentro de momentos.', showingCount: '{count} produtos ativos em {categoryCount} categorias', showingFiltered: '{count} produtos em {category}',
+                filterAll: 'Todos', sellerLabel: 'Vendedor', addToCart: 'Prévia · Compras disponíveis mais tarde', toastMessage: 'O checkout do carrinho abre após o lançamento 🛍️', loadingTitle: 'A carregar produtos', loadingBody: 'Estamos a buscar as listagens mais recentes do AfroMkt no Supabase.', emptyTitle: 'Ainda não há produtos disponíveis', emptyBody: 'Assim que os vendedores publicarem listagens aprovadas, elas aparecerão aqui para os compradores.', errorTitle: 'Não foi possível carregar os produtos', errorBody: 'Tente novamente dentro de momentos.', showingCount: '{count} produtos ativos em {categoryCount} categorias', showingFiltered: '{count} produtos em {category}',
                 sellerCtaTitle: 'É vendedor? Liste os seus produtos', sellerCtaText: 'Abra a sua loja AfroMkt e comece a alcançar clientes da diáspora em toda a Europa com um marketplace focado em cultura, confiança e visibilidade.', sellerCtaButton: 'Comece a vender hoje',
-                footerBrand: 'O principal marketplace da comunidade africana. A lançar em Portugal e a crescer pela Europa para ligar cultura, comércio e comunidade.', footerMarketplace: 'Marketplace', footerShop: 'Comprar produtos', footerSeller: 'Tornar-se vendedor', footerDelivery: 'Info de entrega', footerProtection: 'Proteção do comprador', footerCompany: 'Empresa', footerAbout: 'Sobre nós', footerCareers: 'Carreiras', footerPress: 'Imprensa', footerContact: 'Contacto', footerLegal: 'Legal', footerTerms: 'Termos de serviço', footerPrivacy: 'Política de privacidade', footerCookies: 'Política de cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Todos os direitos reservados.'
+                footerBrand: 'O principal marketplace da comunidade africana. A lançar em Portugal e a crescer pela Europa para ligar cultura, comércio e comunidade.', footerMarketplace: 'Marketplace', footerShop: 'Comprar produtos', footerSeller: 'Tornar-se vendedor', footerDelivery: 'Info de entrega', footerProtection: 'Proteção do comprador', footerCompany: 'Empresa', footerAbout: 'Sobre nós', footerCareers:"Lista de espera", footerPress:"Novidades do lançamento", footerContact: 'Contacto', footerLegal: 'Legal', footerTerms: 'Termos de serviço', footerPrivacy: 'Política de privacidade', footerCookies: 'Política de cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Todos os direitos reservados.'
             },
             fr: {
-                navHome: 'Accueil', navShop: 'Boutique', navSell: 'Vendre sur AfroMkt', navSignIn: 'Connexion', navGetStarted: 'Commencer',
-                heroBadge: 'Sélection de vendeurs AfroMkt', heroTitle: 'Achetez des Produits Africains', heroSubtitle: 'Découvrez des produits authentiques proposés par des vendeurs africains à travers l’Europe.', heroExplore: 'Explorer les produits', heroSell: 'Lister vos produits',
+                navHome: 'Accueil', navShop:"Aperçu des produits", navSell: 'Vendre sur AfroMkt', navSignIn: 'Connexion', navGetStarted: 'Commencer',
+                heroBadge:"Inscriptions vendeurs ouvertes · Achats à venir", heroTitle:"Aperçu des produits africains", heroSubtitle:"Découvrez les annonces approuvées. Les achats ne sont pas encore disponibles.", heroExplore: 'Explorer les produits', heroSell: 'Lister vos produits',
                 heroPanelTitle: 'Pourquoi les acheteurs vont aimer AfroMkt', heroPanelText: 'Des essentiels du quotidien à la mode, la beauté, la déco et la tech, AfroMkt aide les clients à soutenir des vendeurs africains de confiance en un seul lieu.',
                 miniOneTitle: 'Pensé pour la diaspora', miniOneText: 'Des produits choisis pour les communautés africaines vivant en Europe.', miniTwoTitle: 'Trouvailles authentiques', miniTwoText: 'Des articles portés par la culture et l’histoire réelle des vendeurs.', miniThreeTitle: 'En croissance chaque semaine', miniThreeText: 'De nouvelles boutiques et catégories rejoignent la marketplace.', miniFourTitle: 'Lancement au Portugal', miniFourText: 'Lancement local, conçu pour grandir partout en Europe.',
                 productsTitle: 'Parcourir par catégorie', productsSubtitle: 'Explorez les vrais produits AfroMkt déjà publiés par les vendeurs sur la marketplace.', gridIntro: 'Chargement des produits de la marketplace...',
-                filterAll: 'Tous', sellerLabel: 'Vendeur', addToCart: 'Ajouter au panier', toastMessage: 'Le paiement du panier ouvrira après le lancement 🛍️', loadingTitle: 'Chargement des produits', loadingBody: 'Nous récupérons les derniers listings AfroMkt depuis Supabase.', emptyTitle: 'Aucun produit en ligne pour le moment', emptyBody: 'Dès que des vendeurs publient des listings approuvés, ils apparaîtront ici.', errorTitle: 'Impossible de charger les produits', errorBody: 'Veuillez réessayer dans un instant.', showingCount: '{count} produits en ligne dans {categoryCount} catégories', showingFiltered: '{count} produits dans {category}',
+                filterAll: 'Tous', sellerLabel: 'Vendeur', addToCart: 'Aperçu · Commandes à venir', toastMessage: 'Le paiement du panier ouvrira après le lancement 🛍️', loadingTitle: 'Chargement des produits', loadingBody: 'Nous récupérons les derniers listings AfroMkt depuis Supabase.', emptyTitle: 'Aucun produit en ligne pour le moment', emptyBody: 'Dès que des vendeurs publient des listings approuvés, ils apparaîtront ici.', errorTitle: 'Impossible de charger les produits', errorBody: 'Veuillez réessayer dans un instant.', showingCount: '{count} produits en ligne dans {categoryCount} catégories', showingFiltered: '{count} produits dans {category}',
                 sellerCtaTitle: 'Vous êtes vendeur ? Listez vos produits', sellerCtaText: 'Lancez votre boutique AfroMkt et touchez la diaspora à travers l’Europe avec une marketplace construite autour de la culture, de la confiance et de la visibilité.', sellerCtaButton: 'Commencer à vendre',
-                footerBrand: 'La marketplace africaine de référence. Lancée au Portugal et en croissance en Europe pour connecter culture, commerce et communauté.', footerMarketplace: 'Marketplace', footerShop: 'Acheter des produits', footerSeller: 'Devenir vendeur', footerDelivery: 'Infos livraison', footerProtection: 'Protection acheteur', footerCompany: 'Entreprise', footerAbout: 'À propos', footerCareers: 'Carrières', footerPress: 'Presse', footerContact: 'Contact', footerLegal: 'Juridique', footerTerms: 'Conditions d\'utilisation', footerPrivacy: 'Confidentialité', footerCookies: 'Cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Tous droits réservés.'
+                footerBrand: 'La marketplace africaine de référence. Lancée au Portugal et en croissance en Europe pour connecter culture, commerce et communauté.', footerMarketplace: 'Marketplace', footerShop: 'Acheter des produits', footerSeller: 'Devenir vendeur', footerDelivery: 'Infos livraison', footerProtection: 'Protection acheteur', footerCompany: 'Entreprise', footerAbout: 'À propos', footerCareers:"Liste d’attente", footerPress:"Actualités du lancement", footerContact: 'Contact', footerLegal: 'Juridique', footerTerms: 'Conditions d\'utilisation', footerPrivacy: 'Confidentialité', footerCookies: 'Cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Tous droits réservés.'
             },
             es: {
-                navHome: 'Inicio', navShop: 'Tienda', navSell: 'Vender en AfroMkt', navSignIn: 'Iniciar sesión', navGetStarted: 'Empezar',
-                heroBadge: 'Selección cuidada de vendedores AfroMkt', heroTitle: 'Compra Productos Africanos', heroSubtitle: 'Descubre productos auténticos de vendedores africanos en toda Europa.', heroExplore: 'Explorar productos', heroSell: 'Publica tus productos',
+                navHome: 'Inicio', navShop:"Vista previa", navSell: 'Vender en AfroMkt', navSignIn: 'Iniciar sesión', navGetStarted: 'Empezar',
+                heroBadge:"Registro de vendedores abierto · Compras próximamente", heroTitle:"Vista previa de productos africanos", heroSubtitle:"Explora anuncios aprobados. Las compras aún no están disponibles.", heroExplore: 'Explorar productos', heroSell: 'Publica tus productos',
                 heroPanelTitle: 'Por qué a los compradores les encantará AfroMkt', heroPanelText: 'Desde básicos de despensa hasta moda, belleza, decoración y tecnología, AfroMkt ayuda a los clientes a apoyar a vendedores africanos de confianza en un solo espacio.',
                 miniOneTitle: 'Pensado para la diáspora', miniOneText: 'Productos elegidos para comunidades africanas que viven en Europa.', miniTwoTitle: 'Hallazgos auténticos', miniTwoText: 'Productos con identidad cultural y con historias reales detrás.', miniThreeTitle: 'Creciendo cada semana', miniThreeText: 'Nuevas tiendas y categorías llegan al marketplace.', miniFourTitle: 'Lanzamiento en Portugal', miniFourText: 'Nace local, diseñado para crecer por toda Europa.',
                 productsTitle: 'Explora por categoría', productsSubtitle: 'Explora productos reales de AfroMkt ya publicados por vendedores en el marketplace.', gridIntro: 'Cargando productos del marketplace...',
-                filterAll: 'Todos', sellerLabel: 'Vendedor', addToCart: 'Añadir al carrito', toastMessage: 'El checkout del carrito se abrirá después del lanzamiento 🛍️', loadingTitle: 'Cargando productos', loadingBody: 'Estamos trayendo los listados más recientes de AfroMkt desde Supabase.', emptyTitle: 'Todavía no hay productos disponibles', emptyBody: 'En cuanto los vendedores publiquen listados aprobados, aparecerán aquí para explorar.', errorTitle: 'No pudimos cargar los productos', errorBody: 'Vuelve a intentarlo en un momento.', showingCount: '{count} productos activos en {categoryCount} categorías', showingFiltered: '{count} productos en {category}',
+                filterAll: 'Todos', sellerLabel: 'Vendedor', addToCart: 'Vista previa · Compras próximamente', toastMessage: 'El checkout del carrito se abrirá después del lanzamiento 🛍️', loadingTitle: 'Cargando productos', loadingBody: 'Estamos trayendo los listados más recientes de AfroMkt desde Supabase.', emptyTitle: 'Todavía no hay productos disponibles', emptyBody: 'En cuanto los vendedores publiquen listados aprobados, aparecerán aquí para explorar.', errorTitle: 'No pudimos cargar los productos', errorBody: 'Vuelve a intentarlo en un momento.', showingCount: '{count} productos activos en {categoryCount} categorías', showingFiltered: '{count} productos en {category}',
                 sellerCtaTitle: '¿Eres vendedor? Publica tus productos', sellerCtaText: 'Abre tu escaparate en AfroMkt y empieza a llegar a clientes de la diáspora en toda Europa con un marketplace construido alrededor de cultura, confianza y visibilidad.', sellerCtaButton: 'Empieza a vender hoy',
-                footerBrand: 'El marketplace líder de la comunidad africana. Lanzando en Portugal y creciendo por Europa para conectar cultura, comercio y comunidad.', footerMarketplace: 'Marketplace', footerShop: 'Comprar productos', footerSeller: 'Ser vendedor', footerDelivery: 'Información de entrega', footerProtection: 'Protección del comprador', footerCompany: 'Empresa', footerAbout: 'Sobre nosotros', footerCareers: 'Carreras', footerPress: 'Prensa', footerContact: 'Contacto', footerLegal: 'Legal', footerTerms: 'Términos de servicio', footerPrivacy: 'Política de privacidad', footerCookies: 'Política de cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Todos los derechos reservados.'
+                footerBrand: 'El marketplace líder de la comunidad africana. Lanzando en Portugal y creciendo por Europa para conectar cultura, comercio y comunidad.', footerMarketplace: 'Marketplace', footerShop: 'Comprar productos', footerSeller: 'Ser vendedor', footerDelivery: 'Información de entrega', footerProtection: 'Protección del comprador', footerCompany: 'Empresa', footerAbout: 'Sobre nosotros', footerCareers:"Lista de espera", footerPress:"Novedades del lanzamiento", footerContact: 'Contacto', footerLegal: 'Legal', footerTerms: 'Términos de servicio', footerPrivacy: 'Política de privacidad', footerCookies: 'Política de cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Todos los derechos reservados.'
             }
         };
 
@@ -464,15 +465,13 @@
                                 <span class="seller-pill">${dictionary.sellerLabel}: ${escapeHtml(sellerName)}</span>
                                 <span class="price-tag">€${formatPrice(product.price)}</span>
                             </div>
-                            <button class="add-cart-btn" type="button" data-product-id="${escapeHtml(product.id)}">${dictionary.addToCart}</button>
+                            <span class="seller-pill">${dictionary.addToCart}</span>
                         </div>
                     </article>
                 `;
             }).join('');
 
-            document.querySelectorAll('.add-cart-btn').forEach((button) => {
-                button.addEventListener('click', () => showToast(translations[activeLanguage].toastMessage));
-            });
+
         }
 
         async function loadProducts() {
@@ -483,7 +482,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('products')
-                    .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active')
+                    .select('id,seller_name,name,price,description,category,image_url,created_at,is_active')
                     .eq('is_active', true)
                     .order('created_at', { ascending: false });
 
