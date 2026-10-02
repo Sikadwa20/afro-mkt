@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { stripeConfig, checkoutPlan } from "../_shared/stripe.ts";
+import { launchOffer } from "../_shared/launch-offer.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,41 +8,45 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const BASIC_PRICE_ID = "price_1UJ7Pp4Poh3P3Yxvs6XGZQz0";
-const PREMIUM_PRICE_ID = "price_1UJ7Qk4Poh3P3YxvDnZ1nDsT";
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  if (req.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405);
+
+  let config;
+  try {
+    config = stripeConfig((name) => Deno.env.get(name));
+  } catch (error) {
+    console.error("Checkout configuration:", String(error));
+    return jsonResponse({ error: "Seller checkout is temporarily unavailable. Please contact hello@afro-mkt.com." }, 503);
+  }
+
   try {
     const payload = await req.json().catch(() => null);
-    const priceId = typeof payload?.priceId === "string" ? payload.priceId : null;
-
-    if (!priceId) {
-      return jsonResponse({ error: "Missing required fields" }, 400);
+    const plan = checkoutPlan(payload, config.prices);
+    if (!plan) {
+      return jsonResponse({ error: "Choose a valid seller plan" }, 400);
     }
 
-    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
-
-    if (!stripeSecretKey) {
-      return jsonResponse({ error: "Missing STRIPE_SECRET_KEY secret" }, 500);
-    }
-
-    const selectedPriceId = priceId === PREMIUM_PRICE_ID ? PREMIUM_PRICE_ID : BASIC_PRICE_ID;
-    const plan = selectedPriceId === PREMIUM_PRICE_ID ? "premium" : "basic";
+    const selectedPriceId = config.prices[plan];
     const successUrl = "https://afro-mkt.com/success.html?session_id={CHECKOUT_SESSION_ID}";
+
+    const offer = await launchOffer(config.key, config.prices, (name) => Deno.env.get(name));
+    const discount = offer.promotionId
+      ? { "discounts[0][promotion_code]": offer.promotionId }
+      : { allow_promotion_codes: "true" };
 
     const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${stripeSecretKey}`,
+        Authorization: `Bearer ${config.key}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
         mode: "subscription",
-        allow_promotion_codes: "true",
+        ...discount,
         "line_items[0][price]": selectedPriceId,
         "line_items[0][quantity]": "1",
         success_url: successUrl,
@@ -56,10 +62,10 @@ serve(async (req) => {
 
     if (!response.ok) {
       console.error("Stripe error:", session);
-      return jsonResponse({ error: session.error?.message || "Stripe error" }, 400);
+      return jsonResponse({ error: "Seller checkout could not start. Please contact hello@afro-mkt.com." }, 502);
     }
 
-    return jsonResponse({ url: session.url }, 200);
+    return jsonResponse({ url: session.url, freeMonthApplied: Boolean(offer.promotionId) }, 200);
   } catch (error) {
     console.error("create-checkout-session error:", error);
     return jsonResponse({ error: "Unexpected error" }, 500);
