@@ -3,7 +3,8 @@ Deploy:
 1. Open the Supabase Edge Functions editor.
 2. Create or open the function named `get-subscription-status`.
 3. Paste this file into `get-subscription-status/index.ts` and deploy.
-4. Turn JWT verification OFF for this function because the storefront calls it directly.
+4. JWT verification may be OFF for the public checkout-session return path.
+   Email lookups always verify the caller with Supabase Auth in this function.
 
 Call it:
 POST https://nmusxculduptvefgqfjn.supabase.co/functions/v1/get-subscription-status
@@ -15,6 +16,8 @@ Secrets:
 */
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { verifiedUser } from "../_shared/auth.ts";
+import { completedCheckout, LIVE_PRICES } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,8 +27,8 @@ const corsHeaders = {
   "Access-Control-Max-Age": "86400",
 };
 
-const BASIC_PRICE_ID = "price_1UJ7Pp4Poh3P3Yxvs6XGZQz0";
-const PREMIUM_PRICE_ID = "price_1UJ7Qk4Poh3P3YxvDnZ1nDsT";
+const BASIC_PRICE_ID = Deno.env.get("STRIPE_BASIC_PRICE_ID") || LIVE_PRICES.basic;
+const PREMIUM_PRICE_ID = Deno.env.get("STRIPE_PREMIUM_PRICE_ID") || LIVE_PRICES.premium;
 
 type SubscriptionPlan = "basic" | "premium" | null;
 type SubscriptionStatus = "active" | "cancelled" | "past_due" | null;
@@ -52,8 +55,12 @@ serve(async (req: Request) => {
     return jsonResponse({ error: "Invalid JSON body", detail: String(error) }, 400);
   }
 
+  if (!body || typeof body !== "object" || Array.isArray(body)) return jsonResponse({ error: "Invalid request" }, 400);
   const email = normalizeEmail(body.email);
-  const sessionId = body.session_id?.trim();
+  const sessionId = typeof body.session_id === "string" ? body.session_id.trim() : undefined;
+  if (sessionId && !/^cs_(test_|live_)?[A-Za-z0-9]+$/.test(sessionId)) {
+    return jsonResponse({ error: "Invalid checkout session" }, 400);
+  }
 
   if (!email && !sessionId) {
     return jsonResponse(
@@ -85,6 +92,9 @@ serve(async (req: Request) => {
       }
 
       const session = await fetchStripeSession(sessionId, stripeSecretKey);
+      if (!completedCheckout(session)) {
+        return jsonResponse({ plan: null, status: null, created_at: null }, 200);
+      }
       const stripeSubscription = session.subscription && typeof session.subscription === "object"
         ? session.subscription
         : null;
@@ -107,11 +117,14 @@ serve(async (req: Request) => {
       return jsonResponse(mergeSubscription(record, fallback), 200);
     }
 
-    const record = await getSubscriptionByEmail(supabase, email!);
+    const user = await verifiedUser(req, supabase);
+    if (!user?.email) return jsonResponse({ error: "Sign in to view your subscription" }, 401);
+    if (normalizeEmail(user.email) !== email) return jsonResponse({ error: "Forbidden" }, 403);
+    const record = await getSubscriptionByEmail(supabase, normalizeEmail(user.email)!);
     return jsonResponse(mergeSubscription(record, null), 200);
   } catch (error) {
     console.error("[get-subscription-status] Request failed:", error);
-    return jsonResponse({ error: "Failed to load subscription status.", detail: String(error) }, 500);
+    return jsonResponse({ error: "Failed to load subscription status." }, 500);
   }
 });
 
@@ -147,7 +160,7 @@ async function getSubscriptionByEmail(supabase: any, email: string): Promise<any
   const { data, error } = await supabase
     .from("seller_subscriptions")
     .select("plan,status,created_at,updated_at")
-    .ilike("email", email)
+    .eq("email", email)
     .order("updated_at", { ascending: false })
     .limit(1)
     .maybeSingle();
