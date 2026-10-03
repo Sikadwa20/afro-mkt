@@ -16,3 +16,7 @@ verify_jwt = true
 
 [functions.send-welcome-email]
 verify_jwt = true
+
+# JWT gateway plus getUser and listing ownership verification in the function.
+[functions.approve-listing]
+verify_jwt = true
