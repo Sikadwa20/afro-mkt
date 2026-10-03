@@ -595,7 +595,7 @@
                 planValue.textContent = '—';
                 statusValue.textContent = 'Check failed';
                 createdAtValue.textContent = '—';
-                renewalNote.textContent = 'Sign in with the email used at checkout. If the problem continues, contact mreugene233@gmail.com.';
+                renewalNote.textContent = 'Sign in with the email used at checkout. If the problem continues, contact support@afro-mkt.com.';
             }
         }
 
@@ -629,7 +629,7 @@
                 setMessage(productMessage, approval.approved ? 'Product published! It is now available in the product preview.' : `Product saved and pending. ${approval.error}`, approval.approved ? 'success' : 'error');
                 await loadListings(payload.seller_email);
             } catch (error) {
-                setMessage(productMessage, error.message || 'Product could not be saved. Please try again or contact mreugene233@gmail.com.', 'error');
+                setMessage(productMessage, error.message || 'Product could not be saved. Please try again or contact support@afro-mkt.com.', 'error');
             } finally {
                 productSubmitBtn.disabled = false;
                 productSubmitBtn.textContent = 'Save product listing';
