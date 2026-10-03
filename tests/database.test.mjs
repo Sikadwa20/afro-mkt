@@ -34,6 +34,9 @@ for (const legacy of [false, true]) test(`PostgreSQL launch rules (${legacy ? 'l
       create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);
       alter table storage.objects enable row level security;
       grant all on storage.objects to authenticated, service_role;
+      create policy storage_read_fixture on storage.objects for select to authenticated using (true);
+      create policy storage_update_fixture on storage.objects for update to authenticated using (true) with check (true);
+      create policy storage_delete_fixture on storage.objects for delete to authenticated using (true);
       create function storage.foldername(text) returns text[] language sql as $$select string_to_array($1,'/')$$;
     `);
     const withoutExtension = source => source.replace(/create extension if not exists pgcrypto;/gi, '');
@@ -100,7 +103,11 @@ for (const legacy of [false, true]) test(`PostgreSQL launch rules (${legacy ? 'l
     assert.equal((await approve()).rows[0].approved, true);
     await as(db, 'anon'); assert.equal((await db.query('select id from public.products')).rows.length, 1);
     await as(db, 'authenticated', other);
+    await db.query("insert into storage.objects(bucket_id,name) values ('product-images',$1)", [`${other.sub}/photo.png`]);
+    assert.equal((await db.query("update storage.objects set name=$1 where name=$2 returning name", [`${other.sub}/changed.png`, `${other.sub}/photo.png`])).rows.length, 0);
+    assert.equal((await db.query('delete from storage.objects where name=$1 returning name', [`${other.sub}/photo.png`])).rows.length, 0);
     await db.query("update public.products set description='Changed after check' where id=$1", [target]);
+    assert.equal((await db.query('delete from storage.objects where name=$1 returning name', [`${other.sub}/photo.png`])).rows.length, 1);
     await as(db, 'service_role'); assert.equal((await approve()).rows[0].approved, false);
     await as(db, 'authenticated', other);
     await db.query("insert into storage.objects(bucket_id,name) values ('product-images',$1)", [`${other.sub}/fixture.png`]);
