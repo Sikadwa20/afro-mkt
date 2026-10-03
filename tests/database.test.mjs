@@ -83,6 +83,26 @@ for (const legacy of [false, true]) test(`PostgreSQL launch rules (${legacy ? 'l
     await seedSubscription(db, other.email, 'premium');
     await as(db, 'authenticated', other);
     for (let i = 0; i < 11; i++) await addProduct(db, other.email);
+    const automatic = readFileSync('supabase/automatic_listing_approval.sql', 'utf8');
+    await as(db, 'postgres'); await db.exec(automatic); await db.exec(automatic);
+    const description = 'Handmade cotton shirt with traditional patterns, available in medium and large sizes for everyday wear.';
+    const image = `https://nmusxculduptvefgqfjn.supabase.co/storage/v1/object/public/product-images/${other.sub}/photo.png`;
+    const target = (await db.query("select id from public.products where seller_email=$1 limit 1", [other.email])).rows[0].id;
+    await db.query('update public.products set description=$1,image_url=$2 where id=$3', [description,image,target]);
+    await as(db, 'authenticated', other);
+    const approve = (desc=description, url=image, email=other.email) => db.query(
+      'select public.approve_seller_listing($1,$2,$3,$4,$5) as approved', [target,other.sub,email,desc,url]);
+    await assert.rejects(approve(), /permission denied/);
+    await as(db, 'service_role');
+    assert.equal((await approve('Too short')).rows[0].approved, false);
+    assert.equal((await approve(description, image+'changed')).rows[0].approved, false);
+    assert.equal((await approve(description, image, seller.email)).rows[0].approved, false);
+    assert.equal((await approve()).rows[0].approved, true);
+    await as(db, 'anon'); assert.equal((await db.query('select id from public.products')).rows.length, 1);
+    await as(db, 'authenticated', other);
+    await db.query("update public.products set description='Changed after check' where id=$1", [target]);
+    await as(db, 'service_role'); assert.equal((await approve()).rows[0].approved, false);
+    await as(db, 'authenticated', other);
     await db.query("insert into storage.objects(bucket_id,name) values ('product-images',$1)", [`${other.sub}/fixture.png`]);
     await assert.rejects(db.query("insert into storage.objects(bucket_id,name) values ('product-images',$1)", [`${seller.sub}/forged.png`]), /row-level security/);
   } finally { await db.close(); }
