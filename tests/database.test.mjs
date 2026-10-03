@@ -68,6 +68,7 @@ for (const legacy of [false, true]) test(`PostgreSQL launch rules (${legacy ? 'l
     assert.equal((await db.query('select id from public.products')).rows.length, 0);
     await as(db, 'authenticated', other);
     assert.equal((await db.query('select id from public.products')).rows.length, 0);
+    assert.equal((await db.query('delete from public.products where id=$1 returning id', [firstId])).rows.length, 0);
     await as(db, 'postgres');
     await db.query('update public.products set is_approved=true where id=$1', [firstId]);
     await as(db, 'anon');
@@ -78,6 +79,10 @@ for (const legacy of [false, true]) test(`PostgreSQL launch rules (${legacy ? 'l
     assert.equal((await db.query('select id from public.products')).rows.length, 0);
     await as(db, 'postgres');
     await db.query('update public.products set is_approved=true where id=$1', [firstId]);
+    await as(db, 'authenticated', seller);
+    const disposable = (await db.query('select id from public.products where id <> $1 limit 1', [firstId])).rows[0].id;
+    assert.equal((await db.query('delete from public.products where id=$1 returning id', [disposable])).rows.length, 1);
+    await as(db, 'postgres');
     await db.exec("update public.seller_subscriptions set status='cancelled'");
     await as(db, 'anon');
     assert.equal((await db.query('select id from public.products')).rows.length, 0);
