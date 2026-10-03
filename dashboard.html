@@ -306,7 +306,7 @@
                     <section>
                         <article class="card product-form-card">
                             <h2>Submit a product</h2>
-                            <p class="muted">Add a listing for the marketplace. Keep images clear, prices in EUR, and descriptions buyer-friendly.</p>
+                            <p class="muted">Add a listing for the marketplace. Listings publish automatically after checking your active plan, description and photo. Describe the product in at least 80 characters and 12 words. Use a clear photo at least 800 × 800 pixels; prices are in EUR.</p>
                             <form id="productForm" class="form" style="margin-top:20px;">
                                 <div class="form-grid">
                                     <div class="field"><label for="sellerName">Shop / seller name</label><input id="sellerName" class="input" type="text" maxlength="120" autocomplete="organization" placeholder="Afro Taste Lisboa" required></div>
@@ -316,9 +316,9 @@
                                     <div class="field"><label for="productPrice">Price (EUR)</label><input id="productPrice" class="input" type="number" min="0" step="0.01" autocomplete="transaction-amount" placeholder="19.99" required></div>
                                     <div class="field"><label for="productCategory">Category</label><select id="productCategory" class="select" autocomplete="off" required><option value="">Choose category</option><option>Food & Drinks</option><option>Fashion & Clothing</option><option>Beauty & Hair</option><option>Art & Crafts</option><option>Music & Culture</option><option>Other</option></select></div>
                                 </div>
-                                <div class="field"><label for="productDescription">Description</label><textarea id="productDescription" class="textarea" maxlength="1000" autocomplete="off" placeholder="Tell buyers what makes this product special..." required></textarea></div>
+                                <div class="field"><label for="productDescription">Description</label><textarea id="productDescription" class="textarea" minlength="80" maxlength="1000" autocomplete="off" placeholder="Tell buyers what makes this product special..." required></textarea></div>
                                 <div class="form-grid">
-                                    <div class="field upload-control"><label for="productImageFile">Product image</label><input id="productImageFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp" autocomplete="off"><label class="file-upload-btn" for="productImageFile">📷 Choose product image</label><div class="file-name" id="productImageName">No image selected</div><div class="upload-status" id="uploadStatus" aria-live="polite"></div><div class="image-preview" id="imagePreview"><img id="imagePreviewImg" alt="Selected product image preview"></div></div>
+                                    <div class="field upload-control"><label for="productImageFile">Product image</label><input id="productImageFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp" autocomplete="off" required><label class="file-upload-btn" for="productImageFile">📷 Choose product image</label><div class="file-name" id="productImageName">No image selected</div><div class="upload-status" id="uploadStatus" aria-live="polite"></div><div class="image-preview" id="imagePreview"><img id="imagePreviewImg" alt="Selected product image preview"></div></div>
                                 </div>
                                 <button class="btn btn-gold" id="productSubmitBtn" type="submit">Save product listing</button>
                             </form>
@@ -426,16 +426,31 @@
         });
 
         async function uploadProductImage(file, sellerEmail) {
-            if (!file) return null;
+            if (!file) throw new Error('Choose a clear product photo at least 800 × 800 pixels.');
             if (!currentUser?.id) throw new Error('Sign in before uploading an image.');
             if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
                 throw new Error('Choose a JPG, PNG, or WebP image under 5 MB.');
             }
+            let bitmap;
+            try { bitmap = await createImageBitmap(file); }
+            catch { throw new Error('This photo cannot be opened. Choose a JPG, PNG, or WebP photo.'); }
+            let upload;
+            try {
+                if (bitmap.width < 800 || bitmap.height < 800) throw new Error('Choose a photo at least 800 × 800 pixels.');
+                const scale = Math.min(1, 4096 / Math.max(bitmap.width, bitmap.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.floor(bitmap.width * scale);
+                canvas.height = Math.floor(bitmap.height * scale);
+                if (canvas.width < 800 || canvas.height < 800) throw new Error('Choose a less narrow photo, at least 800 pixels on both sides.');
+                canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+                upload = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                if (!upload || upload.size > 5 * 1024 * 1024) throw new Error('The prepared photo is over 5 MB. Choose a smaller photo that is still at least 800 × 800 pixels.');
+            } finally { bitmap.close(); }
             const sellerFolder = currentUser.id;
-            const filePath = `${sellerFolder}/${Date.now()}-${makeSafeFilename(file.name)}`;
+            const filePath = `${sellerFolder}/${crypto.randomUUID()}.png`;
             uploadStatus.textContent = 'Uploading image...';
             productSubmitBtn.textContent = 'Uploading image...';
-            const { error } = await supabaseClient.storage.from('product-images').upload(filePath, file);
+            const { error } = await supabaseClient.storage.from('product-images').upload(filePath, upload, { contentType: 'image/png', upsert: false });
             if (error) throw error;
             const { data } = supabaseClient.storage.from('product-images').getPublicUrl(filePath);
             uploadStatus.textContent = 'Image uploaded. Saving listing...';
@@ -536,7 +551,7 @@
             if (status === 'active') return `Your ${formatPlan(plan)} subscription is active. Stripe will handle renewal automatically based on your billing cycle.`;
             if (status === 'cancelled') return 'Your subscription is cancelled. You can restart or change your plan from the seller plans page.';
             if (status === 'past_due') return 'Your subscription is past due. Please update payment details through Stripe or choose a seller plan again.';
-            return 'No active subscription record was found for this email. Choose a seller plan before submitting listings for review.';
+            return 'No active subscription record was found for this email. Choose a seller plan before publishing listings.';
         }
 
         async function fetchSubscription(email) {
@@ -566,7 +581,7 @@
                 statusBadge.className = `status-pill ${statusClass}`;
                 statusBadge.textContent = formatStatus(status);
                 planHeading.textContent = plan ? `AfroMkt ${formatPlan(plan)} Plan` : 'Subscription status';
-                planSummary.textContent = plan ? 'Use the same email for Stripe checkout and this account. Listings are reviewed before appearing in the preview.' : 'No paid seller subscription record was found for this login email.';
+                planSummary.textContent = plan ? 'Use the same email for Stripe checkout and this account. Listings publish after automatic description and photo checks.' : 'No paid seller subscription record was found for this login email.';
                 planValue.textContent = formatPlan(plan);
                 statusValue.textContent = formatStatus(status);
                 createdAtValue.textContent = formatDate(data?.created_at);
@@ -602,13 +617,15 @@
                 is_active: true
             };
             try {
+                if (payload.description.length < 80 || payload.description.split(/\s+/u).length < 12) throw new Error('Write at least 80 characters and 12 words describing the product, its size, materials or ingredients and intended use.');
                 payload.image_url = await uploadProductImage(selectedImage, sellerEmail);
                 productSubmitBtn.textContent = 'Saving listing...';
-                const { error } = await supabaseClient.from('products').insert(payload);
+                const { data: saved, error } = await supabaseClient.from('products').insert(payload).select('id').single();
                 if (error) throw error;
+                const approval = await checkListing(saved.id);
                 productForm.reset();
                 resetImageUploadPreview();
-                setMessage(productMessage, 'Product submitted for AfroMkt review. It will appear in the preview after approval.', 'success');
+                setMessage(productMessage, approval.approved ? 'Product published! It is now available in the product preview.' : `Product saved and pending. ${approval.error}`, approval.approved ? 'success' : 'error');
                 await loadListings(payload.seller_email);
             } catch (error) {
                 setMessage(productMessage, error.message || 'Product could not be saved. Please try again or contact hello@afro-mkt.com.', 'error');
@@ -616,6 +633,26 @@
                 productSubmitBtn.disabled = false;
                 productSubmitBtn.textContent = 'Save product listing';
             }
+        });
+
+        async function checkListing(id) {
+            try {
+                const { data, error } = await supabaseClient.functions.invoke('approve-listing', { body: { product_id: id } });
+                if (error) {
+                    let detail;
+                    try { detail = await error.context?.json(); } catch {}
+                    return { approved: false, error: detail?.error || 'The automatic check could not finish. Use Check for publication to try again.' };
+                }
+                return data || { approved: false, error: 'Please try the check again.' };
+            } catch { return { approved: false, error: 'Please try the check again.' }; }
+        }
+        listingsContainer.addEventListener('click', async event => {
+            const button = event.target.closest('[data-check-listing]');
+            if (!button) return;
+            button.disabled = true;
+            const result = await checkListing(button.dataset.checkListing);
+            setMessage(productMessage, result.approved ? 'Product published!' : result.error, result.approved ? 'success' : 'error');
+            await loadListings(normalizeEmail(currentUser?.email));
         });
 
         function listingImage(product) {
@@ -648,7 +685,7 @@
                         <div class="listing-image">${listingImage(product)}</div>
                         <div class="listing-body">
                             <div class="listing-meta"><h3>${escapeHtml(product.name)}</h3><div class="price">€${Number(product.price || 0).toFixed(2)}</div></div>
-                            <span class="category-tag">${escapeHtml(product.category || 'Other')}</span><span class="category-tag">${product.is_approved ? 'Approved' : 'Pending review'}</span>
+                            <span class="category-tag">${escapeHtml(product.category || 'Other')}</span><span class="category-tag">${product.is_approved ? 'Published' : 'Pending checks'}</span>${!product.is_approved ? `<button class="btn btn-soft" type="button" data-check-listing="${escapeHtml(product.id)}">Check for publication</button>` : ''}
                             <p class="muted">${escapeHtml(product.description || '')}</p>
                         </div>
                     </article>
