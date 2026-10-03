@@ -8,14 +8,14 @@ import { stripeConfig, checkoutPlan, completedCheckout, LIVE_PRICES, sellerStatu
 import { verifiedUser, verifiedAdmin } from '../supabase/functions/_shared/auth.ts';
 import { launchOffer } from '../supabase/functions/_shared/launch-offer.ts';
 
-function handler(name, { env = {}, supabase = {}, fetch = async () => { throw new Error('Unexpected outgoing request'); } } = {}) {
+function handler(name, { env = {}, supabase = {}, fetch = async () => { throw new Error('Unexpected outgoing request'); }, decodePng = () => { throw Error("Unexpected decode"); } } = {}) {
   let result;
   const source = readFileSync(`supabase/functions/${name}/index.ts`, 'utf8').replace(/^import .*;\r?\n/gm, '');
   vm.runInNewContext(stripTypeScriptTypes(source), {
-    serve: fn => { result = fn; }, createClient: () => supabase,
+    decodePng, Uint8Array, DataView, serve: fn => { result = fn; }, createClient: () => supabase,
     verifiedUser, verifiedAdmin, stripeConfig, checkoutPlan, completedCheckout, LIVE_PRICES, sellerStatus,
     launchOffer: (key, prices, env) => launchOffer(key, prices, env, fetch),
-    Deno: { env: { get: name => env[name] } }, fetch, Request, Response, URLSearchParams,
+    Blob, Deno: { env: { get: name => env[name] } }, fetch, Request, Response, URLSearchParams,
     console: { error() {} }, crypto: webcrypto, TextEncoder,
   });
   return result;
@@ -180,4 +180,32 @@ test('every page script and every edge function parses', () => {
     const source = readFileSync(`supabase/functions/${name}/index.ts`, 'utf8').replace(/^import .*;\r?\n/gm, '');
     new vm.Script(stripTypeScriptTypes(source), { filename: name });
   }
+});
+
+
+test('automatic publication checks auth, ownership, description and image before approval', async () => {
+  const seller = { id:'11111111-1111-4111-8111-111111111111', email:'seller@example.test' };
+  const id = '22222222-2222-4222-8222-222222222222';
+  const product = { id, seller_email:seller.email, description:'Handmade cotton shirt with traditional patterns, available in medium and large sizes for everyday wear.', image_url:`https://example.supabase.co/storage/v1/object/public/product-images/${seller.id}/photo.png` };
+  const bytes = new Uint8Array(33); bytes.set([137,80,78,71,13,10,26,10]);
+  const view = new DataView(bytes.buffer); view.setUint32(16,800); view.setUint32(20,800);
+  let photo = bytes, approvedCalls=0, found=product, authenticated=true, decodeFails=false;
+  const supabase = {
+    auth: { getUser: async()=>({data:{user:authenticated?seller:null}}) },
+    from:()=>({select(){return this;},eq(){return this;},maybeSingle:async()=>({data:found})}),
+    storage:{from:()=>({download:async()=>({data:new Blob([photo])})})},
+    rpc:async()=>{approvedCalls++;return {data:true};},
+  };
+  const route = handler('approve-listing',{ env:{SUPABASE_URL:'https://example.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'fixture'},supabase,
+    decodePng:()=>{if(decodeFails)throw Error('Corrupt');return {width:800,height:800};} });
+  assert.equal((await route(post({product_id:id}))).status,401);
+  authenticated=false; assert.equal((await route(post({product_id:id},'token'))).status,401); authenticated=true;
+  found=null; assert.equal((await route(post({product_id:id},'token'))).status,404); found=product;
+  const desc=product.description;product.description='Too short';assert.equal((await route(post({product_id:id},'token'))).status,422);product.description=desc;
+  const url=product.image_url;product.image_url='https://untrusted.example/photo.png';assert.equal((await route(post({product_id:id},'token'))).status,422);product.image_url=url;
+  photo=new Uint8Array(33);assert.equal((await route(post({product_id:id},'token'))).status,422);photo=bytes;
+  view.setUint32(16,799);assert.equal((await route(post({product_id:id},'token'))).status,422);view.setUint32(16,800);
+  decodeFails=true;assert.equal((await route(post({product_id:id},'token'))).status,422);decodeFails=false;
+  assert.equal(approvedCalls,0);
+  assert.equal((await route(post({product_id:id},'token'))).status,200);assert.equal(approvedCalls,1);
 });
