@@ -274,7 +274,7 @@
                     <form id="signupForm" class="form hidden">
                         <div class="field"><label for="signupEmail">Email address</label><input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="seller@diasporamarket.eu" required></div>
                         <div class="field"><label for="signupPassword">Password</label><input id="signupPassword" class="input" type="password" autocomplete="new-password" minlength="6" placeholder="Minimum 6 characters" required></div>
-                        <button class="btn btn-gold" id="signupBtn" type="submit">Create seller account</button>
+                        <label class="form-help"><input type="checkbox" id="sellerTermsAccepted" required> I am at least 18 and agree to the <a href="policies.html#terms" target="_blank" rel="noopener">Terms</a> and <a href="policies.html#sellers" target="_blank" rel="noopener">Seller Agreement</a>. I have read the <a href="policies.html#privacy" target="_blank" rel="noopener">Privacy Notice</a>.</label><button class="btn btn-gold" id="signupBtn" type="submit">Create seller account</button>
                         <p class="form-help">If email confirmation is enabled in Supabase, check your inbox before logging in.</p>
                     </form>
                     <div id="authMessage" class="message" aria-live="polite"></div>
@@ -335,7 +335,7 @@
         </div>
     </main>
 
-    <footer class="footer"><div class="container"><p>© 2026 AfroMkt (afro-mkt.com). All rights reserved.</p></div></footer>
+    <footer class="footer"><div class="container"><p>© 2026 AfroMkt (afro-mkt.com). All rights reserved.</p></div><p style="text-align:center"><a href="policies.html#terms">Terms</a> · <a href="policies.html#privacy">Privacy</a> · <a href="policies.html#sellers">Seller Agreement</a> · <a href="policies.html#cancellation">Cancellation &amp; refunds</a></p></footer>
 
     <script>
         const SUPABASE_URL = window.AFRO_MKT_CONFIG.supabaseUrl;
@@ -490,6 +490,7 @@
 
         signupForm.addEventListener('submit', async (event) => {
             event.preventDefault();
+            if (!document.getElementById('sellerTermsAccepted').checked) return;
             signupBtn.disabled = true;
             signupBtn.textContent = 'Creating account...';
             setMessage(authMessage, '');
@@ -499,7 +500,7 @@
                 const { data, error } = await supabaseClient.auth.signUp({
                     email,
                     password,
-                    options: { data: { role: 'seller' }, emailRedirectTo: new URL('dashboard.html', window.location.href).href }
+                    options: { data: { role: 'seller', policy_version: '2026-10-03', policy_accepted_at: new Date().toISOString() }, emailRedirectTo: new URL('dashboard.html', window.location.href).href }
                 });
                 if (error) throw error;
                 if (data.session?.user) {
@@ -594,7 +595,7 @@
                 planValue.textContent = '—';
                 statusValue.textContent = 'Check failed';
                 createdAtValue.textContent = '—';
-                renewalNote.textContent = 'Sign in with the email used at checkout. If the problem continues, contact hello@afro-mkt.com.';
+                renewalNote.textContent = 'Sign in with the email used at checkout. If the problem continues, contact mreugene233@gmail.com.';
             }
         }
 
@@ -628,7 +629,7 @@
                 setMessage(productMessage, approval.approved ? 'Product published! It is now available in the product preview.' : `Product saved and pending. ${approval.error}`, approval.approved ? 'success' : 'error');
                 await loadListings(payload.seller_email);
             } catch (error) {
-                setMessage(productMessage, error.message || 'Product could not be saved. Please try again or contact hello@afro-mkt.com.', 'error');
+                setMessage(productMessage, error.message || 'Product could not be saved. Please try again or contact mreugene233@gmail.com.', 'error');
             } finally {
                 productSubmitBtn.disabled = false;
                 productSubmitBtn.textContent = 'Save product listing';
