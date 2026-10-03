@@ -9,12 +9,14 @@ POST https://nmusxculduptvefgqfjn.supabase.co/functions/v1/blast-waitlist
 Optional JSON body: { "test": true }
 
 Important:
-- Turn JWT verification OFF for this function (same as `create-checkout-session`).
+- Keep JWT verification ON and call with an administrator Supabase Auth access token.
+- The function also verifies app_metadata.role = admin; ordinary users cannot send blasts.
 - `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` must be set in Supabase secrets.
 - Optional: set `WAITLIST_TEST_EMAIL` if you want `{ "test": true }` to send to a custom test inbox.
 */
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { verifiedAdmin } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -78,9 +80,15 @@ serve(async (req: Request) => {
     }
   }
 
+  if (!body || typeof body !== "object" || Array.isArray(body)) return jsonResponse({ error: "Invalid request" }, 400);
+
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+
+  if (!await verifiedAdmin(req, supabase)) {
+    return jsonResponse({ error: "Administrator access required" }, 403);
+  }
 
   let recipients: string[] = [];
   try {
@@ -168,7 +176,7 @@ async function getWaitlistRecipients(
   const { data, error } = await supabase
     .from("waitlist")
     .select("email")
-    .order("joined_at", { ascending: true });
+    .order("created_at", { ascending: true });
 
   if (error) {
     throw new Error(`Failed to load waitlist emails: ${error.message}`);

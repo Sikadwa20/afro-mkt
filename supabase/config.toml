@@ -1,0 +1,18 @@
+[functions.create-checkout-session]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.notify-waitlist]
+verify_jwt = false
+
+# Public session-ID lookup; email lookup authenticates and checks ownership in code.
+[functions.get-subscription-status]
+verify_jwt = false
+
+[functions.blast-waitlist]
+verify_jwt = true
+
+[functions.send-welcome-email]
+verify_jwt = true

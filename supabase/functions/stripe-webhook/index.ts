@@ -16,11 +16,14 @@ Stripe dashboard setup:
    https://nmusxculduptvefgqfjn.supabase.co/functions/v1/stripe-webhook
 3. Subscribe to these events:
    - checkout.session.completed
+   - checkout.session.async_payment_succeeded
+   - customer.subscription.created
    - customer.subscription.updated
    - customer.subscription.deleted
 */
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { completedCheckout, LIVE_PRICES, sellerStatus } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,8 +31,8 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const BASIC_PRICE_ID = "price_1UJ7Pp4Poh3P3Yxvs6XGZQz0";
-const PREMIUM_PRICE_ID = "price_1UJ7Qk4Poh3P3YxvDnZ1nDsT";
+const BASIC_PRICE_ID = Deno.env.get("STRIPE_BASIC_PRICE_ID") || LIVE_PRICES.basic;
+const PREMIUM_PRICE_ID = Deno.env.get("STRIPE_PREMIUM_PRICE_ID") || LIVE_PRICES.premium;
 const SIGNATURE_TOLERANCE_SECONDS = 300;
 
 type SellerPlan = "basic" | "premium";
@@ -86,14 +89,20 @@ serve(async (req: Request) => {
   try {
     switch (event.type) {
       case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded":
         await handleCheckoutSessionCompleted(supabase, event.data.object, stripeSecretKey);
         break;
+      case "customer.subscription.created":
       case "customer.subscription.updated":
-        await handleSubscriptionUpdated(supabase, event.data.object);
+      case "customer.subscription.deleted": {
+        if (!stripeSecretKey) throw new Error("Missing STRIPE_SECRET_KEY");
+        // Always reconcile current Stripe state: delivery order and retries must not reactivate a cancelled subscription.
+        const subscription = await fetchStripeSubscription(event.data.object.id, stripeSecretKey);
+        await handleSubscriptionUpdated(supabase, subscription);
         break;
-      case "customer.subscription.deleted":
-        await handleSubscriptionDeleted(supabase, event.data.object);
-        break;
+      }
+
+
       default:
         break;
     }
@@ -117,6 +126,7 @@ async function handleCheckoutSessionCompleted(
   session: any,
   stripeSecretKey: string | undefined,
 ): Promise<void> {
+  if (!completedCheckout(session)) return;
   const subscriptionId = getString(session.subscription);
   const customerId = getString(session.customer);
   const email = getString(session.customer_details?.email) ||
@@ -129,19 +139,21 @@ async function handleCheckoutSessionCompleted(
     throw new Error("checkout.session.completed is missing customer email");
   }
 
-  const priceId = await resolveCheckoutPriceId(session, stripeSecretKey);
-  const plan = normalizePlan(getString(session.metadata?.plan), priceId);
+  if (!stripeSecretKey) throw new Error("Missing STRIPE_SECRET_KEY");
+  const subscription = await fetchStripeSubscription(subscriptionId, stripeSecretKey);
+  const priceId = getPriceIdFromSubscription(subscription);
+  const plan = normalizePlan(null, priceId);
 
   if (!plan) {
-    throw new Error("Could not determine seller plan from checkout session");
+    return; // Ignore other products sold through this Stripe account.
   }
 
   const { error } = await supabase.from("seller_subscriptions").upsert({
-    email,
+    email: email.trim().toLowerCase(),
     stripe_customer_id: customerId,
     stripe_subscription_id: subscriptionId,
     plan,
-    status: "active",
+    status: sellerStatus(subscription.status),
     updated_at: new Date().toISOString(),
   }, {
     onConflict: "stripe_subscription_id",
@@ -162,7 +174,7 @@ async function handleSubscriptionUpdated(
   }
 
   const updatePayload: Record<string, string> = {
-    status: normalizeStatus(getString(subscription.status)),
+    status: sellerStatus(getString(subscription.status)),
     updated_at: new Date().toISOString(),
   };
 
@@ -176,70 +188,35 @@ async function handleSubscriptionUpdated(
     updatePayload.plan = plan;
   }
 
-  const { error } = await supabase.from("seller_subscriptions")
-    .update(updatePayload)
-    .eq("stripe_subscription_id", subscriptionId);
+  if (!plan) return; // Ignore non-AfroMkt subscriptions.
+  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+  if (!stripeKey || !customerId) throw new Error("Subscription cannot be reconciled");
+  const existing = await supabase.from("seller_subscriptions").select("email")
+    .eq("stripe_subscription_id", subscriptionId).maybeSingle();
+  if (existing.error) throw new Error("Subscription lookup failed");
+  let email = getString(existing.data?.email);
+  if (!email) {
+    const customerResponse = await fetch(`https://api.stripe.com/v1/customers/${encodeURIComponent(customerId)}`, {
+      headers: { Authorization: `Bearer ${stripeKey}` },
+    });
+    const customer = await customerResponse.json();
+    email = getString(customer.email);
+    if (!customerResponse.ok || !email) throw new Error("Subscription customer email unavailable");
+  }
+  const { error } = await supabase.from("seller_subscriptions").upsert({
+    ...updatePayload,
+    email: email.trim().toLowerCase(),
+    stripe_subscription_id: subscriptionId,
+    plan,
+  }, { onConflict: "stripe_subscription_id" });
 
   if (error) {
     throw new Error(`Failed to update seller subscription: ${error.message}`);
   }
 }
 
-async function handleSubscriptionDeleted(
-  supabase: any,
-  subscription: any,
-): Promise<void> {
-  const subscriptionId = getString(subscription.id);
-  if (!subscriptionId) {
-    throw new Error("customer.subscription.deleted is missing subscription id");
-  }
-
-  const updatePayload: Record<string, string> = {
-    status: "cancelled",
-    updated_at: new Date().toISOString(),
-  };
-
-  const customerId = getString(subscription.customer);
-  if (customerId) {
-    updatePayload.stripe_customer_id = customerId;
-  }
-
-  const plan = normalizePlan(undefined, getPriceIdFromSubscription(subscription));
-  if (plan) {
-    updatePayload.plan = plan;
-  }
-
-  const { error } = await supabase.from("seller_subscriptions")
-    .update(updatePayload)
-    .eq("stripe_subscription_id", subscriptionId);
-
-  if (error) {
-    throw new Error(`Failed to cancel seller subscription: ${error.message}`);
-  }
-}
-
-async function resolveCheckoutPriceId(
-  session: any,
-  stripeSecretKey?: string,
-): Promise<string | null> {
-  const directPriceId = getString(session.metadata?.priceId) ||
-    getString(session.line_items?.data?.[0]?.price?.id);
-
-  if (directPriceId) {
-    return directPriceId;
-  }
-
-  const subscriptionId = getString(session.subscription);
-  if (!subscriptionId || !stripeSecretKey) {
-    return null;
-  }
-
-  const subscription = await fetchStripeSubscription(subscriptionId, stripeSecretKey);
-  return getPriceIdFromSubscription(subscription);
-}
-
 async function fetchStripeSubscription(subscriptionId: string, stripeSecretKey: string): Promise<any> {
-  const response = await fetch(`https://api.stripe.com/v1/subscriptions/${subscriptionId}?expand[]=items.data.price`, {
+  const response = await fetch(`https://api.stripe.com/v1/subscriptions/${encodeURIComponent(subscriptionId)}?expand[]=items.data.price`, {
     headers: {
       Authorization: `Bearer ${stripeSecretKey}`,
     },
@@ -254,7 +231,9 @@ async function fetchStripeSubscription(subscriptionId: string, stripeSecretKey: 
 }
 
 function getPriceIdFromSubscription(subscription: any): string | null {
-  return getString(subscription?.items?.data?.[0]?.price?.id) || null;
+  const items = subscription?.items?.data;
+  if (!Array.isArray(items) || items.length !== 1) return null;
+  return getString(items[0]?.price?.id) || null;
 }
 
 function normalizePlan(planValue?: string | null, priceId?: string | null): SellerPlan | null {
@@ -269,20 +248,6 @@ function normalizePlan(planValue?: string | null, priceId?: string | null): Sell
     return "premium";
   }
   return null;
-}
-
-function normalizeStatus(status?: string | null): SellerStatus {
-  switch ((status || "").toLowerCase()) {
-    case "active":
-    case "trialing":
-      return "active";
-    case "past_due":
-    case "incomplete":
-    case "paused":
-      return "past_due";
-    default:
-      return "cancelled";
-  }
 }
 
 function getString(value: unknown): string | undefined {

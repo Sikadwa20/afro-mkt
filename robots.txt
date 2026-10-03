@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /success
+Disallow: /supabase/
+Disallow: /tests/
+
+Sitemap: https://afro-mkt.com/sitemap.xml
