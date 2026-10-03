@@ -2,7 +2,7 @@
 
 These changes are prepared locally against GitHub commit `e6f1f26`. They are not deployed.
 Public Supabase URLs and the browser anon key are centralized in `config.js`; this file must never contain server secrets.
-Buyer purchases are intentionally unavailable. This is a seller-subscription and listing-review launch.
+Buyer purchases are intentionally unavailable. This is a seller-subscription and product-preview launch.
 
 ## What changed
 
@@ -13,7 +13,7 @@ Buyer purchases are intentionally unavailable. This is a seller-subscription and
 - Webhooks verify signatures and reconcile the current Stripe subscription on retries and out-of-order events. Failed renewals and cancellations revoke active listing entitlements.
 - Subscription and waitlist tables are server-only. Public product requests omit seller email addresses.
 - An active subscription is required to submit products. Basic accounts can create at most 10 listings; Premium accounts can create more. Database locks serialize concurrent inserts. Existing listings are retained after a downgrade, but new inserts are blocked while over the Basic limit.
-- Listings require operator approval before appearing publicly. Editing a listing sends it back for review. No existing listings are automatically approved.
+- New listings publish after automatic checks: active plan, description at least 80 characters and 12 words, and a decodable owned photo at least 800 × 800 pixels. The dashboard prepares photos as PNG (at most 4096 pixels per side and 5 MB). The approve-listing function downloads and decodes the actual bytes with CRC validation, then uses a service-only SQL function to approve the unchanged listing. Editing resets approval; pending listings have a Check for publication retry button. Existing listings are not bulk-approved. These checks do not assess blur, authenticity or description truthfulness.
 - Product uploads use authenticated UUID folders, a 5 MB limit, and JPG/PNG/WebP only.
 - Waitlist functions use `created_at`; the migration preserves historical `joined_at` dates. Saved signups remain successful even if email delivery fails.
 - Sign In opens the dashboard, the homepage opens the product preview, and the shop no longer offers nonfunctional purchase buttons. English, Portuguese, French, and Spanish launch notices reflect seller onboarding.
@@ -33,6 +33,9 @@ Run these SQL files in order in the Supabase SQL Editor:
 1. `supabase/seller_subscriptions.sql`
 2. `supabase/products_table.sql`
 3. `supabase/seller_onboarding_launch.sql`
+4. `supabase/automatic_listing_approval.sql`
+
+Deploy `approve-listing` with JWT verification enabled, its pinned `fast-png@8.0.0` decoder, and the shared verifiedUser helper. Apply the automatic migration last; reapplying the base launch migration afterward must be followed by the automatic migration again. Published photos cannot be overwritten or deleted while referenced by an approved listing.
 
 The migration adds columns, changes grants/policies, and adds listing rules. It does not delete seller or product records.
 All existing products start unapproved unless already approved in a previous run. Review them before enabling public visibility.
@@ -42,7 +45,7 @@ Enable Email/Password authentication and email confirmation. Configure the site 
 and the email confirmation redirect as `https://afro-mkt.com/dashboard.html`.
 Configure production authentication email delivery and test it. Require sellers to use the same email for checkout and their account.
 
-Approve an individual reviewed listing in the SQL Editor with its actual UUID:
+Optional operator override: approve an individually reviewed listing in the SQL Editor with its actual UUID:
 
 ```sql
 update public.products set is_approved = true where id = 'REVIEWED-PRODUCT-UUID';
@@ -147,7 +150,7 @@ pnpm build
 - Publish reviewed Terms, Privacy, and Seller Agreement pages with the real operator details, fees, cancellation/refund terms, and data practices. Existing email-only legal links are not replaced with invented policy text.
 - Verify the live account secrets, webhooks, authentication email, and Resend DNS/sender setup in the actual dashboards.
 - Add reviewed seller listings; the public Supabase request currently returns zero active products.
-- Complete staging signup → email confirmation → test subscription → dashboard → product upload → moderation approval.
+- Complete staging signup → email confirmation → test subscription → dashboard → product upload → automatic checks → public preview.
 - Test Basic's limit, failed renewal, cancellation, promotion redemption limits, and seller billing management.
 - Re-test both production checkout buttons and webhook records after deployment. A live payment test requires the owner's explicit spending authorization; none has been performed.
 - Do not send a launch email blast until these checks pass. Add abuse protection to the public waitlist before a large promotion.
