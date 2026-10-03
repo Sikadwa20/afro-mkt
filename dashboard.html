@@ -305,7 +305,7 @@
 
                     <section>
                         <article class="card product-form-card">
-                            <h2>Submit a product</h2>
+                            <h2 id="productFormHeading">Submit a product</h2>
                             <p class="muted">Add a listing for the marketplace. Listings publish automatically after checking your active plan, description and photo. Describe the product in at least 80 characters and 12 words. Use a clear photo at least 800 × 800 pixels; prices are in EUR.</p>
                             <form id="productForm" class="form" style="margin-top:20px;">
                                 <div class="form-grid">
@@ -321,6 +321,7 @@
                                     <div class="field upload-control"><label for="productImageFile">Product image</label><input id="productImageFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp" autocomplete="off" required><label class="file-upload-btn" for="productImageFile">📷 Choose product image</label><div class="file-name" id="productImageName">No image selected</div><div class="upload-status" id="uploadStatus" aria-live="polite"></div><div class="image-preview" id="imagePreview"><img id="imagePreviewImg" alt="Selected product image preview"></div></div>
                                 </div>
                                 <button class="btn btn-gold" id="productSubmitBtn" type="submit">Save product listing</button>
+                                <button class="btn btn-soft hidden" id="cancelEditBtn" type="button">Cancel editing</button>
                             </form>
                             <div id="productMessage" class="message" aria-live="polite"></div>
                         </article>
@@ -370,6 +371,49 @@
         const userChip = document.getElementById('userChip');
         const userEmailChip = document.getElementById('userEmailChip');
         let currentUser = null;
+        let editingListing = null;
+        let sellerListings = [];
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        function resetProductForm() {
+            editingListing = null;
+            productForm.reset();
+            resetImageUploadPreview();
+            productImageFile.required = true;
+            document.getElementById('productFormHeading').textContent = 'Submit a product';
+            productSubmitBtn.textContent = 'Save product listing';
+            cancelEditBtn.classList.add('hidden');
+        }
+        cancelEditBtn.addEventListener('click', () => { resetProductForm(); setMessage(productMessage, ''); });
+        function editListing(product) {
+            resetProductForm();
+            editingListing = product;
+            for (const [field, value] of Object.entries({sellerName: product.seller_name, productName: product.name, productPrice: product.price, productCategory: product.category, productDescription: product.description})) {
+                document.getElementById(field).value = value ?? '';
+            }
+            productImageFile.required = false;
+            productImageName.textContent = 'Current photo retained unless you choose a replacement';
+            imagePreviewImg.src = product.image_url || '';
+            imagePreview.classList.toggle('show', Boolean(product.image_url));
+            document.getElementById('productFormHeading').textContent = 'Edit product';
+            productSubmitBtn.textContent = 'Save changes';
+            cancelEditBtn.classList.remove('hidden');
+            setMessage(productMessage, 'Update your listing below. Saving runs the publication checks again.');
+            productForm.scrollIntoView({behavior: 'smooth', block: 'start'});
+            document.getElementById('productName').focus({preventScroll: true});
+        }
+        async function saveListing(payload, listingId, sellerEmail) {
+            const query = supabaseClient.from('products');
+            return listingId
+                ? query.update(payload).eq('id', listingId).eq('seller_email', sellerEmail).select('id').single()
+                : query.insert(payload).select('id').single();
+        }
+        async function removeListing(listingId, sellerEmail) {
+            const { data, error } = await supabaseClient.from('products').delete()
+                .eq('id', listingId).eq('seller_email', sellerEmail).select('id').single();
+            if (error) throw error;
+            if (!data) throw new Error('Listing could not be deleted. Refresh and try again.');
+            return data;
+        }
 
         mobileBtn.addEventListener('click', () => {
             navbar.classList.toggle('nav-active');
@@ -619,20 +663,20 @@
             };
             try {
                 if (payload.description.length < 80 || payload.description.split(/\s+/u).length < 12) throw new Error('Write at least 80 characters and 12 words describing the product, its size, materials or ingredients and intended use.');
-                payload.image_url = await uploadProductImage(selectedImage, sellerEmail);
+                payload.image_url = selectedImage ? await uploadProductImage(selectedImage, sellerEmail) : editingListing?.image_url;
+                if (!payload.image_url) throw new Error('Choose a product photo.');
                 productSubmitBtn.textContent = 'Saving listing...';
-                const { data: saved, error } = await supabaseClient.from('products').insert(payload).select('id').single();
+                const { data: saved, error } = await saveListing(payload, editingListing?.id, sellerEmail);
                 if (error) throw error;
                 const approval = await checkListing(saved.id);
-                productForm.reset();
-                resetImageUploadPreview();
+                resetProductForm();
                 setMessage(productMessage, approval.approved ? 'Product published! It is now available in the product preview.' : `Product saved and pending. ${approval.error}`, approval.approved ? 'success' : 'error');
                 await loadListings(payload.seller_email);
             } catch (error) {
                 setMessage(productMessage, error.message || 'Product could not be saved. Please try again or contact support@afro-mkt.com.', 'error');
             } finally {
                 productSubmitBtn.disabled = false;
-                productSubmitBtn.textContent = 'Save product listing';
+                productSubmitBtn.textContent = editingListing ? 'Save changes' : 'Save product listing';
             }
         });
 
@@ -648,12 +692,27 @@
             } catch { return { approved: false, error: 'Please try the check again.' }; }
         }
         listingsContainer.addEventListener('click', async event => {
-            const button = event.target.closest('[data-check-listing]');
-            if (!button) return;
+            const button = event.target.closest('[data-check-listing], [data-edit-listing], [data-delete-listing]');
+            if (!button || !currentUser?.email) return;
+            const id = button.dataset.checkListing || button.dataset.editListing || button.dataset.deleteListing;
+            const product = sellerListings.find(item => String(item.id) === id);
+            if (!product) return;
+            if (button.dataset.editListing) { editListing(product); return; }
+            if (button.dataset.deleteListing && !window.confirm(`Delete "${product.name}"? This removes the listing from the marketplace and cannot be undone.`)) return;
             button.disabled = true;
-            const result = await checkListing(button.dataset.checkListing);
-            setMessage(productMessage, result.approved ? 'Product published!' : result.error, result.approved ? 'success' : 'error');
-            await loadListings(normalizeEmail(currentUser?.email));
+            try {
+                if (button.dataset.deleteListing) {
+                    await removeListing(id, normalizeEmail(currentUser.email));
+                    if (String(editingListing?.id) === id) resetProductForm();
+                    setMessage(productMessage, 'Product listing deleted.', 'success');
+                } else {
+                    const result = await checkListing(id);
+                    setMessage(productMessage, result.approved ? 'Product published!' : result.error, result.approved ? 'success' : 'error');
+                }
+                await loadListings(normalizeEmail(currentUser.email));
+            } catch (error) {
+                setMessage(productMessage, error.message || 'Could not update this listing. Please try again.', 'error');
+            } finally { button.disabled = false; }
         });
 
         function listingImage(product) {
@@ -676,6 +735,7 @@
                     .order('created_at', { ascending: false });
                 if (error) throw error;
                 const products = data || [];
+                sellerListings = products;
                 listingCount.textContent = `${products.length} ${products.length === 1 ? 'listing' : 'listings'}`;
                 if (!products.length) {
                     listingsContainer.innerHTML = '<div class="empty-listings">No listings yet. Add your first product above and it will appear here.</div>';
@@ -688,6 +748,7 @@
                             <div class="listing-meta"><h3>${escapeHtml(product.name)}</h3><div class="price">€${Number(product.price || 0).toFixed(2)}</div></div>
                             <span class="category-tag">${escapeHtml(product.category || 'Other')}</span><span class="category-tag">${product.is_approved ? 'Published' : 'Pending checks'}</span>${!product.is_approved ? `<button class="btn btn-soft" type="button" data-check-listing="${escapeHtml(product.id)}">Check for publication</button>` : ''}
                             <p class="muted">${escapeHtml(product.description || '')}</p>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-soft" type="button" data-edit-listing="${escapeHtml(product.id)}">Edit</button><button class="btn btn-soft" type="button" data-delete-listing="${escapeHtml(product.id)}">Delete</button></div>
                         </div>
                     </article>
                 `).join('');
@@ -717,6 +778,8 @@
                 if (session?.user) await renderDashboard(session.user);
                 else {
                     currentUser = null;
+                    sellerListings = [];
+                    resetProductForm();
                     userChip.classList.remove('show');
                     navLogoutBtn.classList.add('hidden');
                     setState('auth');
