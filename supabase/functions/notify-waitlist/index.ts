@@ -10,7 +10,7 @@ const corsHeaders = {
 };
 
 const RESEND_FROM = "AfroMkt <noreply@afro-mkt.com>";
-const OWNER_EMAIL = "mreugene233@gmail.com";
+const OWNER_EMAIL = "support@afro-mkt.com";
 const BRAND_GREEN = "#1a5c38";
 const BRAND_GOLD = "#D4A017";
 
