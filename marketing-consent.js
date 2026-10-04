@@ -8,7 +8,7 @@
     if (saved && ['accepted', 'rejected'].includes(saved.value) && Date.now() - saved.at >= 0 && Date.now() - saved.at < MAX_AGE) choice = saved.value;
   } catch {}
   function startPixel() {
-    if (window.fbq) return;
+    if (window.fbq) { window.fbq('consent', 'grant'); return; }
     const queue = window.fbq = function () { queue.callMethod ? queue.callMethod.apply(queue, arguments) : queue.queue.push(arguments); };
     window._fbq = queue; queue.push = queue; queue.loaded = true; queue.version = '2.0'; queue.queue = [];
     // Send only explicit page views; no automatic form or click events.
