@@ -5,14 +5,17 @@ await mkdir('dist');
 // Explicitly publish only visitor assets, never backend source or configuration.
 for (const name of await readdir('.')) {
   if (/\.html$/.test(name) || /^afromkt-.*\.png$/.test(name) ||
-      ['robots.txt', 'sitemap.xml', '_headers', 'config.js'].includes(name)) {
+      ['robots.txt', 'sitemap.xml', '_headers', 'config.js', 'marketing-consent.js'].includes(name)) {
     if (/\.html$/.test(name)) {
       const html = await readFile(name, 'utf8');
       const icon = '<link rel="icon" type="image/png" href="/afromkt-favicon.png?v=20261003">';
       const page = /rel\s*=\s*["'](?:shortcut )?icon["']/i.test(html) ? html
         : /<\/head>/i.test(html) ? html.replace(/<\/head>/i, `${icon}\n</head>`)
         : html.replace(/(<html\b[^>]*>)/i, `$1\n${icon}`);
-      await writeFile(`dist/${name}`, page);
+      const consent = '<script src="/marketing-consent.js" defer></script>';
+      const published = /<\/body>/i.test(page) && !['dashboard.html', 'success.html', '404.html'].includes(name)
+        ? page.replace(/<\/body>/i, `${consent}\n</body>`) : page;
+      await writeFile(`dist/${name}`, published);
     } else {
       await copyFile(name, `dist/${name}`);
     }
