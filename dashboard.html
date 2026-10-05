@@ -1016,6 +1016,7 @@
                     product_images: [],
                     is_active: true
                 };
+                if (!payload.price || payload.price <= 0) throw new Error('Please enter a valid price greater than 0.');
                 if (payload.description.length < 80 || payload.description.split(/\s+/u).length < 12) throw new Error('Write at least 80 characters and 12 words describing the product, its size, materials or ingredients and intended use.');
                 if (!galleryPhotos.length) throw new Error('Choose between 1 and 5 product photos.');
                 const uploadedPhotoUrls = await uploadProductGallery(galleryPhotos, editingListing?.id || Date.now());
