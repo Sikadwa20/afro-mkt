@@ -5,7 +5,7 @@ await mkdir('dist');
 // Explicitly publish only visitor assets, never backend source or configuration.
 for (const name of await readdir('.')) {
   if (/\.html$/.test(name) || /^afromkt-.*\.png$/.test(name) ||
-      ['robots.txt', 'sitemap.xml', '_headers', 'config.js', 'marketing-consent.js'].includes(name)) {
+      ['robots.txt', 'sitemap.xml', '_headers', 'config.js', 'marketing-consent.js', 'marketplace-search.js'].includes(name)) {
     if (/\.html$/.test(name)) {
       const html = await readFile(name, 'utf8');
       const icon = '<link rel="icon" type="image/png" href="/afromkt-favicon.png?v=20261003">';
