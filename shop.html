@@ -77,9 +77,10 @@
         .section-header { text-align: center; margin-bottom: 30px; }
         .section-header h2 { font-size: 2.6rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 14px; }
         .section-header p { color: var(--text-light); font-size: 1.05rem; max-width: 760px; margin: 0 auto; }
-        .filter-bar { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 34px 0 22px; }
-        .filter-btn { border: 0; border-radius: 999px; padding: 12px 18px; background: #ffffff; color: var(--primary-dark); font-weight: 700; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.05); transition: var(--transition); }
-        .filter-btn:hover, .filter-btn.active { background: var(--primary-dark); color: #ffffff; transform: translateY(-2px); }
+        .filter-bar { display: flex; gap: 12px; justify-content: flex-start; margin: 34px auto 22px; padding: 8px; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; border-radius: 999px; background: rgba(13,47,33,.08); border: 1px solid rgba(26,60,46,.10); scrollbar-width: thin; }
+        .filter-btn { flex: 0 0 auto; scroll-snap-align: start; border: 1px solid rgba(26,60,46,.12); border-radius: 999px; padding: 12px 18px; background: #ffffff; color: var(--primary-dark); font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.05); transition: var(--transition); white-space: nowrap; }
+        .filter-btn:hover { border-color: var(--accent); color: var(--accent-dark); transform: translateY(-2px); }
+        .filter-btn.active { background: linear-gradient(135deg, var(--accent), #f1d27c); color: var(--primary-dark); border-color: rgba(13,47,33,.16); box-shadow: 0 12px 28px rgba(212,168,67,.3); transform: translateY(-2px); }
         .grid-intro { text-align: center; color: var(--text-light); font-weight: 600; margin-bottom: 26px; }
         .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
         .product-card { background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 40px rgba(0,0,0,.06); border: 1px solid rgba(26,60,46,.08); transition: var(--transition); display: flex; flex-direction: column; }
@@ -298,6 +299,17 @@
         const SUPABASE_URL = window.AFRO_MKT_CONFIG.supabaseUrl;
         const SUPABASE_ANON_KEY = window.AFRO_MKT_CONFIG.supabaseAnonKey;
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const DEFAULT_STORE_CATEGORY = 'General Store';
+        const STORE_CATEGORIES = [
+            { value: 'Food & Drinks', label: '🍛 Food & Drinks' },
+            { value: 'Fashion & Clothing', label: '👗 Fashion & Clothing' },
+            { value: 'Hair & Beauty', label: '💇 Hair & Beauty' },
+            { value: 'Electronics', label: '📱 Electronics' },
+            { value: 'Home & Living', label: '🏠 Home & Living' },
+            { value: 'Money & Services', label: '💸 Money & Services' },
+            { value: 'Music & Entertainment', label: '🎵 Music & Entertainment' },
+            { value: 'General Store', label: '🛒 General Store' }
+        ];
 
         const translations = {
             en: {
@@ -348,7 +360,7 @@
         let activeLanguage = 'en';
         let activeCategory = 'all';
         let allProducts = [];
-        let availableCategories = [];
+        const availableCategories = STORE_CATEGORIES.map((category) => category.value);
         let sellerContacts = {};
 
         const mobileBtn = document.getElementById('mobileBtn');
@@ -377,6 +389,32 @@
 
         function slugifyCategory(value) {
             return String(value || 'other').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'other';
+        }
+
+        function normalizeStoreCategory(value) {
+            const legacyMap = {
+                'Beauty & Hair': 'Hair & Beauty',
+                'Music & Culture': 'Music & Entertainment',
+                'Art & Crafts': 'Home & Living',
+                Other: DEFAULT_STORE_CATEGORY
+            };
+            const rawCategory = legacyMap[value] || value;
+            const category = STORE_CATEGORIES.find((item) => item.value === rawCategory);
+            return category ? category.value : DEFAULT_STORE_CATEGORY;
+        }
+
+        function getStoreCategoryLabel(value) {
+            const category = STORE_CATEGORIES.find((item) => item.value === normalizeStoreCategory(value));
+            return category ? category.label : '🛒 General Store';
+        }
+
+        function getProductStoreCategory(product) {
+            return normalizeStoreCategory(product?.store_category || product?.category);
+        }
+
+        function isMissingStoreCategoryColumnError(error) {
+            const message = String(error?.message || error?.details || error?.hint || '');
+            return error?.code === 'PGRST204' && /store_category/i.test(message);
         }
 
         function normalizeWhatsAppDigits(value) {
@@ -443,7 +481,7 @@
         function buildFilterButtons() {
             const dictionary = translations[activeLanguage];
             const buttons = [{ slug: 'all', label: dictionary.filterAll }].concat(
-                availableCategories.map((category) => ({ slug: slugifyCategory(category), label: category }))
+                availableCategories.map((category) => ({ slug: slugifyCategory(category), label: getStoreCategoryLabel(category) }))
             );
 
             filterBar.innerHTML = buttons.map((button) => `
@@ -461,7 +499,7 @@
 
         function getVisibleProducts() {
             if (activeCategory === 'all') return allProducts;
-            return allProducts.filter((product) => slugifyCategory(product.category) === activeCategory);
+            return allProducts.filter((product) => slugifyCategory(getProductStoreCategory(product)) === activeCategory);
         }
 
         function getProductGallery(product) {
@@ -482,7 +520,7 @@
 
         function buildProductVisual(product, fallbackVisual) {
             const galleryImages = getProductGallery(product);
-            const categoryLabel = escapeHtml(product.category || 'Other');
+            const categoryLabel = escapeHtml(getStoreCategoryLabel(getProductStoreCategory(product)));
             if (!galleryImages.length) {
                 return `
                     <div class="product-visual ${fallbackVisual}">
@@ -552,7 +590,7 @@
             const visibleProducts = getVisibleProducts();
 
             if (!visibleProducts.length) {
-                setGridIntro(dictionary.showingFiltered.replace('{count}', '0').replace('{category}', availableCategories.find((category) => slugifyCategory(category) === activeCategory) || dictionary.filterAll));
+                setGridIntro(dictionary.showingFiltered.replace('{count}', '0').replace('{category}', getStoreCategoryLabel(availableCategories.find((category) => slugifyCategory(category) === activeCategory) || DEFAULT_STORE_CATEGORY)));
                 setStatusCard('empty');
                 return;
             }
@@ -560,7 +598,7 @@
             if (activeCategory === 'all') {
                 setGridIntro(dictionary.showingCount.replace('{count}', String(allProducts.length)).replace('{categoryCount}', String(availableCategories.length)));
             } else {
-                const categoryLabel = availableCategories.find((category) => slugifyCategory(category) === activeCategory) || dictionary.filterAll;
+                const categoryLabel = getStoreCategoryLabel(availableCategories.find((category) => slugifyCategory(category) === activeCategory) || DEFAULT_STORE_CATEGORY);
                 setGridIntro(dictionary.showingFiltered.replace('{count}', String(visibleProducts.length)).replace('{category}', categoryLabel));
             }
 
@@ -639,30 +677,32 @@
             try {
                 let { data, error } = await supabaseClient
                     .from('products')
-                    .select('id,seller_email,seller_name,name,price,description,category,image_url,product_images,created_at,is_active,is_approved')
+                    .select('id,seller_email,seller_name,name,price,description,category,store_category,image_url,product_images,created_at,is_active,is_approved')
                     .eq('is_active', true)
                     .eq('is_approved', true)
                     .order('created_at', { ascending: false });
-                if (error && isMissingProductImagesColumnError(error)) {
+                if (error && (isMissingProductImagesColumnError(error) || isMissingStoreCategoryColumnError(error))) {
                     ({ data, error } = await supabaseClient
                         .from('products')
                         .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active,is_approved')
                         .eq('is_active', true)
                         .eq('is_approved', true)
                         .order('created_at', { ascending: false }));
-                    data = (data || []).map((product) => ({ ...product, product_images: [] }));
+                    data = (data || []).map((product) => ({ ...product, product_images: [], store_category: getProductStoreCategory(product) }));
                 }
 
                 if (error) throw error;
 
-                allProducts = (data || []).filter((product) => product && product.name && product.category);
+                allProducts = (data || []).filter((product) => product && product.name).map((product) => ({
+                    ...product,
+                    store_category: getProductStoreCategory(product)
+                }));
                 try {
                     await loadSellerContacts(allProducts);
                 } catch (contactError) {
                     console.warn('Failed to load seller WhatsApp contacts:', contactError);
                     sellerContacts = {};
                 }
-                availableCategories = [...new Set(allProducts.map((product) => product.category).filter(Boolean))].sort((left, right) => left.localeCompare(right));
                 if (activeCategory !== 'all' && !availableCategories.some((category) => slugifyCategory(category) === activeCategory)) {
                     activeCategory = 'all';
                 }
@@ -681,7 +721,6 @@
                     raw: error
                 });
                 allProducts = [];
-                availableCategories = [];
                 sellerContacts = {};
                 activeCategory = 'all';
                 productGrid.dataset.state = 'error';

@@ -299,6 +299,7 @@
                     <form id="signupForm" class="form hidden">
                         <div class="field"><label for="signupEmail">Email address</label><input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="seller@diasporamarket.eu" required></div>
                         <div class="field"><label for="signupPassword">Password</label><input id="signupPassword" class="input" type="password" autocomplete="new-password" minlength="6" placeholder="Minimum 6 characters" required></div>
+                        <div class="field"><label for="signupStoreCategory">What do you sell?</label><select id="signupStoreCategory" class="select" autocomplete="organization-title" required><option value="Food & Drinks">🍛 Food & Drinks</option><option value="Fashion & Clothing">👗 Fashion & Clothing</option><option value="Hair & Beauty">💇 Hair & Beauty</option><option value="Electronics">📱 Electronics</option><option value="Home & Living">🏠 Home & Living</option><option value="Money & Services">💸 Money & Services</option><option value="Music & Entertainment">🎵 Music & Entertainment</option><option value="General Store" selected>🛒 General Store</option></select></div>
                         <label class="form-help"><input type="checkbox" id="sellerTermsAccepted" required> I am at least 18 and agree to the <a href="/policies#terms" target="_blank" rel="noopener">Terms</a> and <a href="/policies#sellers" target="_blank" rel="noopener">Seller Agreement</a>. I have read the <a href="/policies#privacy" target="_blank" rel="noopener">Privacy Notice</a>.</label><button class="btn btn-gold" id="signupBtn" type="submit">Create seller account</button>
                         <p class="form-help">If email confirmation is enabled in Supabase, check your inbox before logging in.</p>
                     </form>
@@ -335,9 +336,10 @@
                             <form id="profileForm" class="form" style="margin-top:20px;">
                                 <div class="form-grid">
                                     <div class="field"><label for="profileWhatsapp">WhatsApp number</label><input id="profileWhatsapp" class="input" type="tel" inputmode="tel" maxlength="32" autocomplete="tel" placeholder="+351 912 345 678"></div>
+                                    <div class="field"><label for="profileStoreCategory">Store Category</label><select id="profileStoreCategory" class="select" autocomplete="organization-title" required><option value="Food & Drinks">🍛 Food & Drinks</option><option value="Fashion & Clothing">👗 Fashion & Clothing</option><option value="Hair & Beauty">💇 Hair & Beauty</option><option value="Electronics">📱 Electronics</option><option value="Home & Living">🏠 Home & Living</option><option value="Money & Services">💸 Money & Services</option><option value="Music & Entertainment">🎵 Music & Entertainment</option><option value="General Store" selected>🛒 General Store</option></select></div>
                                     <div class="field"><label for="profileWhatsappPreview">WhatsApp link preview</label><input id="profileWhatsappPreview" class="input" type="text" placeholder="https://wa.me/351912345678" readonly></div>
                                 </div>
-                                <p class="form-help">Use your country code. Buyers will see a WhatsApp button only when this number is saved.</p>
+                                <p class="form-help">Use your country code. Buyers will see a WhatsApp button only when this number is saved. Your store category is applied to every product you publish.</p>
                                 <button class="btn btn-green" id="profileSubmitBtn" type="submit">Save seller profile</button>
                             </form>
                             <div id="profileMessage" class="message" aria-live="polite"></div>
@@ -397,6 +399,17 @@
         const SUPABASE_ANON_KEY = window.AFRO_MKT_CONFIG.supabaseAnonKey;
         const SUBSCRIPTION_ENDPOINT = `${SUPABASE_URL}/functions/v1/get-subscription-status`;
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const DEFAULT_STORE_CATEGORY = 'General Store';
+        const STORE_CATEGORIES = [
+            { value: 'Food & Drinks', label: '🍛 Food & Drinks' },
+            { value: 'Fashion & Clothing', label: '👗 Fashion & Clothing' },
+            { value: 'Hair & Beauty', label: '💇 Hair & Beauty' },
+            { value: 'Electronics', label: '📱 Electronics' },
+            { value: 'Home & Living', label: '🏠 Home & Living' },
+            { value: 'Money & Services', label: '💸 Money & Services' },
+            { value: 'Music & Entertainment', label: '🎵 Music & Entertainment' },
+            { value: 'General Store', label: '🛒 General Store' }
+        ];
 
         const mobileBtn = document.getElementById('mobileBtn');
         const navbar = document.querySelector('.navbar');
@@ -413,6 +426,8 @@
         const profileForm = document.getElementById('profileForm');
         const profileSubmitBtn = document.getElementById('profileSubmitBtn');
         const profileWhatsapp = document.getElementById('profileWhatsapp');
+        const profileStoreCategory = document.getElementById('profileStoreCategory');
+        const signupStoreCategory = document.getElementById('signupStoreCategory');
         const profileWhatsappPreview = document.getElementById('profileWhatsappPreview');
         const profileMessage = document.getElementById('profileMessage');
         const productForm = document.getElementById('productForm');
@@ -623,6 +638,27 @@
             return typeof value === 'string' ? value.trim().toLowerCase() : '';
         }
 
+        function normalizeStoreCategory(value) {
+            const category = STORE_CATEGORIES.find((item) => item.value === value);
+            return category ? category.value : DEFAULT_STORE_CATEGORY;
+        }
+
+        function getStoreCategoryLabel(value) {
+            const category = STORE_CATEGORIES.find((item) => item.value === normalizeStoreCategory(value));
+            return category ? category.label : '🛒 General Store';
+        }
+
+        function prefillSignupStoreCategory() {
+            const storedCategory = normalizeStoreCategory(localStorage.getItem('afromkt-store-category'));
+            if (signupStoreCategory) signupStoreCategory.value = storedCategory;
+            if (profileStoreCategory) profileStoreCategory.value = storedCategory;
+        }
+
+        function isMissingStoreCategoryColumnError(error) {
+            const message = String(error?.message || error?.details || error?.hint || '');
+            return error?.code === 'PGRST204' && /store_category/i.test(message);
+        }
+
         function normalizeWhatsAppNumber(value) {
             const raw = String(value || '').trim();
             if (!raw) return '';
@@ -773,13 +809,22 @@
         async function loadSellerProfile() {
             if (!currentUser?.id) return;
             try {
-                const { data, error } = await supabaseClient
+                let { data, error } = await supabaseClient
                     .from('profiles')
-                    .select('whatsapp_number')
+                    .select('whatsapp_number,store_category')
                     .eq('id', currentUser.id)
                     .maybeSingle();
+                if (error && isMissingStoreCategoryColumnError(error)) {
+                    ({ data, error } = await supabaseClient
+                        .from('profiles')
+                        .select('whatsapp_number')
+                        .eq('id', currentUser.id)
+                        .maybeSingle());
+                    data = data ? { ...data, store_category: DEFAULT_STORE_CATEGORY } : data;
+                }
                 if (error) throw error;
                 profileWhatsapp.value = data?.whatsapp_number || '';
+                profileStoreCategory.value = normalizeStoreCategory(data?.store_category || localStorage.getItem('afromkt-store-category'));
                 refreshWhatsAppPreview(profileWhatsapp.value);
             } catch (error) {
                 setMessage(profileMessage, error.message || 'Seller profile could not be loaded.', 'error');
@@ -794,19 +839,35 @@
             setMessage(profileMessage, '');
             try {
                 const whatsappNumber = normalizeWhatsAppNumber(profileWhatsapp.value);
-                const { data, error } = await supabaseClient
+                const storeCategory = normalizeStoreCategory(profileStoreCategory.value);
+                let { data, error } = await supabaseClient
                     .from('profiles')
                     .update({
                         email: normalizeEmail(currentUser.email),
                         role: 'seller',
-                        whatsapp_number: whatsappNumber || null
+                        whatsapp_number: whatsappNumber || null,
+                        store_category: storeCategory
                     })
                     .eq('id', currentUser.id)
                     .select('id')
                     .single();
+                if (error && isMissingStoreCategoryColumnError(error)) {
+                    ({ data, error } = await supabaseClient
+                        .from('profiles')
+                        .update({
+                            email: normalizeEmail(currentUser.email),
+                            role: 'seller',
+                            whatsapp_number: whatsappNumber || null
+                        })
+                        .eq('id', currentUser.id)
+                        .select('id')
+                        .single());
+                }
                 if (error) throw error;
                 if (!data) throw new Error('Seller profile could not be found. Please sign out and sign in again.');
                 profileWhatsapp.value = whatsappNumber;
+                profileStoreCategory.value = storeCategory;
+                localStorage.setItem('afromkt-store-category', storeCategory);
                 refreshWhatsAppPreview(whatsappNumber);
                 setMessage(profileMessage, whatsappNumber ? 'Seller profile saved. Buyers can now contact you on WhatsApp from your listings.' : 'Seller profile saved. Add a WhatsApp number any time to show the buyer contact button.', 'success');
             } catch (error) {
@@ -890,13 +951,16 @@
             try {
                 const email = normalizeEmail(document.getElementById('signupEmail').value);
                 const password = document.getElementById('signupPassword').value;
+                const storeCategory = normalizeStoreCategory(signupStoreCategory.value);
+                localStorage.setItem('afromkt-store-category', storeCategory);
                 const { data, error } = await supabaseClient.auth.signUp({
                     email,
                     password,
-                    options: { data: { role: 'seller', policy_version: '2026-10-03', policy_accepted_at: new Date().toISOString() }, emailRedirectTo: new URL('/dashboard', window.location.origin).href }
+                    options: { data: { role: 'seller', store_category: storeCategory, policy_version: '2026-10-03', policy_accepted_at: new Date().toISOString() }, emailRedirectTo: new URL('/dashboard', window.location.origin).href }
                 });
                 if (error) throw error;
                 if (data.session?.user) {
+                    profileStoreCategory.value = storeCategory;
                     await renderDashboard(data.session.user);
                 } else {
                     setAuthTab('login');
@@ -914,6 +978,7 @@
             await supabaseClient.auth.signOut();
             currentUser = null;
             profileForm.reset();
+            profileStoreCategory.value = normalizeStoreCategory(localStorage.getItem('afromkt-store-category'));
             refreshWhatsAppPreview('');
             setMessage(profileMessage, '');
             userChip.classList.remove('show');
@@ -1012,6 +1077,7 @@
                     price: document.getElementById('productPrice').value ? Number(document.getElementById('productPrice').value) : 0,
                     description: document.getElementById('productDescription').value.trim(),
                     category: document.getElementById('productCategory').value,
+                    store_category: normalizeStoreCategory(profileStoreCategory.value),
                     image_url: null,
                     product_images: [],
                     is_active: true
@@ -1032,7 +1098,9 @@
                 setMessage(productMessage, approval.approved ? 'Product published! It is now available in the product preview.' : `Product saved and pending. ${approval.error}`, approval.approved ? 'success' : 'error');
                 await loadListings(sellerEmail);
             } catch (error) {
-                if (isMissingProductImagesColumnError(error)) {
+                if (isMissingStoreCategoryColumnError(error)) {
+                    setMessage(productMessage, 'Run the store category SQL in Supabase first, then save this listing again.', 'error');
+                } else if (isMissingProductImagesColumnError(error)) {
                     setMessage(productMessage, 'Run the product gallery SQL in Supabase first, then save this listing again.', 'error');
                 } else {
                     console.error('Full save error:', error);
@@ -1096,17 +1164,17 @@
             try {
                 let query = supabaseClient
                     .from('products')
-                    .select('id,seller_email,seller_name,name,price,description,category,image_url,product_images,created_at,is_active,is_approved')
+                    .select('id,seller_email,seller_name,name,price,description,category,store_category,image_url,product_images,created_at,is_active,is_approved')
                     .eq('seller_email', email)
                     .order('created_at', { ascending: false });
                 let { data, error } = await query;
-                if (error && isMissingProductImagesColumnError(error)) {
+                if (error && (isMissingProductImagesColumnError(error) || isMissingStoreCategoryColumnError(error))) {
                     ({ data, error } = await supabaseClient
                         .from('products')
                         .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active,is_approved')
                         .eq('seller_email', email)
                         .order('created_at', { ascending: false }));
-                    data = (data || []).map((product) => ({ ...product, product_images: [] }));
+                    data = (data || []).map((product) => ({ ...product, product_images: [], store_category: DEFAULT_STORE_CATEGORY }));
                 }
                 if (error) throw error;
                 const products = data || [];
@@ -1121,7 +1189,7 @@
                         <div class="listing-image">${listingImage(product)}</div>
                         <div class="listing-body">
                             <div class="listing-meta"><h3>${escapeHtml(product.name)}</h3><div class="price">€${Number(product.price || 0).toFixed(2)}</div></div>
-                            <span class="category-tag">${escapeHtml(product.category || 'Other')}</span><span class="category-tag">${product.is_approved ? 'Published' : 'Pending checks'}</span>${!product.is_approved ? `<button class="btn btn-soft" type="button" data-check-listing="${escapeHtml(product.id)}">Check for publication</button>` : ''}
+                            <span class="category-tag">${escapeHtml(product.category || 'Other')}</span><span class="category-tag">${escapeHtml(getStoreCategoryLabel(product.store_category))}</span><span class="category-tag">${product.is_approved ? 'Published' : 'Pending checks'}</span>${!product.is_approved ? `<button class="btn btn-soft" type="button" data-check-listing="${escapeHtml(product.id)}">Check for publication</button>` : ''}
                             <p class="muted">${escapeHtml(product.description || '')}</p>
                             <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-soft" type="button" data-edit-listing="${escapeHtml(product.id)}">Edit</button><button class="btn btn-soft" type="button" data-delete-listing="${escapeHtml(product.id)}">Delete</button></div>
                         </div>
@@ -1145,6 +1213,7 @@
         }
 
         async function init() {
+            prefillSignupStoreCategory();
             setState('loading');
             const { data } = await supabaseClient.auth.getSession();
             if (data.session?.user) await renderDashboard(data.session.user);
