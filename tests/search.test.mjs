@@ -40,3 +40,21 @@ test('clearing search restores the original order and punctuation remains plain 
   assert.equal(rankProducts(products,'').map(item=>item.product.id).join(','),'cake,stew,rice,cake2');
   assert.equal(rankProducts(products,'<script>alert(1)</script>').length,0);
 });
+
+test('store pages include all published products from the selected owner and keep prices',()=>{
+  const owned=window.AFRO_MKT_SEARCH.getStoreProducts(products,'b');
+  assert.equal(owned.length,2); assert.equal(owned.map(p=>p.id).join(','),'stew,rice');
+  const priced=window.AFRO_MKT_SEARCH.getStoreProducts(products.map(p=>({...p,price:20})), 'a');
+  assert.equal(priced[0].price,20);
+});
+test('store identity never merges equal seller names or includes inactive and pending listings',()=>{
+  const fixtures=products.map(p=>({...p,seller_name:'Same name'})).concat([
+    {...products[0],id:'pending',is_approved:false}, {...products[0],id:'inactive',is_active:false}
+  ]);
+  assert.equal(window.AFRO_MKT_SEARCH.getStoreProducts(fixtures,'a').length,1);
+  assert.equal(window.AFRO_MKT_SEARCH.getStoreProducts(fixtures,'unknown').length,0);
+});
+test('older store links can resolve through a published product without exposing email in the URL',()=>{
+  const fixtures=[{id:'one',seller_email:'one@example.test'},{id:'two',seller_email:'one@example.test'},{id:'three',seller_email:'other@example.test'}];
+  assert.equal(window.AFRO_MKT_SEARCH.getStoreProducts(fixtures,'two').length,2);
+});
