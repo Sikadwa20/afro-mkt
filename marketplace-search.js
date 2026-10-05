@@ -20,7 +20,12 @@
     }
     function rankProducts(products, query) {
         const terms = [...new Set(words(String(query || '').slice(0, 120)).filter(word => !stopWords.has(word)))];
+        // Store names are often typed without spaces, punctuation or the word "and".
+        const compact = value => words(value).filter(word => word !== 'and').join('');
+        const storeQuery = compact(String(query || '').slice(0, 120));
         return products.map((product, index) => {
+            const storeName = compact(product.seller_name);
+            const storeScore = storeQuery && storeName && (storeQuery === storeName ? 7 : storeQuery.length >= 3 && storeName.startsWith(storeQuery) ? 5.6 : oneTypo(storeQuery, storeName) ? 3.5 : 0);
             const fields = [[product.name, 10], [product.seller_name, 7], [product.description, 3], [product.category, 1]].map(([value, weight]) => [words(value), weight]);
             let score = 0;
             for (const term of terms) {
@@ -30,7 +35,7 @@
                     else if (term.length >= 3 && token.startsWith(term)) best = Math.max(best, weight * .8);
                     else if (oneTypo(term, token)) best = Math.max(best, weight * .5);
                 }
-                if (!best) return null;
+                if (!best) return storeScore ? { product, score: storeScore, index } : null;
                 score += best;
             }
             return { product, score, index };
