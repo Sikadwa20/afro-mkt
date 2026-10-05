@@ -1022,6 +1022,8 @@
                 payload.image_url = uploadedPhotoUrls[0] || null;
                 if (!payload.image_url) throw new Error('Choose at least one product photo.');
                 payload.product_images = uploadedPhotoUrls.slice(1, MAX_PRODUCT_IMAGES);
+                
+                console.log('Supabase Insert Payload:', JSON.stringify(payload, null, 2));
                 productSubmitBtn.textContent = 'Saving listing...';
                 const { data: saved, error } = await saveListing(payload, editingListing?.id, sellerEmail, user.id);
                 if (error) throw error;
@@ -1033,7 +1035,13 @@
                 if (isMissingProductImagesColumnError(error)) {
                     setMessage(productMessage, 'Run the product gallery SQL in Supabase first, then save this listing again.', 'error');
                 } else {
-                    setMessage(productMessage, error.message || 'Product could not be saved. Please try again or contact support@afro-mkt.com.', 'error');
+                    const errorDetails = [
+                        error.message,
+                        error.code ? `(Code: ${error.code})` : '',
+                        error.details ? `Details: ${error.details}` : '',
+                        error.hint ? `Hint: ${error.hint}` : ''
+                    ].filter(Boolean).join(' | ');
+                    setMessage(productMessage, `Save failed: ${errorDetails}`, 'error');
                 }
             } finally {
                 productSubmitBtn.disabled = false;
