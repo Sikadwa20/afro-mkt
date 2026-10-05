@@ -1,0 +1,9 @@
+{
+  "appId": "com.afromkt.app",
+  "appName": "AfroMkt",
+  "webDir": "www",
+  "server": {
+    "url": "https://afro-mkt.com",
+    "cleartext": false
+  }
+}

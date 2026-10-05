@@ -1,11 +1,38 @@
 {
   "name": "afro-mkt",
+  "version": "1.0.0",
+  "description": "AfroMkt website plus Capacitor mobile app shell for previewing the live AfroMkt website.",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.18" },
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "cap:sync": "cap sync",
+    "cap:open:android": "cap open android",
+    "cap:run:android": "cap run android",
+    "android:debug-apk": "cd android && ./gradlew assembleDebug"
   },
-  "devDependencies": { "@electric-sql/pglite": "0.5.8" }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sikadwa20/afro-mkt.git"
+  },
+  "keywords": [],
+  "author": "Eugene Tenakwah",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sikadwa20/afro-mkt/issues"
+  },
+  "homepage": "https://github.com/Sikadwa20/afro-mkt#readme",
+  "devDependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@electric-sql/pglite": "0.5.8"
+  },
+  "dependencies": {
+    "supabase": "^2.119.0"
+  }
 }

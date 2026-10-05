@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AfroMkt</string>
+    <string name="title_activity_main">AfroMkt</string>
+    <string name="package_name">com.afromkt.app</string>
+    <string name="custom_url_scheme">com.afromkt.app</string>
+</resources>
