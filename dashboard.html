@@ -579,10 +579,19 @@
             document.getElementById('productName').focus({ preventScroll: true });
         }
 
-        async function saveListing(payload, listingId, sellerEmail) {
+        async function getAuthenticatedUser() {
+            const { data, error } = await supabaseClient.auth.getUser();
+            if (error) throw error;
+            const user = data?.user || currentUser;
+            if (!user?.id || !user?.email) throw new Error('Please sign in again before saving your listing.');
+            currentUser = user;
+            return user;
+        }
+
+        async function saveListing(payload, listingId, sellerEmail, sellerId) {
             const query = supabaseClient.from('products');
             return listingId
-                ? query.update(payload).eq('id', listingId).eq('seller_email', sellerEmail).select('id').single()
+                ? query.update(payload).eq('id', listingId).eq('seller_email', sellerEmail).eq('seller_id', sellerId).select('id').single()
                 : query.insert(payload).select('id').single();
         }
 
@@ -988,24 +997,25 @@
 
         productForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            if (!currentUser?.email) return;
             productSubmitBtn.disabled = true;
             productSubmitBtn.textContent = 'Saving product...';
             setMessage(productMessage, '');
-            const sellerEmail = normalizeEmail(currentUser.email);
             const galleryPhotos = stagedProductPhotos.slice(0, MAX_PRODUCT_IMAGES);
-            const payload = {
-                seller_email: sellerEmail,
-                seller_name: document.getElementById('sellerName').value.trim(),
-                name: document.getElementById('productName').value.trim(),
-                price: Number(document.getElementById('productPrice').value),
-                description: document.getElementById('productDescription').value.trim(),
-                category: document.getElementById('productCategory').value,
-                image_url: null,
-                product_images: [],
-                is_active: true
-            };
             try {
+                const user = await getAuthenticatedUser();
+                const sellerEmail = normalizeEmail(user.email);
+                const payload = {
+                    seller_id: user.id,
+                    seller_email: sellerEmail,
+                    seller_name: document.getElementById('sellerName').value.trim(),
+                    name: document.getElementById('productName').value.trim(),
+                    price: Number(document.getElementById('productPrice').value),
+                    description: document.getElementById('productDescription').value.trim(),
+                    category: document.getElementById('productCategory').value,
+                    image_url: null,
+                    product_images: [],
+                    is_active: true
+                };
                 if (payload.description.length < 80 || payload.description.split(/\s+/u).length < 12) throw new Error('Write at least 80 characters and 12 words describing the product, its size, materials or ingredients and intended use.');
                 if (!galleryPhotos.length) throw new Error('Choose between 1 and 5 product photos.');
                 const uploadedPhotoUrls = await uploadProductGallery(galleryPhotos, editingListing?.id || Date.now());
@@ -1013,12 +1023,12 @@
                 if (!payload.image_url) throw new Error('Choose at least one product photo.');
                 payload.product_images = uploadedPhotoUrls.slice(1, MAX_PRODUCT_IMAGES);
                 productSubmitBtn.textContent = 'Saving listing...';
-                const { data: saved, error } = await saveListing(payload, editingListing?.id, sellerEmail);
+                const { data: saved, error } = await saveListing(payload, editingListing?.id, sellerEmail, user.id);
                 if (error) throw error;
                 const approval = await checkListing(saved.id);
                 resetProductForm();
                 setMessage(productMessage, approval.approved ? 'Product published! It is now available in the product preview.' : `Product saved and pending. ${approval.error}`, approval.approved ? 'success' : 'error');
-                await loadListings(payload.seller_email);
+                await loadListings(sellerEmail);
             } catch (error) {
                 if (isMissingProductImagesColumnError(error)) {
                     setMessage(productMessage, 'Run the product gallery SQL in Supabase first, then save this listing again.', 'error');
