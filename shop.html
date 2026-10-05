@@ -91,7 +91,7 @@
         .store-result img { width:64px; height:64px; border-radius:14px; object-fit:cover; }
         .store-result strong { display:block; font-size:1.05rem; color:var(--primary-dark); }
         .store-result p { font-size:.88rem; color:var(--text-light); margin:5px 0 9px; }
-        .store-result button { border:0; background:none; padding:0; color:var(--primary-dark); font:inherit; font-weight:700; text-decoration:underline; cursor:pointer; }
+        .store-result button, .store-result a { border:0; background:none; padding:0; color:var(--primary-dark); font:inherit; font-weight:700; text-decoration:underline; cursor:pointer; }
         .search-clear { border:1px solid rgba(26,60,46,.2); background:white; color:var(--primary-dark); border-radius:14px; padding:12px 18px; font:inherit; cursor:pointer; }
         .filter-bar { display: flex; gap: 12px; justify-content: flex-start; margin: 34px auto 22px; padding: 8px; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; border-radius: 999px; background: rgba(13,47,33,.08); border: 1px solid rgba(26,60,46,.10); scrollbar-width: thin; }
         .filter-btn { flex: 0 0 auto; scroll-snap-align: start; border: 1px solid rgba(26,60,46,.12); border-radius: 999px; padding: 12px 18px; background: #ffffff; color: var(--primary-dark); font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.05); transition: var(--transition); white-space: nowrap; }
@@ -129,6 +129,15 @@
         .product-body h3 { color: var(--primary-dark); font-size: 1.28rem; margin-bottom: 10px; }
         .product-body p { color: var(--text-light); font-size: .96rem; margin-bottom: 18px; }
         .product-meta { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-top: auto; margin-bottom: 18px; }
+        .seller-pill[href]:hover, .store-name-link:hover { text-decoration:underline; color:var(--accent-dark); }
+        .store-view .hero, .store-view #marketSearchForm, .store-view #filterBar, .store-view .section-header { display:none; }
+        .seller-store-header { display:flex; flex-wrap:wrap; align-items:center; gap:24px; padding:30px; margin-bottom:28px; background:var(--primary-dark); color:white; border-radius:24px; }
+        .seller-store-header[hidden] { display:none; }
+        .seller-store-header img { width:112px; height:112px; border-radius:22px; object-fit:cover; }
+        .seller-store-header h1 { font-size:clamp(2rem,4vw,3rem); line-height:1.2; margin:8px 0 12px; }
+        .seller-store-header p { color:#f6e7bd; margin-bottom:14px; }
+        .store-header-actions { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+        .store-kicker { font-weight:700; color:#f6e7bd; }
         .seller-pill { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; background: #f7faf8; color: var(--primary-dark); font-size: .86rem; font-weight: 700; }
         .price-tag { font-size: 1.25rem; font-weight: 800; color: var(--primary-dark); }
         .seller-actions { display: flex; flex-direction: column; gap: 12px; }
@@ -247,6 +256,7 @@
 
         <section class="products-section" id="products">
             <div class="container">
+                <section class="seller-store-header" id="storeHeader" aria-label="Seller store" hidden></section>
                 <div class="section-header">
                     <h2 data-i18n="productsTitle">Browse by Category</h2>
                     <p data-i18n="productsSubtitle">Explore approved listings while sellers prepare for the buyer launch.</p>
@@ -321,7 +331,7 @@
 
 
 
-    <script src="/marketplace-search.js"></script>
+    <script src="/marketplace-search.js?v=20261005-stores"></script>
     <script>
         const SUPABASE_URL = window.AFRO_MKT_CONFIG.supabaseUrl;
         const SUPABASE_ANON_KEY = window.AFRO_MKT_CONFIG.supabaseAnonKey;
@@ -341,6 +351,7 @@
 
         const translations = {
             en: {
+                storeLabel: "Seller store",storeIntro: "Browse all published products and their prices.",storeBack: "Back to marketplace",storeContact: "Contact seller on WhatsApp",storeEmpty: "This store has no published products available right now.",storeCount: "products",
                 searchLabel: "What are you looking for?",searchButton: "Search",searchClear: "Clear",searchHelp: "Find matching products and seller stores. Results are ordered by relevance to your search.",searchPlaceholder: "Birthday cake, eba with egusi, clothing…",searchStores: "Matching seller stores",searchOrder: "Ordered by search relevance. Seller ratings are not available yet.",searchViewStore: "View store products",searchMatch: "matching listing",searchMatches: "matching listings",searchEmpty: "No matching listings yet",searchEmptyBody: "Try a different product, fewer words, or clear the category filter.",searchResults: "Search results for",searchStoreProducts: "Store products",searchBack: "Back to search results",
                 navHome: 'Home', navShop:"Product Preview", navSell: 'Sell on AfroMkt', navSignIn: 'Sign In', navGetStarted: 'Get Started',
                 heroBadge:"Seller onboarding open · Buyer orders coming later", heroTitle:"Preview African Products", heroSubtitle:"Explore approved seller listings. Product purchases are not available yet.", heroExplore: 'Explore Products', heroSell: 'List Your Products',
@@ -352,6 +363,7 @@
                 footerBrand: 'The premier African Community Marketplace. Launching in Portugal and growing across Europe to connect culture, commerce, and community.', footerMarketplace: 'Marketplace', footerShop: 'Shop Products', footerSeller: 'Become a Seller', footerDelivery: 'Delivery Info', footerProtection: 'Buyer Protection', footerCompany: 'Company', footerAbout: 'About Us', footerCareers:"Join the Waitlist", footerPress:"Launch Updates", footerContact: 'Contact', footerLegal: 'Legal', footerTerms: 'Terms of Service', footerPrivacy: 'Privacy Policy', footerCookies: 'Cookie Policy', footerBottom: '© 2026 AfroMkt (afro-mkt.com). All rights reserved.'
             },
             pt: {
+                storeLabel: "Loja do vendedor",storeIntro: "Explore todos os produtos publicados e os seus preços.",storeBack: "Voltar ao marketplace",storeContact: "Contactar pelo WhatsApp",storeEmpty: "Esta loja não tem produtos publicados disponíveis neste momento.",storeCount: "produtos",
                 searchLabel: "O que procura?",searchButton: "Pesquisar",searchClear: "Limpar",searchHelp: "Encontre produtos e lojas. Os resultados são ordenados pela relevância da pesquisa.",searchPlaceholder: "Bolo de aniversário, eba com egusi, roupa…",searchStores: "Lojas correspondentes",searchOrder: "Ordenadas por relevância. As avaliações de vendedores ainda não estão disponíveis.",searchViewStore: "Ver produtos da loja",searchMatch: "anúncio correspondente",searchMatches: "anúncios correspondentes",searchEmpty: "Ainda não há anúncios correspondentes",searchEmptyBody: "Experimente outro produto, menos palavras ou limpe o filtro de categoria.",searchResults: "Resultados para",searchStoreProducts: "Produtos da loja",searchBack: "Voltar aos resultados",
                 navHome: 'Início', navShop:"Prévia de produtos", navSell: 'Vender no AfroMkt', navSignIn: 'Entrar', navGetStarted: 'Começar',
                 heroBadge:"Inscrições de vendedores abertas · Compras mais tarde", heroTitle:"Prévia de produtos africanos", heroSubtitle:"Explore listagens aprovadas. As compras ainda não estão disponíveis.", heroExplore: 'Explorar produtos', heroSell: 'Liste os seus produtos',
@@ -363,6 +375,7 @@
                 footerBrand: 'O principal marketplace da comunidade africana. A lançar em Portugal e a crescer pela Europa para ligar cultura, comércio e comunidade.', footerMarketplace: 'Marketplace', footerShop: 'Comprar produtos', footerSeller: 'Tornar-se vendedor', footerDelivery: 'Info de entrega', footerProtection: 'Proteção do comprador', footerCompany: 'Empresa', footerAbout: 'Sobre nós', footerCareers:"Lista de espera", footerPress:"Novidades do lançamento", footerContact: 'Contacto', footerLegal: 'Legal', footerTerms: 'Termos de serviço', footerPrivacy: 'Política de privacidade', footerCookies: 'Política de cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Todos os direitos reservados.'
             },
             fr: {
+                storeLabel: "Boutique du vendeur",storeIntro: "Découvrez tous les produits publiés et leurs prix.",storeBack: "Retour à la marketplace",storeContact: "Contacter sur WhatsApp",storeEmpty: "Cette boutique n’a aucun produit publié disponible pour le moment.",storeCount: "produits",
                 searchLabel: "Que recherchez-vous ?",searchButton: "Rechercher",searchClear: "Effacer",searchHelp: "Trouvez des produits et boutiques. Les résultats sont classés par pertinence.",searchPlaceholder: "Gâteau d’anniversaire, eba avec egusi, vêtements…",searchStores: "Boutiques correspondantes",searchOrder: "Classées par pertinence. Les avis vendeurs ne sont pas encore disponibles.",searchViewStore: "Voir les produits",searchMatch: "annonce correspondante",searchMatches: "annonces correspondantes",searchEmpty: "Aucune annonce correspondante",searchEmptyBody: "Essayez un autre produit, moins de mots ou effacez le filtre de catégorie.",searchResults: "Résultats pour",searchStoreProducts: "Produits de la boutique",searchBack: "Retour aux résultats",
                 navHome: 'Accueil', navShop:"Aperçu des produits", navSell: 'Vendre sur AfroMkt', navSignIn: 'Connexion', navGetStarted: 'Commencer',
                 heroBadge:"Inscriptions vendeurs ouvertes · Achats à venir", heroTitle:"Aperçu des produits africains", heroSubtitle:"Découvrez les annonces approuvées. Les achats ne sont pas encore disponibles.", heroExplore: 'Explorer les produits', heroSell: 'Lister vos produits',
@@ -374,6 +387,7 @@
                 footerBrand: 'La marketplace africaine de référence. Lancée au Portugal et en croissance en Europe pour connecter culture, commerce et communauté.', footerMarketplace: 'Marketplace', footerShop: 'Acheter des produits', footerSeller: 'Devenir vendeur', footerDelivery: 'Infos livraison', footerProtection: 'Protection acheteur', footerCompany: 'Entreprise', footerAbout: 'À propos', footerCareers:"Liste d’attente", footerPress:"Actualités du lancement", footerContact: 'Contact', footerLegal: 'Juridique', footerTerms: 'Conditions d\'utilisation', footerPrivacy: 'Confidentialité', footerCookies: 'Cookies', footerBottom: '© 2026 AfroMkt (afro-mkt.com). Tous droits réservés.'
             },
             es: {
+                storeLabel: "Tienda del vendedor",storeIntro: "Explora todos los productos publicados y sus precios.",storeBack: "Volver al marketplace",storeContact: "Contactar por WhatsApp",storeEmpty: "Esta tienda no tiene productos publicados disponibles ahora.",storeCount: "productos",
                 searchLabel: "¿Qué buscas?",searchButton: "Buscar",searchClear: "Borrar",searchHelp: "Encuentra productos y tiendas. Los resultados se ordenan por relevancia.",searchPlaceholder: "Tarta de cumpleaños, eba con egusi, ropa…",searchStores: "Tiendas coincidentes",searchOrder: "Ordenadas por relevancia. Las valoraciones aún no están disponibles.",searchViewStore: "Ver productos de la tienda",searchMatch: "anuncio coincidente",searchMatches: "anuncios coincidentes",searchEmpty: "No hay anuncios coincidentes",searchEmptyBody: "Prueba otro producto, menos palabras o borra el filtro de categoría.",searchResults: "Resultados para",searchStoreProducts: "Productos de la tienda",searchBack: "Volver a los resultados",
                 navHome: 'Inicio', navShop:"Vista previa", navSell: 'Vender en AfroMkt', navSignIn: 'Iniciar sesión', navGetStarted: 'Empezar',
                 heroBadge:"Registro de vendedores abierto · Compras próximamente", heroTitle:"Vista previa de productos africanos", heroSubtitle:"Explora anuncios aprobados. Las compras aún no están disponibles.", heroExplore: 'Explorar productos', heroSell: 'Publica tus productos',
@@ -392,6 +406,7 @@
         let activeLanguage = 'en';
         let searchQuery = (new URLSearchParams(window.location.search).get('q') || '').slice(0,120);
         let activeStore = new URLSearchParams(window.location.search).get('seller') || '';
+        document.body.classList.toggle('store-view', Boolean(activeStore));
         let activeCategory = new URLSearchParams(window.location.search).get('category') || 'all';
         let allProducts = [];
         const availableCategories = STORE_CATEGORIES.map((category) => category.value);
@@ -545,11 +560,30 @@
             return window.AFRO_MKT_SEARCH.rankProducts(candidates, searchQuery);
         }
 
+        function storeUrl(product) {
+            return '/shop?seller=' + encodeURIComponent(product.seller_id || product.id) + '#products';
+        }
+
         function getVisibleProducts() {
             if (!activeStore) return getRankedProducts().map(item => item.product);
-            const owner = allProducts.find(product => product.seller_id === activeStore || product.id === activeStore);
-            if (!owner) return [];
-            return allProducts.filter(product => owner.seller_id ? product.seller_id === owner.seller_id : owner.seller_email ? product.seller_email === owner.seller_email : product.id === owner.id);
+            return window.AFRO_MKT_SEARCH.getStoreProducts(allProducts, activeStore);
+        }
+
+        function renderStoreHeader() {
+            const header = document.getElementById('storeHeader');
+            document.body.classList.toggle('store-view', Boolean(activeStore));
+            header.hidden = !activeStore;
+            if (!activeStore) return;
+            const dictionary = translations[activeLanguage];
+            const products = getVisibleProducts();
+            const owner = products[0];
+            const name = owner?.seller_name || dictionary.storeLabel;
+            document.title = name + ' | AfroMkt';
+            const canonical = document.querySelector('link[rel="canonical"]');
+            if (canonical) canonical.href = 'https://afro-mkt.com/shop?seller=' + encodeURIComponent(activeStore);
+            const digits = normalizeWhatsAppDigits(owner && sellerContacts[owner.seller_email]);
+            const contact = digits ? 'https://wa.me/' + digits + '?text=' + encodeURIComponent('Hi, I would like to ask about your store on AfroMkt: ' + name) : '';
+            header.innerHTML = `${owner?.image_url ? `<img src="${escapeHtml(owner.image_url)}" alt="" loading="lazy">` : ''}<div><span class="store-kicker">${dictionary.storeLabel}</span><h1>${escapeHtml(name)}</h1><p>${owner ? dictionary.storeIntro : productGrid.dataset.state === 'loading' ? dictionary.loadingBody : dictionary.storeEmpty}</p><div class="store-header-actions"><a class="btn btn-outline-light" href="/shop#products">${dictionary.storeBack}</a>${contact ? `<a class="btn btn-gold" href="${escapeHtml(contact)}" target="_blank" rel="noopener noreferrer">${dictionary.storeContact}</a>` : ''}</div></div>`;
         }
 
         function syncSearchUrl() {
@@ -563,11 +597,11 @@
         function renderStoreSuggestions() {
             const dictionary = translations[activeLanguage];
             const groups = window.AFRO_MKT_SEARCH.groupSellers(getRankedProducts());
-            storeSuggestions.hidden = (!searchQuery && !activeStore) || !groups.length || emptyStates.has(productGrid.dataset.state);
+            storeSuggestions.hidden = Boolean(activeStore) || !searchQuery || !groups.length || emptyStates.has(productGrid.dataset.state);
             if (storeSuggestions.hidden) { storeSuggestions.innerHTML = ''; return; }
             storeSuggestions.innerHTML = `<h3>${dictionary.searchStores}</h3><p class="search-help">${dictionary.searchOrder}</p><div class="store-cards">${groups.slice(0,6).map(store => {
                 const product = store.products[0];
-                return `<article class="store-result">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" loading="lazy">` : ''}<div><strong>${escapeHtml(store.name)}</strong><p>${store.products.length} ${store.products.length === 1 ? dictionary.searchMatch : dictionary.searchMatches} · ${escapeHtml(product.name)}</p><button type="button" data-search-store="${escapeHtml(store.id)}">${dictionary.searchViewStore}</button></div></article>`;
+                return `<article class="store-result">${product.image_url ? `<img src="${escapeHtml(product.image_url)}" alt="" loading="lazy">` : ''}<div><strong><a class="store-name-link" href="${escapeHtml(storeUrl(product))}">${escapeHtml(store.name)}</a></strong><p>${store.products.length} ${store.products.length === 1 ? dictionary.searchMatch : dictionary.searchMatches} · ${escapeHtml(product.name)}</p><a class="store-name-link" href="${escapeHtml(storeUrl(product))}">${dictionary.searchViewStore}</a></div></article>`;
             }).join('')}</div>${activeStore ? `<button type="button" class="search-clear" data-search-back style="margin-top:14px">${dictionary.searchBack}</button>` : ''}`;
         }
 
@@ -581,15 +615,6 @@
             searchQuery = ''; searchInput.value = ''; activeStore = ''; activeCategory = 'all';
             syncSearchUrl(); renderProducts(); searchInput.focus();
         });
-        storeSuggestions.addEventListener('click', event => {
-            const button = event.target.closest('[data-search-store], [data-search-back]');
-            if (!button) return;
-            activeStore = button.dataset.searchStore || '';
-            activeCategory = 'all';
-            // A store page shows all of its products, while retaining the buyer's search.
-            syncSearchUrl(); renderProducts();
-        });
-
         function getProductGallery(product) {
             const uniqueUrls = new Set();
             return [product.image_url].concat(Array.isArray(product.product_images) ? product.product_images : [])
@@ -671,6 +696,7 @@
         function renderProducts() {
             buildFilterButtons();
             renderStoreSuggestions();
+            renderStoreHeader();
 
             if (emptyStates.has(productGrid.dataset.state) && !(productGrid.dataset.state === 'empty' && searchQuery)) {
                 setStatusCard(productGrid.dataset.state);
@@ -682,7 +708,7 @@
 
             if (!visibleProducts.length && (searchQuery || activeStore || activeCategory !== 'all')) {
                 setGridIntro(searchQuery ? `${dictionary.searchResults} “${searchQuery}” · 0` : dictionary.searchEmpty);
-                productGrid.innerHTML = `<article class="status-card"><div><div class="status-card-icon" aria-hidden="true">🔎</div><h3>${dictionary.searchEmpty}</h3><p>${dictionary.searchEmptyBody}</p></div></article>`;
+                productGrid.innerHTML = `<article class="status-card"><div><div class="status-card-icon" aria-hidden="true">🔎</div><h3>${activeStore ? dictionary.storeEmpty : dictionary.searchEmpty}</h3><p>${activeStore ? dictionary.storeIntro : dictionary.searchEmptyBody}</p></div></article>`;
                 return;
             }
 
@@ -712,11 +738,11 @@
                         ${buildProductVisual(product, fallbackVisual)}
                         <div class="product-body">
                             <h3>${escapeHtml(product.name)}</h3>
-                            <p>${escapeHtml(product.description || 'Discover this AfroMkt seller listing.')}</p>
                             <div class="product-meta">
-                                <span class="seller-pill">${dictionary.sellerLabel}: ${escapeHtml(sellerName)}</span>
+                                <a class="seller-pill" href="${escapeHtml(storeUrl(product))}">${dictionary.sellerLabel}: ${escapeHtml(sellerName)}</a>
                                 <span class="price-tag">€${formatPrice(product.price)}</span>
                             </div>
+                            <p>${escapeHtml(product.description || 'Discover this AfroMkt seller listing.')}</p>
                             ${sellerActions}
                         </div>
                     </article>

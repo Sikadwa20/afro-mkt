@@ -48,5 +48,11 @@
         }
         return [...groups.values()].sort((a, b) => b.score - a.score || b.products.length - a.products.length);
     }
-    window.AFRO_MKT_SEARCH = { rankProducts, groupSellers };
+    function getStoreProducts(products, id) {
+        const published = products.filter(product => product.is_active !== false && product.is_approved !== false);
+        const owner = published.find(product => product.seller_id === id || product.id === id);
+        if (!owner) return [];
+        return published.filter(product => owner.seller_id ? product.seller_id === owner.seller_id : owner.seller_email ? product.seller_email === owner.seller_email : product.id === owner.id);
+    }
+    window.AFRO_MKT_SEARCH = { rankProducts, groupSellers, getStoreProducts };
 })();
