@@ -522,14 +522,20 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('products')
-                    .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active')
+                    .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active,is_approved')
                     .eq('is_active', true)
+                    .eq('is_approved', true)
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
 
                 allProducts = (data || []).filter((product) => product && product.name && product.category);
-                await loadSellerContacts(allProducts);
+                try {
+                    await loadSellerContacts(allProducts);
+                } catch (contactError) {
+                    console.warn('Failed to load seller WhatsApp contacts:', contactError);
+                    sellerContacts = {};
+                }
                 availableCategories = [...new Set(allProducts.map((product) => product.category).filter(Boolean))].sort((left, right) => left.localeCompare(right));
                 if (activeCategory !== 'all' && !availableCategories.some((category) => slugifyCategory(category) === activeCategory)) {
                     activeCategory = 'all';
