@@ -8,11 +8,11 @@ import { stripeConfig, checkoutPlan, completedCheckout, LIVE_PRICES, sellerStatu
 import { verifiedUser, verifiedAdmin } from '../supabase/functions/_shared/auth.ts';
 import { launchOffer } from '../supabase/functions/_shared/launch-offer.ts';
 
-function handler(name, { env = {}, supabase = {}, fetch = async () => { throw new Error('Unexpected outgoing request'); }, decodePng = () => { throw Error("Unexpected decode"); } } = {}) {
+function handler(name, { env = {}, supabase = {}, fetch = async () => { throw new Error('Unexpected outgoing request'); }, decodePng = () => { throw Error("Unexpected decode"); }, jpeg = { decode() { throw Error("Unexpected JPEG decode"); } } } = {}) {
   let result;
   const source = readFileSync(`supabase/functions/${name}/index.ts`, 'utf8').replace(/^import .*;\r?\n/gm, '');
   vm.runInNewContext(stripTypeScriptTypes(source), {
-    decodePng, Uint8Array, DataView, serve: fn => { result = fn; }, createClient: () => supabase,
+    decodePng, jpeg, TextDecoder, Uint8Array, DataView, serve: fn => { result = fn; }, createClient: () => supabase,
     verifiedUser, verifiedAdmin, stripeConfig, checkoutPlan, completedCheckout, LIVE_PRICES, sellerStatus,
     launchOffer: (key, prices, env) => launchOffer(key, prices, env, fetch),
     Blob, Deno: { env: { get: name => env[name] } }, fetch, Request, Response, URLSearchParams,
@@ -208,4 +208,10 @@ test('automatic publication checks auth, ownership, description and image before
   decodeFails=true;assert.equal((await route(post({product_id:id},'token'))).status,422);decodeFails=false;
   assert.equal(approvedCalls,0);
   assert.equal((await route(post({product_id:id},'token'))).status,200);assert.equal(approvedCalls,1);
+  product.product_images = Array(5).fill(url); assert.equal((await route(post({product_id:id},'token'))).status,422);
+  product.product_images = ['https://untrusted.example/video.mp4']; assert.equal((await route(post({product_id:id},'token'))).status,422);
+  product.product_images = [url.replace('photo.png','video.mp4')]; assert.equal((await route(post({product_id:id},'token'))).status,422);
+  product.product_images = [url.replace('photo.png','second.png')]; assert.equal((await route(post({product_id:id},'token'))).status,200);
+  assert.equal(approvedCalls,2);
+
 });

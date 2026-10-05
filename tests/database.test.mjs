@@ -40,6 +40,7 @@ for (const legacy of [false, true]) test(`PostgreSQL launch rules (${legacy ? 'l
       create function storage.foldername(text) returns text[] language sql as $$select string_to_array($1,'/')$$;
     `);
     const withoutExtension = source => source.replace(/create extension if not exists pgcrypto;/gi, '');
+    if (!legacy) await db.exec("create table public.profiles(id uuid primary key, email text, role text);");
     if (legacy) await db.exec(withoutExtension(readFileSync('supabase-schema.sql', 'utf8')));
     await db.exec(withoutExtension(readFileSync('supabase/products_table.sql', 'utf8')));
     await db.exec(readFileSync('supabase/seller_subscriptions.sql', 'utf8'));
@@ -117,5 +118,58 @@ for (const legacy of [false, true]) test(`PostgreSQL launch rules (${legacy ? 'l
     await as(db, 'authenticated', other);
     await db.query("insert into storage.objects(bucket_id,name) values ('product-images',$1)", [`${other.sub}/fixture.png`]);
     await assert.rejects(db.query("insert into storage.objects(bucket_id,name) values ('product-images',$1)", [`${seller.sub}/forged.png`]), /row-level security/);
+  } finally { await db.close(); }
+});
+
+test('seller media migration restores editing, checks ownership and approves an unchanged five-file gallery', async () => {
+  const db = new PGlite();
+  try {
+    await db.exec(`
+      create role anon; create role authenticated; create role service_role bypassrls;
+      create schema auth; create schema storage;
+      create table auth.users(id uuid primary key,raw_user_meta_data jsonb,email text);
+      create table public.profiles(id uuid primary key,email text,role text);
+      create function auth.jwt() returns jsonb language sql stable as $$select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb$$;
+      create function auth.uid() returns uuid language sql stable as $$select (auth.jwt()->>'sub')::uuid$$;
+      grant usage on schema public,auth,storage to anon,authenticated,service_role;
+      create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+      create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);
+      alter table storage.objects enable row level security;
+      grant all on storage.objects to authenticated,service_role;
+      create policy storage_read_fixture on storage.objects for select to authenticated using(true);
+      create policy storage_delete_fixture on storage.objects for delete to authenticated using(true);
+      create function storage.foldername(text) returns text[] language sql as $$select string_to_array($1,'/')$$;
+    `);
+    await db.exec(readFileSync('supabase/products_table.sql','utf8').replace(/create extension if not exists pgcrypto;/gi,''));
+    await db.exec(readFileSync('supabase/seller_subscriptions.sql','utf8'));
+    await db.exec(readFileSync('supabase/seller_onboarding_launch.sql','utf8'));
+    await db.exec(readFileSync('supabase/automatic_listing_approval.sql','utf8'));
+    await db.query('insert into auth.users(id,email) values($1,$2)',[seller.sub,seller.email]);
+    await seedSubscription(db,seller.email);
+    const id=(await addProduct(db)).rows[0].id;
+    const migration=readFileSync('supabase/seller_media_categories.sql','utf8');
+    await db.exec(migration); await db.exec(migration);
+    assert.equal((await db.query('select seller_id from public.products where id=$1',[id])).rows[0].seller_id,seller.sub);
+    await as(db,'authenticated',seller);
+    assert.equal((await db.query("update public.products set name='Edited',category='Electronics' where id=$1 returning id",[id])).rows.length,1);
+    await assert.rejects(db.query('update public.products set seller_id=$1 where id=$2',[other.sub,id]),/own listings|ownership|row-level/);
+    const prefix=`https://nmusxculduptvefgqfjn.supabase.co/storage/v1/object/public/product-images/${seller.sub}/`;
+    const cover=prefix+'cover.png', gallery=['one.png','two.jpeg','three.mp4','four.webm'].map(file=>prefix+file);
+    await assert.rejects(db.query('update public.products set image_url=$1,product_images=$2 where id=$3',[cover,[...gallery,prefix+'six.png'],id]),/five/);
+    await assert.rejects(db.query('update public.products set image_url=$1 where id=$2',[prefix+'video.mp4',id]),/cover photo/);
+    await assert.rejects(db.query('update public.products set image_url=$1 where id=$2',[prefix.replace(seller.sub,other.sub)+'cover.png',id]),/own seller dashboard/);
+    const desc='Handmade cotton shirt with traditional patterns, available in medium and large sizes for everyday wear.';
+    await db.query('update public.products set image_url=$1,product_images=$2,description=$3 where id=$4',[cover,gallery,desc,id]);
+    await as(db,'authenticated',other);
+    assert.equal((await db.query("update public.products set name='Stolen' where id=$1 returning id",[id])).rows.length,0);
+    await as(db,'service_role');
+    const approve=async files=>(await db.query('select public.approve_seller_listing($1,$2,$3,$4,$5,$6) as approved',[id,seller.sub,seller.email,desc,cover,files])).rows[0].approved;
+    assert.equal(await approve([]),false); assert.equal(await approve(gallery),true);
+    await as(db,'postgres');
+    await db.query("insert into storage.objects(bucket_id,name) values('product-images',$1)",[seller.sub+'/three.mp4']);
+    await as(db,'authenticated',seller);
+    assert.equal((await db.query('delete from storage.objects where name=$1 returning name',[seller.sub+'/three.mp4'])).rows.length,0);
+    await db.query('update public.products set name=name where id=$1',[id]);
+    assert.equal((await db.query('select is_approved from public.products where id=$1',[id])).rows[0].is_approved,false);
   } finally { await db.close(); }
 });
