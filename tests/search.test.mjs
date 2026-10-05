@@ -24,6 +24,13 @@ test('seller name and a minor typing error can find a store',()=>{
   assert.equal(rankProducts(products,'Lagos Kitchen').length,2);
   assert.equal(rankProducts(products,'birthay cake').length,2);
 });
+test('store names match joined words and ampersand variations without unrelated matches',()=>{
+  const fixtures=[{id:'one',seller_id:'a',seller_name:'A&b delight',name:'Cake'}, {id:'two',seller_id:'a',seller_name:'A&b delight',name:'Waakye'}, {id:'three',seller_id:'b',seller_name:'Other store',name:'Cake'}];
+  for (const query of ['abdelight','AB Delight','A&B Delight','A and B Delight','abdel']) {
+    assert.deepEqual(Array.from(rankProducts(fixtures,query),x=>x.product.id),['one','two']);
+  }
+  assert.equal(rankProducts(fixtures,'abdelight shoes').length,0);
+});
 test('all meaningful terms must match; unavailable items do not invent suggestions',()=>{
   assert.equal(rankProducts(products,'eba birthday').length,0);
   assert.equal(rankProducts(products,'waakye').length,0);
