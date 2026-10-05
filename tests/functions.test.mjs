@@ -189,15 +189,16 @@ test('automatic publication checks auth, ownership, description and image before
   const product = { id, seller_email:seller.email, description:'Handmade cotton shirt with traditional patterns, available in medium and large sizes for everyday wear.', image_url:`https://example.supabase.co/storage/v1/object/public/product-images/${seller.id}/photo.png` };
   const bytes = new Uint8Array(33); bytes.set([137,80,78,71,13,10,26,10]);
   const view = new DataView(bytes.buffer); view.setUint32(16,800); view.setUint32(20,800);
-  let photo = bytes, approvedCalls=0, found=product, authenticated=true, decodeFails=false;
+  let photo = bytes, approvedCalls=0, found=product, authenticated=true, decodeFails=false, validVideo=false;
+  const mp4 = new Uint8Array(24); mp4.set([102,116,121,112],4);
   const supabase = {
     auth: { getUser: async()=>({data:{user:authenticated?seller:null}}) },
     from:()=>({select(){return this;},eq(){return this;},maybeSingle:async()=>({data:found})}),
-    storage:{from:()=>({download:async()=>({data:new Blob([photo])})})},
+    storage:{from:()=>({download:async path=>({data:new Blob([validVideo && path.endsWith('.mp4') ? mp4 : photo])})})},
     rpc:async()=>{approvedCalls++;return {data:true};},
   };
   const route = handler('approve-listing',{ env:{SUPABASE_URL:'https://example.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'fixture'},supabase,
-    decodePng:()=>{if(decodeFails)throw Error('Corrupt');return {width:800,height:800};} });
+    decodePng:()=>{if(decodeFails)throw Error('Corrupt');return {width:800,height:800};}, jpeg:{decode:()=>({width:800,height:800})} });
   assert.equal((await route(post({product_id:id}))).status,401);
   authenticated=false; assert.equal((await route(post({product_id:id},'token'))).status,401); authenticated=true;
   found=null; assert.equal((await route(post({product_id:id},'token'))).status,404); found=product;
@@ -213,5 +214,10 @@ test('automatic publication checks auth, ownership, description and image before
   product.product_images = [url.replace('photo.png','video.mp4')]; assert.equal((await route(post({product_id:id},'token'))).status,422);
   product.product_images = [url.replace('photo.png','second.png')]; assert.equal((await route(post({product_id:id},'token'))).status,200);
   assert.equal(approvedCalls,2);
+  product.product_images=[url.replace('photo.png','video.mp4')]; validVideo=true;
+  assert.equal((await route(post({product_id:id},'token'))).status,200);
+  product.product_images=[]; product.image_url=url.replace('photo.png','photo.jpeg'); photo=new Uint8Array([255,216,255,217]);
+  assert.equal((await route(post({product_id:id},'token'))).status,200);
+  assert.equal(approvedCalls,4);
 
 });
