@@ -7,7 +7,7 @@ test('Cloudflare output includes runtime configuration and crawler assets, exclu
   execFileSync(process.execPath, ['scripts/build.mjs']);
   const files = readdirSync('dist');
   for (const expected of ['index.html', 'sell.html', 'shop.html', 'dashboard.html', 'success.html',
-    'config.js', '404.html', 'robots.txt', 'sitemap.xml', '_headers', 'afromkt-facebook-cover.png']) {
+    'config.js', 'marketplace-search.js', '404.html', 'robots.txt', 'sitemap.xml', '_headers', 'afromkt-facebook-cover.png']) {
     assert.ok(files.includes(expected), `${expected} must be published`);
   }
   for (const forbidden of ['supabase', 'supabase-schema.sql', 'tests', 'docs', '.git', '.env', 'package.json']) {

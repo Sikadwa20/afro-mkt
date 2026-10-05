@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import { readFileSync } from 'node:fs';
+const window = {};
+vm.runInNewContext(readFileSync('marketplace-search.js','utf8'),{window});
+const { rankProducts, groupSellers } = window.AFRO_MKT_SEARCH;
+const products = [
+  {id:'cake',seller_id:'a',seller_name:'Celebration Kitchen',name:'Cake',description:'Fresh cakes for birthday celebrations and family gatherings.',category:'Food & Drinks'},
+  {id:'stew',seller_id:'b',seller_name:'Lagos Kitchen',name:'Eba with Egusi',description:'Freshly cooked cassava eba and egusi soup.',category:'Food & Drinks'},
+  {id:'rice',seller_id:'b',seller_name:'Lagos Kitchen',name:'Jollof rice',description:'Rice with tomatoes and herbs.',category:'Food & Drinks'},
+  {id:'cake2',seller_id:'c',seller_name:'Sweet Shop',name:'Birthday cake',description:'Freshly baked.',category:'Food & Drinks'}
+];
+test('birthday cake matches name and description and ranks exact names first',()=>{
+  const matches=rankProducts(products,'birthday cake');
+  assert.equal(matches.length,2); assert.equal(matches[0].product.id,'cake2'); assert.equal(matches[1].product.id,'cake');
+});
+test('eguzi spelling, stop words and accents find actual matching food',()=>{
+  assert.equal(rankProducts(products,'eba with eguzi')[0].product.id,'stew');
+  assert.equal(rankProducts(products,'éba com egusi')[0].product.id,'stew');
+  assert.equal(rankProducts(products,'bolo de aniversário').length,2);
+});
+test('seller name and a minor typing error can find a store',()=>{
+  assert.equal(rankProducts(products,'Lagos Kitchen').length,2);
+  assert.equal(rankProducts(products,'birthay cake').length,2);
+});
+test('all meaningful terms must match; unavailable items do not invent suggestions',()=>{
+  assert.equal(rankProducts(products,'eba birthday').length,0);
+  assert.equal(rankProducts(products,'waakye').length,0);
+});
+test('seller groups use real matching listings and relevance; duplicate names do not merge owners',()=>{
+  const groups=groupSellers(rankProducts(products,'birthday cake'));
+  assert.equal(groups.length,2); assert.equal(groups[0].id,'c'); assert.equal(groups[1].id,'a');
+  const shops=groupSellers(rankProducts(products,'Lagos'));
+  assert.equal(shops.length,1); assert.equal(shops[0].products.length,2);
+  const sameName=groupSellers(rankProducts(products.map(p=>({...p,seller_name:'Same name'})),''));
+  assert.equal(sameName.length,3);
+});
+test('clearing search restores the original order and punctuation remains plain text',()=>{
+  assert.equal(rankProducts(products,'').map(item=>item.product.id).join(','),'cake,stew,rice,cake2');
+  assert.equal(rankProducts(products,'<script>alert(1)</script>').length,0);
+});
