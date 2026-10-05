@@ -151,6 +151,8 @@
         .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(212,168,67,.18); }
         .form-help { color: var(--text-light); font-size: .9rem; }
         .upload-control { display: grid; gap: 12px; }
+        .additional-photos { padding: 18px; border-radius: 18px; border: 1px solid rgba(26,60,46,.08); background: linear-gradient(180deg, rgba(26,60,46,.04), rgba(212,168,67,.08)); }
+        .additional-photos-grid { margin-top: 12px; }
         .file-input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
         .file-upload-btn { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 16px; border-radius: 16px; border: 1px dashed rgba(26,60,46,.26); background: linear-gradient(135deg, rgba(212,168,67,.16), rgba(26,60,46,.06)); color: var(--primary-dark); font-weight: 900; cursor: pointer; transition: var(--transition); }
         .file-upload-btn:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(13,47,33,.08); }
@@ -332,7 +334,17 @@
                                 </div>
                                 <div class="field"><label for="productDescription">Description</label><textarea id="productDescription" class="textarea" minlength="80" maxlength="1000" autocomplete="off" placeholder="Tell buyers what makes this product special..." required></textarea></div>
                                 <div class="form-grid">
-                                    <div class="field upload-control"><label for="productImageFile">Product image</label><input id="productImageFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp" autocomplete="off" required><label class="file-upload-btn" for="productImageFile">📷 Choose product image</label><div class="file-name" id="productImageName">No image selected</div><div class="upload-status" id="uploadStatus" aria-live="polite"></div><div class="image-preview" id="imagePreview"><img id="imagePreviewImg" alt="Selected product image preview"></div></div>
+                                    <div class="field upload-control"><label for="productImageFile">Main product photo</label><input id="productImageFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp" autocomplete="off" required><label class="file-upload-btn" for="productImageFile">📷 Choose main product photo</label><div class="file-name" id="productImageName">No image selected</div><div class="upload-status" id="uploadStatus" aria-live="polite"></div><div class="image-preview" id="imagePreview"><img id="imagePreviewImg" alt="Selected product image preview"></div></div>
+                                </div>
+                                <div class="field additional-photos">
+                                    <label>Additional Photos</label>
+                                    <p class="form-help">Optional gallery links shown after the main product photo on the shop page. Add up to 4 extra image URLs.</p>
+                                    <div class="form-grid additional-photos-grid">
+                                        <div class="field"><label for="productPhoto2">Photo 2</label><input id="productPhoto2" class="input" type="url" inputmode="url" maxlength="2048" autocomplete="off" placeholder="https://example.com/photo-2.jpg"></div>
+                                        <div class="field"><label for="productPhoto3">Photo 3</label><input id="productPhoto3" class="input" type="url" inputmode="url" maxlength="2048" autocomplete="off" placeholder="https://example.com/photo-3.jpg"></div>
+                                        <div class="field"><label for="productPhoto4">Photo 4</label><input id="productPhoto4" class="input" type="url" inputmode="url" maxlength="2048" autocomplete="off" placeholder="https://example.com/photo-4.jpg"></div>
+                                        <div class="field"><label for="productPhoto5">Photo 5</label><input id="productPhoto5" class="input" type="url" inputmode="url" maxlength="2048" autocomplete="off" placeholder="https://example.com/photo-5.jpg"></div>
+                                    </div>
                                 </div>
                                 <button class="btn btn-gold" id="productSubmitBtn" type="submit">Save product listing</button>
                                 <button class="btn btn-soft hidden" id="cancelEditBtn" type="button">Cancel editing</button>
@@ -393,9 +405,37 @@
         let editingListing = null;
         let sellerListings = [];
         const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const extraPhotoInputIds = ['productPhoto2', 'productPhoto3', 'productPhoto4', 'productPhoto5'];
+        function normalizeProductImageUrls(value) {
+            if (!Array.isArray(value)) return [];
+            return value
+                .map((url) => String(url || '').trim())
+                .filter(Boolean)
+                .slice(0, extraPhotoInputIds.length);
+        }
+        function setAdditionalPhotoFields(images = []) {
+            extraPhotoInputIds.forEach((inputId, index) => {
+                const input = document.getElementById(inputId);
+                if (input) input.value = images[index] || '';
+            });
+        }
+        function collectAdditionalPhotoUrls(mainImageUrl = '') {
+            const seen = new Set();
+            const normalizedMainImageUrl = String(mainImageUrl || '').trim();
+            if (normalizedMainImageUrl) seen.add(normalizedMainImageUrl);
+            return extraPhotoInputIds
+                .map((inputId) => document.getElementById(inputId).value.trim())
+                .filter((url) => {
+                    if (!url || seen.has(url)) return false;
+                    seen.add(url);
+                    return true;
+                })
+                .slice(0, extraPhotoInputIds.length);
+        }
         function resetProductForm() {
             editingListing = null;
             productForm.reset();
+            setAdditionalPhotoFields();
             resetImageUploadPreview();
             productImageFile.required = true;
             document.getElementById('productFormHeading').textContent = 'Submit a product';
@@ -410,9 +450,10 @@
                 document.getElementById(field).value = value ?? '';
             }
             productImageFile.required = false;
-            productImageName.textContent = 'Current photo retained unless you choose a replacement';
+            productImageName.textContent = 'Current main photo retained unless you choose a replacement';
             imagePreviewImg.src = product.image_url || '';
             imagePreview.classList.toggle('show', Boolean(product.image_url));
+            setAdditionalPhotoFields(normalizeProductImageUrls(product.product_images));
             document.getElementById('productFormHeading').textContent = 'Edit product';
             productSubmitBtn.textContent = 'Save changes';
             cancelEditBtn.classList.remove('hidden');
@@ -460,6 +501,11 @@
             const digits = raw.replace(/\D+/g, '');
             if (digits.length < 8 || digits.length > 15) throw new Error('Enter a valid WhatsApp number with country code, for example +351 912 345 678.');
             return raw.startsWith('+') ? `+${digits}` : `+${digits}`;
+        }
+
+        function isMissingProductImagesColumnError(error) {
+            const message = String(error?.message || error?.details || error?.hint || '');
+            return error?.code === 'PGRST204' || (/product_images/i.test(message) && (/column/i.test(message) || /schema cache/i.test(message)));
         }
 
         function buildWhatsAppLink(value) {
@@ -750,12 +796,14 @@
                 description: document.getElementById('productDescription').value.trim(),
                 category: document.getElementById('productCategory').value,
                 image_url: null,
+                product_images: [],
                 is_active: true
             };
             try {
                 if (payload.description.length < 80 || payload.description.split(/\s+/u).length < 12) throw new Error('Write at least 80 characters and 12 words describing the product, its size, materials or ingredients and intended use.');
                 payload.image_url = selectedImage ? await uploadProductImage(selectedImage, sellerEmail) : editingListing?.image_url;
                 if (!payload.image_url) throw new Error('Choose a product photo.');
+                payload.product_images = collectAdditionalPhotoUrls(payload.image_url);
                 productSubmitBtn.textContent = 'Saving listing...';
                 const { data: saved, error } = await saveListing(payload, editingListing?.id, sellerEmail);
                 if (error) throw error;
@@ -764,7 +812,11 @@
                 setMessage(productMessage, approval.approved ? 'Product published! It is now available in the product preview.' : `Product saved and pending. ${approval.error}`, approval.approved ? 'success' : 'error');
                 await loadListings(payload.seller_email);
             } catch (error) {
-                setMessage(productMessage, error.message || 'Product could not be saved. Please try again or contact support@afro-mkt.com.', 'error');
+                if (isMissingProductImagesColumnError(error)) {
+                    setMessage(productMessage, 'Run the product gallery SQL in Supabase first, then save this listing again.', 'error');
+                } else {
+                    setMessage(productMessage, error.message || 'Product could not be saved. Please try again or contact support@afro-mkt.com.', 'error');
+                }
             } finally {
                 productSubmitBtn.disabled = false;
                 productSubmitBtn.textContent = editingListing ? 'Save changes' : 'Save product listing';
@@ -807,7 +859,8 @@
         });
 
         function listingImage(product) {
-            if (product.image_url) return `<img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.parentElement.textContent='Image unavailable'">`;
+            const coverImage = product.image_url || normalizeProductImageUrls(product.product_images)[0] || '';
+            if (coverImage) return `<img src="${escapeHtml(coverImage)}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.parentElement.textContent='Image unavailable'">`;
             return 'No image yet';
         }
 
@@ -819,11 +872,20 @@
             listingsContainer.innerHTML = '<div class="empty-listings">Loading your products...</div>';
             listingCount.textContent = 'Loading';
             try {
-                const { data, error } = await supabaseClient
+                let query = supabaseClient
                     .from('products')
-                    .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active,is_approved')
+                    .select('id,seller_email,seller_name,name,price,description,category,image_url,product_images,created_at,is_active,is_approved')
                     .eq('seller_email', email)
                     .order('created_at', { ascending: false });
+                let { data, error } = await query;
+                if (error && isMissingProductImagesColumnError(error)) {
+                    ({ data, error } = await supabaseClient
+                        .from('products')
+                        .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active,is_approved')
+                        .eq('seller_email', email)
+                        .order('created_at', { ascending: false }));
+                    data = (data || []).map((product) => ({ ...product, product_images: [] }));
+                }
                 if (error) throw error;
                 const products = data || [];
                 sellerListings = products;

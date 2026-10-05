@@ -84,9 +84,23 @@
         .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
         .product-card { background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 40px rgba(0,0,0,.06); border: 1px solid rgba(26,60,46,.08); transition: var(--transition); display: flex; flex-direction: column; }
         .product-card:hover { transform: translateY(-8px); box-shadow: 0 22px 48px rgba(0,0,0,.1); }
-        .product-visual { min-height: 180px; display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; color: #ffffff; background-size: cover; background-position: center; overflow: hidden; }
+        .product-visual { min-height: 220px; display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; color: #ffffff; background-size: cover; background-position: center; overflow: hidden; background-color: var(--primary-dark); }
         .product-visual::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 17, 13, 0.04), rgba(8, 17, 13, 0.38)); }
         .product-visual > * { position: relative; z-index: 1; }
+        .product-media { position: absolute; inset: 0; }
+        .product-static-media, .product-carousel-slide { width: 100%; height: 100%; display: grid; place-items: center; }
+        .product-static-media img, .product-carousel-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .product-carousel { position: absolute; inset: 0; }
+        .product-carousel-track { display: flex; width: 100%; height: 100%; transition: transform .35s ease; }
+        .product-carousel-slide { min-width: 100%; flex: 0 0 100%; background: linear-gradient(135deg, rgba(26,60,46,.5), rgba(212,168,67,.2)); }
+        .product-carousel-control { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.24); border-radius: 999px; background: rgba(13,47,33,.72); color: #ffffff; display: grid; place-items: center; cursor: pointer; font-size: 1.5rem; line-height: 1; transition: var(--transition); z-index: 2; backdrop-filter: blur(10px); }
+        .product-carousel-control:hover { background: rgba(13,47,33,.88); transform: translateY(-50%) scale(1.04); }
+        .product-carousel-control.prev { left: 14px; }
+        .product-carousel-control.next { right: 14px; }
+        .product-carousel-dots { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 999px; background: rgba(13,47,33,.28); backdrop-filter: blur(8px); z-index: 2; }
+        .product-carousel-dot { width: 10px; height: 10px; border: 0; border-radius: 999px; padding: 0; background: rgba(255,255,255,.42); cursor: pointer; transition: var(--transition); }
+        .product-carousel-dot.active { background: #f6e7bd; transform: scale(1.1); }
+        .product-visual-placeholder { font-size: 4rem; }
         .visual-1 { background: linear-gradient(135deg, #da7f41, #9c3b2f); }
         .visual-2 { background: linear-gradient(135deg, #c84a30, #7c1f16); }
         .visual-3 { background: linear-gradient(135deg, #9c7b2c, #4f5f12); }
@@ -369,6 +383,11 @@
             return String(value || '').replace(/\D+/g, '');
         }
 
+        function isMissingProductImagesColumnError(error) {
+            const message = String(error?.message || error?.details || error?.hint || '');
+            return error?.code === 'PGRST204' || (/product_images/i.test(message) && (/column/i.test(message) || /schema cache/i.test(message)));
+        }
+
         function buildWhatsAppUrl(number, productName) {
             const digits = normalizeWhatsAppDigits(number);
             if (!digits) return '';
@@ -445,8 +464,80 @@
             return allProducts.filter((product) => slugifyCategory(product.category) === activeCategory);
         }
 
-        function productVisualStyle(product) {
-            return product.image_url ? ` style="background-image: linear-gradient(180deg, rgba(13,47,33,.12), rgba(13,47,33,.24)), url('${escapeHtml(product.image_url)}');"` : '';
+        function getProductGallery(product) {
+            const uniqueUrls = new Set();
+            return [product.image_url].concat(Array.isArray(product.product_images) ? product.product_images : [])
+                .map((url) => String(url || '').trim())
+                .filter((url) => {
+                    if (!url || uniqueUrls.has(url)) return false;
+                    uniqueUrls.add(url);
+                    return true;
+                })
+                .slice(0, 5);
+        }
+
+        function productImageMarkup(imageUrl, altText) {
+            return `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(altText)}" loading="lazy" onerror="this.style.display='none'">`;
+        }
+
+        function buildProductVisual(product, fallbackVisual) {
+            const galleryImages = getProductGallery(product);
+            const categoryLabel = escapeHtml(product.category || 'Other');
+            if (!galleryImages.length) {
+                return `
+                    <div class="product-visual ${fallbackVisual}">
+                        <span class="product-category">${categoryLabel}</span>
+                        <span class="product-visual-placeholder" aria-hidden="true">📦</span>
+                    </div>
+                `;
+            }
+            if (galleryImages.length === 1) {
+                return `
+                    <div class="product-visual ${fallbackVisual}">
+                        <div class="product-media product-static-media">${productImageMarkup(galleryImages[0], product.name || 'AfroMkt product')}</div>
+                        <span class="product-category">${categoryLabel}</span>
+                    </div>
+                `;
+            }
+            return `
+                <div class="product-visual ${fallbackVisual}">
+                    <div class="product-media product-carousel" data-current-index="0" data-total-slides="${galleryImages.length}">
+                        <div class="product-carousel-track">
+                            ${galleryImages.map((imageUrl, imageIndex) => `
+                                <div class="product-carousel-slide">
+                                    ${productImageMarkup(imageUrl, `${product.name || 'AfroMkt product'} photo ${imageIndex + 1}`)}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="product-carousel-control prev" type="button" data-carousel-direction="-1" aria-label="Previous photo">&#8249;</button>
+                        <button class="product-carousel-control next" type="button" data-carousel-direction="1" aria-label="Next photo">&#8250;</button>
+                        <div class="product-carousel-dots" aria-label="Product photo gallery">
+                            ${galleryImages.map((_, imageIndex) => `<button class="product-carousel-dot ${imageIndex === 0 ? 'active' : ''}" type="button" data-carousel-dot-index="${imageIndex}" aria-label="Go to photo ${imageIndex + 1}" aria-current="${imageIndex === 0 ? 'true' : 'false'}"></button>`).join('')}
+                        </div>
+                    </div>
+                    <span class="product-category">${categoryLabel}</span>
+                </div>
+            `;
+        }
+
+        function setProductCarouselIndex(carousel, nextIndex) {
+            const totalSlides = Number(carousel?.dataset.totalSlides || 0);
+            if (!carousel || !totalSlides) return;
+            const safeIndex = ((Number(nextIndex) % totalSlides) + totalSlides) % totalSlides;
+            carousel.dataset.currentIndex = String(safeIndex);
+            const track = carousel.querySelector('.product-carousel-track');
+            if (track) track.style.transform = `translateX(-${safeIndex * 100}%)`;
+            carousel.querySelectorAll('[data-carousel-dot-index]').forEach((dot, dotIndex) => {
+                const isActive = dotIndex === safeIndex;
+                dot.classList.toggle('active', isActive);
+                dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+            });
+        }
+
+        function initializeProductCarousels() {
+            productGrid.querySelectorAll('.product-carousel').forEach((carousel) => {
+                setProductCarouselIndex(carousel, Number(carousel.dataset.currentIndex || 0));
+            });
         }
 
         function renderProducts() {
@@ -476,16 +567,12 @@
             productGrid.innerHTML = visibleProducts.map((product, index) => {
                 const fallbackVisual = fallbackVisuals[index % fallbackVisuals.length];
                 const sellerName = product.seller_name || 'AfroMkt Seller';
-                const imageMarkup = product.image_url ? '' : `<span aria-hidden="true">📦</span>`;
                 const whatsappButton = whatsappButtonMarkup(product, dictionary.whatsappCta);
                 const sellerActions = whatsappButton ? `<div class="seller-actions">${whatsappButton}</div>` : '';
 
                 return `
                     <article class="product-card">
-                        <div class="product-visual ${fallbackVisual}"${productVisualStyle(product)}>
-                            <span class="product-category">${escapeHtml(product.category || 'Other')}</span>
-                            ${imageMarkup}
-                        </div>
+                        ${buildProductVisual(product, fallbackVisual)}
                         <div class="product-body">
                             <h3>${escapeHtml(product.name)}</h3>
                             <p>${escapeHtml(product.description || 'Discover this AfroMkt seller listing.')}</p>
@@ -499,8 +586,25 @@
                 `;
             }).join('');
 
-
+            initializeProductCarousels();
         }
+
+        productGrid.addEventListener('click', (event) => {
+            const carouselControl = event.target.closest('[data-carousel-direction], [data-carousel-dot-index]');
+            if (!carouselControl) return;
+            const carousel = carouselControl.closest('.product-carousel');
+            if (!carousel) return;
+            event.preventDefault();
+            const totalSlides = Number(carousel.dataset.totalSlides || 0);
+            if (totalSlides < 2) return;
+            if (carouselControl.dataset.carouselDotIndex !== undefined) {
+                setProductCarouselIndex(carousel, Number(carouselControl.dataset.carouselDotIndex));
+                return;
+            }
+            const currentIndex = Number(carousel.dataset.currentIndex || 0);
+            const direction = Number(carouselControl.dataset.carouselDirection || 0);
+            setProductCarouselIndex(carousel, currentIndex + direction);
+        });
 
         async function loadSellerContacts(products) {
             const sellerEmails = [...new Set((products || []).map((product) => String(product?.seller_email || '').trim().toLowerCase()).filter(Boolean))];
@@ -533,12 +637,21 @@
             renderProducts();
 
             try {
-                const { data, error } = await supabaseClient
+                let { data, error } = await supabaseClient
                     .from('products')
-                    .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active,is_approved')
+                    .select('id,seller_email,seller_name,name,price,description,category,image_url,product_images,created_at,is_active,is_approved')
                     .eq('is_active', true)
                     .eq('is_approved', true)
                     .order('created_at', { ascending: false });
+                if (error && isMissingProductImagesColumnError(error)) {
+                    ({ data, error } = await supabaseClient
+                        .from('products')
+                        .select('id,seller_email,seller_name,name,price,description,category,image_url,created_at,is_active,is_approved')
+                        .eq('is_active', true)
+                        .eq('is_approved', true)
+                        .order('created_at', { ascending: false }));
+                    data = (data || []).map((product) => ({ ...product, product_images: [] }));
+                }
 
                 if (error) throw error;
 
