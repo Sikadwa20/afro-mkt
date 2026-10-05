@@ -1035,12 +1035,8 @@
                 if (isMissingProductImagesColumnError(error)) {
                     setMessage(productMessage, 'Run the product gallery SQL in Supabase first, then save this listing again.', 'error');
                 } else {
-                    const errorDetails = [
-                        error.message,
-                        error.code ? `(Code: ${error.code})` : '',
-                        error.details ? `Details: ${error.details}` : '',
-                        error.hint ? `Hint: ${error.hint}` : ''
-                    ].filter(Boolean).join(' | ');
+                    console.error('Full save error:', error);
+                    const errorDetails = `Message: ${error.message || 'N/A'} | Code: ${error.code || 'N/A'} | Details: ${error.details || 'N/A'} | Hint: ${error.hint || 'N/A'}`;
                     setMessage(productMessage, `Save failed: ${errorDetails}`, 'error');
                 }
             } finally {
