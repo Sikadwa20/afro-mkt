@@ -4,6 +4,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   full_name text,
   email text,
+  whatsapp_number text,
   role text not null default 'buyer' check (role in ('buyer', 'seller')),
   country text,
   created_at timestamptz not null default timezone('utc', now())
@@ -115,6 +116,7 @@ alter table public.reviews enable row level security;
 alter table public.waitlist enable row level security;
 
 grant usage on schema public to anon, authenticated;
+grant select on public.profiles to anon;
 grant select, update on public.profiles to authenticated;
 grant select on public.stores to anon;
 grant select, insert, update, delete on public.stores to authenticated;
@@ -123,6 +125,13 @@ grant select, insert, update, delete on public.products to authenticated;
 grant select on public.reviews to anon;
 grant select, insert on public.reviews to authenticated;
 grant insert on public.waitlist to anon, authenticated;
+
+drop policy if exists "profiles_public_read_seller_contacts" on public.profiles;
+create policy "profiles_public_read_seller_contacts"
+on public.profiles
+for select
+to public
+using (role = 'seller' and coalesce(trim(whatsapp_number), '') <> '');
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own"

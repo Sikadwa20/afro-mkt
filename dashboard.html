@@ -305,6 +305,20 @@
 
                     <section>
                         <article class="card product-form-card">
+                            <h2>Seller profile</h2>
+                            <p class="muted">Add the WhatsApp number buyers should use to contact you directly from your listings.</p>
+                            <form id="profileForm" class="form" style="margin-top:20px;">
+                                <div class="form-grid">
+                                    <div class="field"><label for="profileWhatsapp">WhatsApp number</label><input id="profileWhatsapp" class="input" type="tel" inputmode="tel" maxlength="32" autocomplete="tel" placeholder="+351 912 345 678"></div>
+                                    <div class="field"><label for="profileWhatsappPreview">WhatsApp link preview</label><input id="profileWhatsappPreview" class="input" type="text" placeholder="https://wa.me/351912345678" readonly></div>
+                                </div>
+                                <p class="form-help">Use your country code. Buyers will see a WhatsApp button only when this number is saved.</p>
+                                <button class="btn btn-green" id="profileSubmitBtn" type="submit">Save seller profile</button>
+                            </form>
+                            <div id="profileMessage" class="message" aria-live="polite"></div>
+                        </article>
+
+                        <article class="card product-form-card">
                             <h2 id="productFormHeading">Submit a product</h2>
                             <p class="muted">Add a listing for the marketplace. Listings publish automatically after checking your active plan, description and photo. Describe the product in at least 80 characters and 12 words. Use a clear photo at least 800 × 800 pixels; prices are in EUR.</p>
                             <form id="productForm" class="form" style="margin-top:20px;">
@@ -356,6 +370,11 @@
         const authMessage = document.getElementById('authMessage');
         const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
+        const profileForm = document.getElementById('profileForm');
+        const profileSubmitBtn = document.getElementById('profileSubmitBtn');
+        const profileWhatsapp = document.getElementById('profileWhatsapp');
+        const profileWhatsappPreview = document.getElementById('profileWhatsappPreview');
+        const profileMessage = document.getElementById('profileMessage');
         const productForm = document.getElementById('productForm');
         const productSubmitBtn = document.getElementById('productSubmitBtn');
         const productMessage = document.getElementById('productMessage');
@@ -435,6 +454,23 @@
             return typeof value === 'string' ? value.trim().toLowerCase() : '';
         }
 
+        function normalizeWhatsAppNumber(value) {
+            const raw = String(value || '').trim();
+            if (!raw) return '';
+            const digits = raw.replace(/\D+/g, '');
+            if (digits.length < 8 || digits.length > 15) throw new Error('Enter a valid WhatsApp number with country code, for example +351 912 345 678.');
+            return raw.startsWith('+') ? `+${digits}` : `+${digits}`;
+        }
+
+        function buildWhatsAppLink(value) {
+            const digits = String(value || '').replace(/\D+/g, '');
+            return digits ? `https://wa.me/${digits}` : '';
+        }
+
+        function refreshWhatsAppPreview(value = profileWhatsapp.value) {
+            profileWhatsappPreview.value = buildWhatsAppLink(value);
+        }
+
         function makeSafeStorageSegment(value) {
             return normalizeEmail(value).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'seller';
         }
@@ -467,6 +503,58 @@
             productImageName.textContent = file.name;
             imagePreviewImg.src = URL.createObjectURL(file);
             imagePreview.classList.add('show');
+        });
+
+        profileWhatsapp.addEventListener('input', () => {
+            refreshWhatsAppPreview();
+            if (profileMessage.classList.contains('show')) setMessage(profileMessage, '');
+        });
+
+        async function loadSellerProfile() {
+            if (!currentUser?.id) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('profiles')
+                    .select('whatsapp_number')
+                    .eq('id', currentUser.id)
+                    .maybeSingle();
+                if (error) throw error;
+                profileWhatsapp.value = data?.whatsapp_number || '';
+                refreshWhatsAppPreview(profileWhatsapp.value);
+            } catch (error) {
+                setMessage(profileMessage, error.message || 'Seller profile could not be loaded.', 'error');
+            }
+        }
+
+        profileForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!currentUser?.id || !currentUser?.email) return;
+            profileSubmitBtn.disabled = true;
+            profileSubmitBtn.textContent = 'Saving profile...';
+            setMessage(profileMessage, '');
+            try {
+                const whatsappNumber = normalizeWhatsAppNumber(profileWhatsapp.value);
+                const { data, error } = await supabaseClient
+                    .from('profiles')
+                    .update({
+                        email: normalizeEmail(currentUser.email),
+                        role: 'seller',
+                        whatsapp_number: whatsappNumber || null
+                    })
+                    .eq('id', currentUser.id)
+                    .select('id')
+                    .single();
+                if (error) throw error;
+                if (!data) throw new Error('Seller profile could not be found. Please sign out and sign in again.');
+                profileWhatsapp.value = whatsappNumber;
+                refreshWhatsAppPreview(whatsappNumber);
+                setMessage(profileMessage, whatsappNumber ? 'Seller profile saved. Buyers can now contact you on WhatsApp from your listings.' : 'Seller profile saved. Add a WhatsApp number any time to show the buyer contact button.', 'success');
+            } catch (error) {
+                setMessage(profileMessage, error.message || 'Seller profile could not be saved.', 'error');
+            } finally {
+                profileSubmitBtn.disabled = false;
+                profileSubmitBtn.textContent = 'Save seller profile';
+            }
         });
 
         async function uploadProductImage(file, sellerEmail) {
@@ -564,6 +652,9 @@
         async function signOut() {
             await supabaseClient.auth.signOut();
             currentUser = null;
+            profileForm.reset();
+            refreshWhatsAppPreview('');
+            setMessage(profileMessage, '');
             userChip.classList.remove('show');
             navLogoutBtn.classList.add('hidden');
             setState('auth');
@@ -766,7 +857,7 @@
             userChip.classList.add('show');
             navLogoutBtn.classList.remove('hidden');
             setState('dashboard');
-            await Promise.all([renderPlan(email), loadListings(email)]);
+            await Promise.all([renderPlan(email), loadSellerProfile(), loadListings(email)]);
         }
 
         async function init() {

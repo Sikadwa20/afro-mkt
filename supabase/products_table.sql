@@ -3,6 +3,8 @@
 
 create extension if not exists pgcrypto;
 
+alter table public.profiles add column if not exists whatsapp_number text;
+
 create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   seller_email text not null,
@@ -59,11 +61,36 @@ create index if not exists idx_products_seller_name on public.products (lower(se
 create index if not exists idx_products_seller_created_at on public.products (lower(seller_email), created_at desc);
 create index if not exists idx_products_active_category on public.products (is_active, category);
 
+alter table public.profiles enable row level security;
 alter table public.products enable row level security;
 
 grant usage on schema public to anon, authenticated;
+grant select on public.profiles to anon;
+grant select, update on public.profiles to authenticated;
 grant select on public.products to anon;
 grant select, insert, update, delete on public.products to authenticated;
+
+drop policy if exists "profiles_public_read_seller_contacts" on public.profiles;
+create policy "profiles_public_read_seller_contacts"
+on public.profiles
+for select
+to public
+using (role = 'seller' and coalesce(trim(whatsapp_number), '') <> '');
+
+drop policy if exists "profiles_select_own" on public.profiles;
+create policy "profiles_select_own"
+on public.profiles
+for select
+to authenticated
+using (auth.uid() = id);
+
+drop policy if exists "profiles_update_own" on public.profiles;
+create policy "profiles_update_own"
+on public.profiles
+for update
+to authenticated
+using (auth.uid() = id)
+with check (auth.uid() = id);
 
 drop policy if exists "products_public_read_active" on public.products;
 create policy "products_public_read_active"
