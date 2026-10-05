@@ -410,8 +410,8 @@
         }
 
         function getProductStoreCategory(product) {
-            const category = normalizeStoreCategory(product?.category);
-            return category === DEFAULT_STORE_CATEGORY ? normalizeStoreCategory(product?.store_category || category) : category;
+            if (product?.category && product.category !== 'Other') return normalizeStoreCategory(product.category);
+            return normalizeStoreCategory(product?.store_category);
         }
 
         function isMissingStoreCategoryColumnError(error) {

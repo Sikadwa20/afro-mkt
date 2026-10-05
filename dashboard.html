@@ -526,11 +526,11 @@
             }
             if (remaining > 0) {
                 productPhotosTriggerTitle.textContent = 'Add photos or videos';
-                productPhotosTriggerText.textContent = `You can add ${remaining} more photo${remaining === 1 ? '' : 's'} or replace any current preview.`;
+                productPhotosTriggerText.textContent = `You can add ${remaining} more file${remaining === 1 ? '' : 's'} or replace any current preview.`;
                 return;
             }
             productPhotosTriggerTitle.textContent = 'Five-file limit reached';
-            productPhotosTriggerText.textContent = 'Remove or replace a photo to keep this gallery within 5 files.';
+            productPhotosTriggerText.textContent = 'Remove or replace a file to keep this gallery within 5 files.';
         }
 
         function renderProductPhotoPreviews() {
@@ -566,7 +566,7 @@
                 url,
                 label: `Photo ${index + 1}`
             }));
-            syncProductPhotoUi(stagedProductPhotos.length ? 'Current photos loaded. Remove or replace any photo before saving.' : '');
+            syncProductPhotoUi(stagedProductPhotos.length ? 'Current media loaded. Remove or replace any file before saving.' : '');
         }
 
         function resetProductForm() {
@@ -833,7 +833,7 @@
                     }
                     const preparedPhotos = await createPreparedPhotoItems(selectedFiles);
                     stagedProductPhotos = stagedProductPhotos.concat(preparedPhotos);
-                    syncProductPhotoUi(`${preparedPhotos.length} photo${preparedPhotos.length === 1 ? '' : 's'} ready to upload.`);
+                    syncProductPhotoUi(`${preparedPhotos.length} file${preparedPhotos.length === 1 ? '' : 's'} ready to upload.`);
                 }
             } catch (error) {
                 setMessage(productMessage, error.message || 'Product photos could not be prepared.', 'error');
