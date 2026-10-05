@@ -107,6 +107,10 @@
         .status-card { grid-column: 1 / -1; display: grid; place-items: center; min-height: 240px; padding: 34px; text-align: center; border-radius: 24px; background: #ffffff; border: 1px solid rgba(26,60,46,.08); box-shadow: 0 16px 40px rgba(0,0,0,.06); color: var(--primary-dark); }
         .status-card h3 { font-size: 1.4rem; margin-bottom: 10px; }
         .status-card p { max-width: 520px; color: var(--text-light); }
+        .status-card.status-card-error { border-color: rgba(201, 92, 32, 0.28); background: linear-gradient(180deg, rgba(255, 248, 243, 1), rgba(255, 255, 255, 1)); }
+        .status-card.status-card-error h3 { color: #b45309; }
+        .status-card.status-card-error p { color: #9a3412; }
+        .status-card-icon { font-size: 3rem; margin-bottom: 16px; }
         .status-spinner { width: 52px; height: 52px; margin-bottom: 18px; border-radius: 50%; border: 4px solid rgba(26,60,46,.12); border-top-color: var(--accent); animation: shopSpin 1s linear infinite; }
         .seller-cta { padding: 94px 0; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); text-align: center; position: relative; overflow: hidden; }
         .seller-cta::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(212,168,67,.14), transparent 58%); }
@@ -288,7 +292,7 @@
                 heroPanelTitle: 'Why buyers will love AfroMkt', heroPanelText: 'From pantry staples to fashion, beauty, decor, and tech essentials, AfroMkt helps customers support trusted African sellers in one beautiful storefront.',
                 miniOneTitle: 'Diaspora-first', miniOneText: 'Products chosen for African communities living across Europe.', miniTwoTitle: 'Authentic finds', miniTwoText: 'Culture-led products with real seller stories behind them.', miniThreeTitle: 'Growing weekly', miniThreeText: 'New shops and categories joining the marketplace.', miniFourTitle: 'Portugal launch', miniFourText: 'Launching locally, designed to scale across Europe.',
                 productsTitle: 'Browse by Category', productsSubtitle: 'Explore approved listings while sellers prepare for the buyer launch.', gridIntro: 'Loading marketplace products...',
-                filterAll: 'All', sellerLabel: 'Seller', whatsappCta: 'Chat on WhatsApp', loadingTitle: 'Loading products', loadingBody: 'We are loading the latest approved listings.', emptyTitle: 'No products live yet', emptyBody: 'As soon as sellers publish approved listings, they will show up here for shoppers to explore.', errorTitle: 'We could not load products', errorBody: 'Please try again in a moment.', showingCount: '{count} live products across {categoryCount} categories', showingFiltered: '{count} products in {category}',
+                filterAll: 'All', sellerLabel: 'Seller', whatsappCta: 'Chat on WhatsApp', loadingTitle: 'Loading products', loadingBody: 'We are loading the latest approved listings.', emptyTitle: 'No products live yet', emptyBody: 'As soon as sellers publish approved listings, they will show up here for shoppers to explore.', errorTitle: '⚠️ Could not connect to the marketplace.', errorBody: 'Please try again shortly.', showingCount: '{count} live products across {categoryCount} categories', showingFiltered: '{count} products in {category}',
                 sellerCtaTitle: 'Are you a seller? List your products', sellerCtaText: 'Launch your AfroMkt storefront and start reaching diaspora customers across Europe with a marketplace built around culture, trust, and visibility.', sellerCtaButton: 'Start Selling Today',
                 footerBrand: 'The premier African Community Marketplace. Launching in Portugal and growing across Europe to connect culture, commerce, and community.', footerMarketplace: 'Marketplace', footerShop: 'Shop Products', footerSeller: 'Become a Seller', footerDelivery: 'Delivery Info', footerProtection: 'Buyer Protection', footerCompany: 'Company', footerAbout: 'About Us', footerCareers:"Join the Waitlist", footerPress:"Launch Updates", footerContact: 'Contact', footerLegal: 'Legal', footerTerms: 'Terms of Service', footerPrivacy: 'Privacy Policy', footerCookies: 'Cookie Policy', footerBottom: '© 2026 AfroMkt (afro-mkt.com). All rights reserved.'
             },
@@ -389,24 +393,27 @@
                 loading: {
                     title: dictionary.loadingTitle,
                     body: dictionary.loadingBody,
-                    visual: '<div class="status-spinner" aria-hidden="true"></div>'
+                    visual: '<div class="status-spinner" aria-hidden="true"></div>',
+                    className: ''
                 },
                 empty: {
                     title: dictionary.emptyTitle,
                     body: dictionary.emptyBody,
-                    visual: '🛍️'
+                    visual: '🛍️',
+                    className: ''
                 },
                 error: {
                     title: dictionary.errorTitle,
                     body: dictionary.errorBody,
-                    visual: '⚠️'
+                    visual: '⚠️',
+                    className: 'status-card-error'
                 }
             }[type];
 
             productGrid.innerHTML = `
-                <article class="status-card">
+                <article class="status-card ${content.className}">
                     <div>
-                        ${content.visual.startsWith('<') ? content.visual : `<div style="font-size:3rem; margin-bottom:16px;">${content.visual}</div>`}
+                        ${content.visual.startsWith('<') ? content.visual : `<div class="status-card-icon">${content.visual}</div>`}
                         <h3>${content.title}</h3>
                         <p>${content.body}</p>
                     </div>
@@ -514,6 +521,12 @@
             }, {});
         }
 
+        function isMarketplaceConnectionError(error) {
+            const status = Number(error?.status || error?.statusCode || error?.code);
+            const message = String(error?.message || '').toLowerCase();
+            return status === 401 || status === 403 || message.includes('invalid api key') || message.includes('failed to fetch') || message.includes('network') || message.includes('jwt');
+        }
+
         async function loadProducts() {
             productGrid.dataset.state = 'loading';
             setGridIntro(translations[activeLanguage].gridIntro);
@@ -544,12 +557,22 @@
                 productGrid.dataset.state = allProducts.length ? 'ready' : 'empty';
                 renderProducts();
             } catch (error) {
-                console.error('Failed to load AfroMkt products:', error);
+                const isConnectionIssue = isMarketplaceConnectionError(error);
+                console.error('Failed to load AfroMkt products:', {
+                    message: error?.message || null,
+                    status: error?.status || error?.statusCode || null,
+                    code: error?.code || null,
+                    details: error?.details || null,
+                    hint: error?.hint || null,
+                    isConnectionIssue,
+                    raw: error
+                });
                 allProducts = [];
                 availableCategories = [];
                 sellerContacts = {};
                 activeCategory = 'all';
                 productGrid.dataset.state = 'error';
+                setGridIntro(translations[activeLanguage].errorTitle);
                 renderProducts();
             }
         }
