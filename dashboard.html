@@ -151,16 +151,39 @@
         .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(212,168,67,.18); }
         .form-help { color: var(--text-light); font-size: .9rem; }
         .upload-control { display: grid; gap: 12px; }
-        .additional-photos { padding: 18px; border-radius: 18px; border: 1px solid rgba(26,60,46,.08); background: linear-gradient(180deg, rgba(26,60,46,.04), rgba(212,168,67,.08)); }
-        .additional-photos-grid { margin-top: 12px; }
+        .photo-upload-panel { display: grid; gap: 12px; }
         .file-input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-        .file-upload-btn { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 16px; border-radius: 16px; border: 1px dashed rgba(26,60,46,.26); background: linear-gradient(135deg, rgba(212,168,67,.16), rgba(26,60,46,.06)); color: var(--primary-dark); font-weight: 900; cursor: pointer; transition: var(--transition); }
-        .file-upload-btn:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(13,47,33,.08); }
-        .file-name { color: var(--text-light); font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .image-preview { display: none; overflow: hidden; border-radius: 18px; border: 1px solid rgba(26,60,46,.10); background: #f8faf9; max-width: 280px; box-shadow: 0 12px 28px rgba(13,47,33,.08); }
-        .image-preview.show { display: block; }
-        .image-preview img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
-        .upload-status { color: var(--primary-dark); font-size: .9rem; font-weight: 800; }
+        .photo-upload-zone {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            min-height: 120px;
+            padding: 18px;
+            border-radius: 22px;
+            border: 1px dashed rgba(26,60,46,.28);
+            background: linear-gradient(135deg, rgba(26,60,46,.06), rgba(212,168,67,.16));
+            color: var(--primary-dark);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .photo-upload-zone:hover, .photo-upload-zone.is-replacing { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 12px 26px rgba(13,47,33,.08); }
+        .photo-upload-icon { width: 54px; height: 54px; flex-shrink: 0; border-radius: 18px; display: grid; place-items: center; font-size: 1.6rem; background: rgba(255,255,255,.72); box-shadow: inset 0 0 0 1px rgba(26,60,46,.06); }
+        .photo-upload-copy { display: grid; gap: 4px; }
+        .photo-upload-copy strong { font-size: 1rem; }
+        .photo-upload-copy span { color: var(--text-light); font-size: .9rem; }
+        .file-name { color: var(--text-light); font-size: .9rem; }
+        .upload-status { color: var(--primary-dark); font-size: .9rem; font-weight: 800; min-height: 1.3em; }
+        .photo-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; }
+        .photo-preview-card { display: grid; gap: 8px; }
+        .photo-preview-thumb { position: relative; overflow: hidden; border-radius: 18px; border: 1px solid rgba(26,60,46,.10); background: #f8faf9; aspect-ratio: 1; box-shadow: 0 12px 24px rgba(13,47,33,.08); }
+        .photo-preview-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .photo-preview-badge { position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 999px; background: rgba(13,47,33,.86); color: var(--white); font-size: .68rem; font-weight: 800; }
+        .photo-preview-source { position: absolute; right: 8px; bottom: 8px; width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center; background: rgba(255,255,255,.88); color: var(--primary-dark); font-size: .85rem; font-weight: 900; }
+        .photo-preview-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .photo-preview-btn { flex: 1 1 0; min-height: 34px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(26,60,46,.12); background: #fff; color: var(--primary-dark); font-size: .78rem; font-weight: 800; cursor: pointer; transition: var(--transition); }
+        .photo-preview-btn:hover { border-color: var(--accent); color: var(--accent-dark); transform: translateY(-1px); }
+        .photo-preview-empty { padding: 18px; border-radius: 18px; border: 1px dashed rgba(26,60,46,.18); color: var(--text-light); background: rgba(26,60,46,.03); font-size: .9rem; text-align: center; }
         .message { display: none; padding: 13px 15px; border-radius: 16px; font-weight: 700; font-size: .92rem; }
         .message.show { display: block; }
         .message.success { background: rgba(29,143,91,.12); color: var(--success); }
@@ -261,7 +284,7 @@
                     <div class="feature-list">
                         <div class="feature-item"><strong>01</strong><div><strong>Secure login</strong><span>Protect your seller account with email and password sign-in.</span></div></div>
                         <div class="feature-item"><strong>02</strong><div><strong>Live plan check</strong><span>Check your current seller plan and subscription status.</span></div></div>
-                        <div class="feature-item"><strong>03</strong><div><strong>Product listings</strong><span>Add a name, price, description, category, and product photo.</span></div></div>
+                        <div class="feature-item"><strong>03</strong><div><strong>Product listings</strong><span>Add a name, price, description, category, and up to 5 product photos.</span></div></div>
                     </div>
                 </article>
                 <article class="panel">
@@ -322,7 +345,7 @@
 
                         <article class="card product-form-card">
                             <h2 id="productFormHeading">Submit a product</h2>
-                            <p class="muted">Add a listing for the marketplace. Listings publish automatically after checking your active plan, description and photo. Describe the product in at least 80 characters and 12 words. Use a clear photo at least 800 × 800 pixels; prices are in EUR.</p>
+                            <p class="muted">Add a listing for the marketplace. Listings publish automatically after checking your active plan, description and photos. Describe the product in at least 80 characters and 12 words. Use clear photos at least 800 × 800 pixels; the first photo becomes the shop cover image and prices are in EUR.</p>
                             <form id="productForm" class="form" style="margin-top:20px;">
                                 <div class="form-grid">
                                     <div class="field"><label for="sellerName">Shop / seller name</label><input id="sellerName" class="input" type="text" maxlength="120" autocomplete="organization" placeholder="Afro Taste Lisboa" required></div>
@@ -333,17 +356,22 @@
                                     <div class="field"><label for="productCategory">Category</label><select id="productCategory" class="select" autocomplete="off" required><option value="">Choose category</option><option>Food & Drinks</option><option>Fashion & Clothing</option><option>Beauty & Hair</option><option>Art & Crafts</option><option>Music & Culture</option><option>Other</option></select></div>
                                 </div>
                                 <div class="field"><label for="productDescription">Description</label><textarea id="productDescription" class="textarea" minlength="80" maxlength="1000" autocomplete="off" placeholder="Tell buyers what makes this product special..." required></textarea></div>
-                                <div class="form-grid">
-                                    <div class="field upload-control"><label for="productImageFile">Main product photo</label><input id="productImageFile" class="file-input" type="file" accept="image/jpeg,image/png,image/webp" autocomplete="off" required><label class="file-upload-btn" for="productImageFile">📷 Choose main product photo</label><div class="file-name" id="productImageName">No image selected</div><div class="upload-status" id="uploadStatus" aria-live="polite"></div><div class="image-preview" id="imagePreview"><img id="imagePreviewImg" alt="Selected product image preview"></div></div>
-                                </div>
-                                <div class="field additional-photos">
-                                    <label>Additional Photos</label>
-                                    <p class="form-help">Optional gallery links shown after the main product photo on the shop page. Add up to 4 extra image URLs.</p>
-                                    <div class="form-grid additional-photos-grid">
-                                        <div class="field"><label for="productPhoto2">Photo 2</label><input id="productPhoto2" class="input" type="url" inputmode="url" maxlength="2048" autocomplete="off" placeholder="https://example.com/photo-2.jpg"></div>
-                                        <div class="field"><label for="productPhoto3">Photo 3</label><input id="productPhoto3" class="input" type="url" inputmode="url" maxlength="2048" autocomplete="off" placeholder="https://example.com/photo-3.jpg"></div>
-                                        <div class="field"><label for="productPhoto4">Photo 4</label><input id="productPhoto4" class="input" type="url" inputmode="url" maxlength="2048" autocomplete="off" placeholder="https://example.com/photo-4.jpg"></div>
-                                        <div class="field"><label for="productPhoto5">Photo 5</label><input id="productPhoto5" class="input" type="url" inputmode="url" maxlength="2048" autocomplete="off" placeholder="https://example.com/photo-5.jpg"></div>
+                                <div class="field upload-control">
+                                    <label for="productPhotosInput">Product Photos (up to 5)</label>
+                                    <div class="photo-upload-panel">
+                                        <input id="productPhotosInput" class="file-input" type="file" accept="image/*" multiple autocomplete="off">
+                                        <label class="photo-upload-zone" id="productPhotosTrigger" for="productPhotosInput">
+                                            <span class="photo-upload-icon" aria-hidden="true">📸</span>
+                                            <span class="photo-upload-copy">
+                                                <strong id="productPhotosTriggerTitle">Tap to add product photos</strong>
+                                                <span id="productPhotosTriggerText">Choose up to 5 photos. The first photo becomes the cover image in the shop.</span>
+                                            </span>
+                                        </label>
+                                        <div class="file-name" id="productPhotosSummary">No photos selected yet</div>
+                                        <div class="upload-status" id="uploadStatus" aria-live="polite"></div>
+                                        <div class="photo-preview-grid" id="productPhotoPreviewGrid" aria-live="polite">
+                                            <div class="photo-preview-empty">Your selected product photos will appear here.</div>
+                                        </div>
                                     </div>
                                 </div>
                                 <button class="btn btn-gold" id="productSubmitBtn" type="submit">Save product listing</button>
@@ -390,83 +418,174 @@
         const productForm = document.getElementById('productForm');
         const productSubmitBtn = document.getElementById('productSubmitBtn');
         const productMessage = document.getElementById('productMessage');
-        const productImageFile = document.getElementById('productImageFile');
-        const productImageName = document.getElementById('productImageName');
+        const productPhotosInput = document.getElementById('productPhotosInput');
+        const productPhotosTrigger = document.getElementById('productPhotosTrigger');
+        const productPhotosTriggerTitle = document.getElementById('productPhotosTriggerTitle');
+        const productPhotosTriggerText = document.getElementById('productPhotosTriggerText');
+        const productPhotosSummary = document.getElementById('productPhotosSummary');
         const uploadStatus = document.getElementById('uploadStatus');
-        const imagePreview = document.getElementById('imagePreview');
-        const imagePreviewImg = document.getElementById('imagePreviewImg');
+        const productPhotoPreviewGrid = document.getElementById('productPhotoPreviewGrid');
         const listingsContainer = document.getElementById('listingsContainer');
         const listingCount = document.getElementById('listingCount');
         const logoutBtn = document.getElementById('logoutBtn');
         const navLogoutBtn = document.getElementById('navLogoutBtn');
         const userChip = document.getElementById('userChip');
         const userEmailChip = document.getElementById('userEmailChip');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const MAX_PRODUCT_IMAGES = 5;
+        const MAX_PRODUCT_IMAGE_SIZE = 5 * 1024 * 1024;
         let currentUser = null;
         let editingListing = null;
         let sellerListings = [];
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const extraPhotoInputIds = ['productPhoto2', 'productPhoto3', 'productPhoto4', 'productPhoto5'];
+        let stagedProductPhotos = [];
+        let replacePhotoId = null;
+
         function normalizeProductImageUrls(value) {
             if (!Array.isArray(value)) return [];
             return value
                 .map((url) => String(url || '').trim())
                 .filter(Boolean)
-                .slice(0, extraPhotoInputIds.length);
+                .slice(0, MAX_PRODUCT_IMAGES - 1);
         }
-        function setAdditionalPhotoFields(images = []) {
-            extraPhotoInputIds.forEach((inputId, index) => {
-                const input = document.getElementById(inputId);
-                if (input) input.value = images[index] || '';
-            });
-        }
-        function collectAdditionalPhotoUrls(mainImageUrl = '') {
+
+        function getProductGallery(product = {}) {
             const seen = new Set();
-            const normalizedMainImageUrl = String(mainImageUrl || '').trim();
-            if (normalizedMainImageUrl) seen.add(normalizedMainImageUrl);
-            return extraPhotoInputIds
-                .map((inputId) => document.getElementById(inputId).value.trim())
+            return [product.image_url].concat(normalizeProductImageUrls(product.product_images))
+                .map((url) => String(url || '').trim())
                 .filter((url) => {
                     if (!url || seen.has(url)) return false;
                     seen.add(url);
                     return true;
                 })
-                .slice(0, extraPhotoInputIds.length);
+                .slice(0, MAX_PRODUCT_IMAGES);
         }
+
+        function revokePhotoPreviewUrl(photo) {
+            if (photo?.source === 'new' && photo.previewUrl) URL.revokeObjectURL(photo.previewUrl);
+        }
+
+        function clearStagedProductPhotos() {
+            stagedProductPhotos.forEach(revokePhotoPreviewUrl);
+            stagedProductPhotos = [];
+        }
+
+        function makePhotoItem({ source, url = '', file = null, previewUrl = '', label = '' }) {
+            return {
+                id: crypto.randomUUID(),
+                source,
+                url,
+                file,
+                previewUrl: previewUrl || url,
+                label: label || file?.name || 'Product photo'
+            };
+        }
+
+        function describePhotoCount(count) {
+            if (!count) return 'No photos selected yet';
+            const remaining = MAX_PRODUCT_IMAGES - count;
+            if (!remaining) return `All ${MAX_PRODUCT_IMAGES} photo slots are ready.`;
+            return `${count} of ${MAX_PRODUCT_IMAGES} photos ready · ${remaining} slot${remaining === 1 ? '' : 's'} left`;
+        }
+
+        function updatePhotoUploadPrompt() {
+            const count = stagedProductPhotos.length;
+            productPhotosSummary.textContent = describePhotoCount(count);
+            const remaining = MAX_PRODUCT_IMAGES - count;
+            const isReplacing = Boolean(replacePhotoId);
+            productPhotosTrigger.classList.toggle('is-replacing', isReplacing);
+            if (isReplacing) {
+                productPhotosTriggerTitle.textContent = 'Choose a replacement photo';
+                productPhotosTriggerText.textContent = 'Select one image to swap into this spot before saving.';
+                return;
+            }
+            if (!count) {
+                productPhotosTriggerTitle.textContent = 'Tap to add product photos';
+                productPhotosTriggerText.textContent = 'Choose up to 5 photos. The first photo becomes the cover image in the shop.';
+                return;
+            }
+            if (remaining > 0) {
+                productPhotosTriggerTitle.textContent = 'Add more product photos';
+                productPhotosTriggerText.textContent = `You can add ${remaining} more photo${remaining === 1 ? '' : 's'} or replace any current preview.`;
+                return;
+            }
+            productPhotosTriggerTitle.textContent = 'Photo limit reached';
+            productPhotosTriggerText.textContent = 'Remove or replace a photo to keep this gallery within 5 images.';
+        }
+
+        function renderProductPhotoPreviews() {
+            if (!stagedProductPhotos.length) {
+                productPhotoPreviewGrid.innerHTML = '<div class="photo-preview-empty">Your selected product photos will appear here.</div>';
+                return;
+            }
+            productPhotoPreviewGrid.innerHTML = stagedProductPhotos.map((photo, index) => `
+                <div class="photo-preview-card">
+                    <div class="photo-preview-thumb">
+                        <img src="${escapeHtml(photo.previewUrl)}" alt="${escapeHtml(photo.label || `Product photo ${index + 1}`)}">
+                        <span class="photo-preview-badge">${index === 0 ? 'Cover' : `Photo ${index + 1}`}</span>
+                        <span class="photo-preview-source" title="${photo.source === 'existing' ? 'Saved photo' : 'New photo'}">${photo.source === 'existing' ? '✓' : '+'}</span>
+                    </div>
+                    <div class="photo-preview-actions">
+                        <button class="photo-preview-btn" type="button" data-photo-action="replace" data-photo-id="${escapeHtml(photo.id)}">Replace</button>
+                        <button class="photo-preview-btn" type="button" data-photo-action="remove" data-photo-id="${escapeHtml(photo.id)}">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function syncProductPhotoUi(statusText = '') {
+            uploadStatus.textContent = statusText;
+            renderProductPhotoPreviews();
+            updatePhotoUploadPrompt();
+        }
+
+        function loadExistingProductPhotos(product) {
+            clearStagedProductPhotos();
+            stagedProductPhotos = getProductGallery(product).map((url, index) => makePhotoItem({
+                source: 'existing',
+                url,
+                label: `Photo ${index + 1}`
+            }));
+            syncProductPhotoUi(stagedProductPhotos.length ? 'Current photos loaded. Remove or replace any photo before saving.' : '');
+        }
+
         function resetProductForm() {
             editingListing = null;
             productForm.reset();
-            setAdditionalPhotoFields();
-            resetImageUploadPreview();
-            productImageFile.required = true;
+            clearStagedProductPhotos();
+            replacePhotoId = null;
+            syncProductPhotoUi('');
             document.getElementById('productFormHeading').textContent = 'Submit a product';
             productSubmitBtn.textContent = 'Save product listing';
             cancelEditBtn.classList.add('hidden');
         }
-        cancelEditBtn.addEventListener('click', () => { resetProductForm(); setMessage(productMessage, ''); });
+
+        cancelEditBtn.addEventListener('click', () => {
+            resetProductForm();
+            setMessage(productMessage, '');
+        });
+
         function editListing(product) {
             resetProductForm();
             editingListing = product;
-            for (const [field, value] of Object.entries({sellerName: product.seller_name, productName: product.name, productPrice: product.price, productCategory: product.category, productDescription: product.description})) {
+            for (const [field, value] of Object.entries({ sellerName: product.seller_name, productName: product.name, productPrice: product.price, productCategory: product.category, productDescription: product.description })) {
                 document.getElementById(field).value = value ?? '';
             }
-            productImageFile.required = false;
-            productImageName.textContent = 'Current main photo retained unless you choose a replacement';
-            imagePreviewImg.src = product.image_url || '';
-            imagePreview.classList.toggle('show', Boolean(product.image_url));
-            setAdditionalPhotoFields(normalizeProductImageUrls(product.product_images));
+            loadExistingProductPhotos(product);
             document.getElementById('productFormHeading').textContent = 'Edit product';
             productSubmitBtn.textContent = 'Save changes';
             cancelEditBtn.classList.remove('hidden');
             setMessage(productMessage, 'Update your listing below. Saving runs the publication checks again.');
-            productForm.scrollIntoView({behavior: 'smooth', block: 'start'});
-            document.getElementById('productName').focus({preventScroll: true});
+            productForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('productName').focus({ preventScroll: true });
         }
+
         async function saveListing(payload, listingId, sellerEmail) {
             const query = supabaseClient.from('products');
             return listingId
                 ? query.update(payload).eq('id', listingId).eq('seller_email', sellerEmail).select('id').single()
                 : query.insert(payload).select('id').single();
         }
+
         async function removeListing(listingId, sellerEmail) {
             const { data, error } = await supabaseClient.from('products').delete()
                 .eq('id', listingId).eq('seller_email', sellerEmail).select('id').single();
@@ -517,38 +636,124 @@
             profileWhatsappPreview.value = buildWhatsAppLink(value);
         }
 
-        function makeSafeStorageSegment(value) {
-            return normalizeEmail(value).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'seller';
-        }
-
         function makeSafeFilename(value) {
-            const filename = String(value || 'product-image').toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
-            return filename || 'product-image.jpg';
+            return String(value || 'product-photo').trim().toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'product-photo';
         }
 
-        function resetImageUploadPreview() {
-            productImageFile.value = '';
-            productImageName.textContent = 'No image selected';
-            uploadStatus.textContent = '';
-            imagePreview.classList.remove('show');
-            imagePreviewImg.removeAttribute('src');
+        function getFileExtension(file) {
+            if (!file) return '.jpg';
+            const extensionMatch = String(file.name || '').toLowerCase().match(/\.[a-z0-9]+$/i);
+            if (extensionMatch) return extensionMatch[0];
+            const extensionByType = {
+                'image/jpeg': '.jpg',
+                'image/png': '.png',
+                'image/webp': '.webp',
+                'image/gif': '.gif',
+                'image/heic': '.heic',
+                'image/heif': '.heif'
+            };
+            return extensionByType[file.type] || '.jpg';
         }
 
-        productImageFile.addEventListener('change', () => {
-            const file = productImageFile.files?.[0];
-            uploadStatus.textContent = '';
-            if (!file) {
-                resetImageUploadPreview();
+        function loadProductImageDimensions(file) {
+            return new Promise((resolve, reject) => {
+                const objectUrl = URL.createObjectURL(file);
+                const image = new Image();
+                image.onload = () => {
+                    const dimensions = { width: image.naturalWidth, height: image.naturalHeight };
+                    URL.revokeObjectURL(objectUrl);
+                    resolve(dimensions);
+                };
+                image.onerror = () => {
+                    URL.revokeObjectURL(objectUrl);
+                    reject(new Error('One of the selected photos could not be opened. Please choose a different image.'));
+                };
+                image.src = objectUrl;
+            });
+        }
+
+        async function validateProductImageFile(file) {
+            if (!file || !file.type.startsWith('image/')) throw new Error('Please choose image files only.');
+            if (file.size > MAX_PRODUCT_IMAGE_SIZE) throw new Error('Each photo must be under 5 MB.');
+            const dimensions = await loadProductImageDimensions(file);
+            if (dimensions.width < 800 || dimensions.height < 800) throw new Error('Each product photo must be at least 800 × 800 pixels.');
+        }
+
+        async function createPreparedPhotoItems(files) {
+            const preparedPhotos = [];
+            for (const file of files) {
+                await validateProductImageFile(file);
+                preparedPhotos.push(makePhotoItem({
+                    source: 'new',
+                    file,
+                    previewUrl: URL.createObjectURL(file),
+                    label: file.name || 'New product photo'
+                }));
+            }
+            return preparedPhotos;
+        }
+
+        function removeStagedPhoto(photoId) {
+            const photoIndex = stagedProductPhotos.findIndex((photo) => photo.id === photoId);
+            if (photoIndex < 0) return;
+            revokePhotoPreviewUrl(stagedProductPhotos[photoIndex]);
+            stagedProductPhotos.splice(photoIndex, 1);
+            replacePhotoId = null;
+            syncProductPhotoUi(stagedProductPhotos.length ? 'Photo removed. Save the listing when you are ready.' : '');
+        }
+
+        async function replaceStagedPhoto(photoId, file) {
+            const photoIndex = stagedProductPhotos.findIndex((photo) => photo.id === photoId);
+            if (photoIndex < 0) return;
+            const [preparedPhoto] = await createPreparedPhotoItems([file]);
+            revokePhotoPreviewUrl(stagedProductPhotos[photoIndex]);
+            stagedProductPhotos[photoIndex] = preparedPhoto;
+            syncProductPhotoUi('Photo replaced. Save the listing to update the gallery.');
+        }
+
+        productPhotoPreviewGrid.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-photo-action]');
+            if (!button) return;
+            const photoId = button.dataset.photoId;
+            if (!photoId) return;
+            if (button.dataset.photoAction === 'remove') {
+                removeStagedPhoto(photoId);
                 return;
             }
-            if (!file.type.startsWith('image/')) {
-                setMessage(productMessage, 'Please choose an image file.', 'error');
-                resetImageUploadPreview();
+            replacePhotoId = photoId;
+            updatePhotoUploadPrompt();
+            productPhotosInput.click();
+        });
+
+        productPhotosInput.addEventListener('change', async () => {
+            const selectedFiles = Array.from(productPhotosInput.files || []);
+            if (!selectedFiles.length) {
+                replacePhotoId = null;
+                updatePhotoUploadPrompt();
                 return;
             }
-            productImageName.textContent = file.name;
-            imagePreviewImg.src = URL.createObjectURL(file);
-            imagePreview.classList.add('show');
+            setMessage(productMessage, '');
+            try {
+                if (replacePhotoId) {
+                    if (selectedFiles.length > 1) uploadStatus.textContent = 'Using the first selected photo for the replacement.';
+                    await replaceStagedPhoto(replacePhotoId, selectedFiles[0]);
+                } else {
+                    if (selectedFiles.length > MAX_PRODUCT_IMAGES) throw new Error('Select up to 5 photos at once.');
+                    if (stagedProductPhotos.length + selectedFiles.length > MAX_PRODUCT_IMAGES) {
+                        throw new Error(`You can keep up to ${MAX_PRODUCT_IMAGES} photos total. Remove one before adding another.`);
+                    }
+                    const preparedPhotos = await createPreparedPhotoItems(selectedFiles);
+                    stagedProductPhotos = stagedProductPhotos.concat(preparedPhotos);
+                    syncProductPhotoUi(`${preparedPhotos.length} photo${preparedPhotos.length === 1 ? '' : 's'} ready to upload.`);
+                }
+            } catch (error) {
+                setMessage(productMessage, error.message || 'Product photos could not be prepared.', 'error');
+                updatePhotoUploadPrompt();
+            } finally {
+                productPhotosInput.value = '';
+                replacePhotoId = null;
+                updatePhotoUploadPrompt();
+            }
         });
 
         profileWhatsapp.addEventListener('input', () => {
@@ -603,36 +808,37 @@
             }
         });
 
-        async function uploadProductImage(file, sellerEmail) {
-            if (!file) throw new Error('Choose a clear product photo at least 800 × 800 pixels.');
-            if (!currentUser?.id) throw new Error('Sign in before uploading an image.');
-            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
-                throw new Error('Choose a JPG, PNG, or WebP image under 5 MB.');
-            }
-            let bitmap;
-            try { bitmap = await createImageBitmap(file); }
-            catch { throw new Error('This photo cannot be opened. Choose a JPG, PNG, or WebP photo.'); }
-            let upload;
-            try {
-                if (bitmap.width < 800 || bitmap.height < 800) throw new Error('Choose a photo at least 800 × 800 pixels.');
-                const scale = Math.min(1, 4096 / Math.max(bitmap.width, bitmap.height));
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.floor(bitmap.width * scale);
-                canvas.height = Math.floor(bitmap.height * scale);
-                if (canvas.width < 800 || canvas.height < 800) throw new Error('Choose a less narrow photo, at least 800 pixels on both sides.');
-                canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-                upload = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                if (!upload || upload.size > 5 * 1024 * 1024) throw new Error('The prepared photo is over 5 MB. Choose a smaller photo that is still at least 800 × 800 pixels.');
-            } finally { bitmap.close(); }
-            const sellerFolder = currentUser.id;
-            const filePath = `${sellerFolder}/${crypto.randomUUID()}.png`;
-            uploadStatus.textContent = 'Uploading image...';
-            productSubmitBtn.textContent = 'Uploading image...';
-            const { error } = await supabaseClient.storage.from('product-images').upload(filePath, upload, { contentType: 'image/png', upsert: false });
+        async function uploadSingleProductImage(file, productIdentifier, index) {
+            if (!currentUser?.id) throw new Error('Sign in before uploading product photos.');
+            const baseFilename = makeSafeFilename(file?.name || `product-photo-${index + 1}`);
+            const filename = /\.[a-z0-9]+$/i.test(baseFilename) ? baseFilename : `${baseFilename}${getFileExtension(file)}`;
+            const filePath = `${currentUser.id}/${productIdentifier}_${index + 1}_${filename}`;
+            const { error } = await supabaseClient.storage.from('product-images').upload(filePath, file, {
+                contentType: file?.type || 'image/jpeg',
+                upsert: true
+            });
             if (error) throw error;
             const { data } = supabaseClient.storage.from('product-images').getPublicUrl(filePath);
-            uploadStatus.textContent = 'Image uploaded. Saving listing...';
             return data.publicUrl;
+        }
+
+        async function uploadProductGallery(photoItems, productIdentifier) {
+            const uploadCount = photoItems.filter((photo) => photo.source === 'new' && photo.file).length;
+            let completedUploads = 0;
+            const publicUrls = [];
+            for (let index = 0; index < photoItems.length; index += 1) {
+                const photo = photoItems[index];
+                if (photo.source === 'new' && photo.file) {
+                    completedUploads += 1;
+                    uploadStatus.textContent = `Uploading photo ${completedUploads} of ${uploadCount}...`;
+                    productSubmitBtn.textContent = `Uploading photo ${completedUploads}/${uploadCount}...`;
+                    publicUrls.push(await uploadSingleProductImage(photo.file, productIdentifier, index));
+                } else {
+                    publicUrls.push(photo.url);
+                }
+            }
+            uploadStatus.textContent = uploadCount ? 'Photos uploaded. Saving listing...' : 'Saving listing...';
+            return publicUrls;
         }
 
         function setAuthTab(tab) {
@@ -787,7 +993,7 @@
             productSubmitBtn.textContent = 'Saving product...';
             setMessage(productMessage, '');
             const sellerEmail = normalizeEmail(currentUser.email);
-            const selectedImage = productImageFile.files?.[0] || null;
+            const galleryPhotos = stagedProductPhotos.slice(0, MAX_PRODUCT_IMAGES);
             const payload = {
                 seller_email: sellerEmail,
                 seller_name: document.getElementById('sellerName').value.trim(),
@@ -801,9 +1007,11 @@
             };
             try {
                 if (payload.description.length < 80 || payload.description.split(/\s+/u).length < 12) throw new Error('Write at least 80 characters and 12 words describing the product, its size, materials or ingredients and intended use.');
-                payload.image_url = selectedImage ? await uploadProductImage(selectedImage, sellerEmail) : editingListing?.image_url;
-                if (!payload.image_url) throw new Error('Choose a product photo.');
-                payload.product_images = collectAdditionalPhotoUrls(payload.image_url);
+                if (!galleryPhotos.length) throw new Error('Choose between 1 and 5 product photos.');
+                const uploadedPhotoUrls = await uploadProductGallery(galleryPhotos, editingListing?.id || Date.now());
+                payload.image_url = uploadedPhotoUrls[0] || null;
+                if (!payload.image_url) throw new Error('Choose at least one product photo.');
+                payload.product_images = uploadedPhotoUrls.slice(1, MAX_PRODUCT_IMAGES);
                 productSubmitBtn.textContent = 'Saving listing...';
                 const { data: saved, error } = await saveListing(payload, editingListing?.id, sellerEmail);
                 if (error) throw error;
