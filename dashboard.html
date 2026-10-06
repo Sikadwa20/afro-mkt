@@ -247,9 +247,11 @@
             .tab-btn { border-radius: 14px; }
         }
     </style>
+    <link rel="stylesheet" href="preview-theme.css">
+    <link rel="stylesheet" href="preview-dashboard.css">
     <script src="config.js?v=3"></script>
 </head>
-<body>
+<body class="dashboard-body">
     <nav class="navbar">
         <div class="container">
             <a href="/" aria-label="AfroMkt homepage">
@@ -394,6 +396,7 @@
 
     <footer class="footer"><div class="container"><p>© 2026 AfroMkt (afro-mkt.com). All rights reserved.</p></div><p style="text-align:center"><a href="/policies#terms">Terms</a> · <a href="/policies#privacy">Privacy</a> · <a href="/policies#sellers">Seller Agreement</a> · <a href="/policies#cancellation">Cancellation &amp; refunds</a></p></footer>
 
+    <script src="preview-dashboard-ui.js"></script>
     <script>
         const SUPABASE_URL = window.AFRO_MKT_CONFIG.supabaseUrl;
         const SUPABASE_ANON_KEY = window.AFRO_MKT_CONFIG.supabaseAnonKey;
