@@ -410,6 +410,7 @@
         let activeCategory = new URLSearchParams(window.location.search).get('category') || 'all';
         let allProducts = [];
         const availableCategories = STORE_CATEGORIES.map((category) => category.value);
+        if (activeCategory !== 'all') activeCategory = slugifyCategory(activeCategory);
         if (activeCategory !== 'all' && !availableCategories.some(category => slugifyCategory(category) === activeCategory)) activeCategory = 'all';
         let sellerContacts = {};
 
@@ -444,14 +445,26 @@
             return String(value || 'other').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'other';
         }
 
+        function decodeHtmlEntities(value) {
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = String(value || '');
+            return textarea.value;
+        }
+
+        function canonicalCategoryValue(value) {
+            return decodeHtmlEntities(value).replace(/\s+/g, ' ').trim();
+        }
+
         function normalizeStoreCategory(value) {
             const legacyMap = {
                 'Beauty & Hair': 'Hair & Beauty',
                 'Music & Culture': 'Music & Entertainment',
+                'Art & Crafts': 'Home & Living',
                 Other: DEFAULT_STORE_CATEGORY
             };
-            const rawCategory = legacyMap[value] || value;
-            const category = STORE_CATEGORIES.find((item) => item.value === rawCategory);
+            const rawCategory = canonicalCategoryValue(value);
+            const mappedCategory = legacyMap[rawCategory] || rawCategory;
+            const category = STORE_CATEGORIES.find((item) => slugifyCategory(item.value) === slugifyCategory(mappedCategory));
             return category ? category.value : DEFAULT_STORE_CATEGORY;
         }
 
@@ -461,8 +474,7 @@
         }
 
         function getProductStoreCategory(product) {
-            if (product?.category && product.category !== 'Other') return normalizeStoreCategory(product.category);
-            return normalizeStoreCategory(product?.store_category);
+            return normalizeStoreCategory(product?.store_category || product?.category);
         }
 
         function isMissingStoreCategoryColumnError(error) {
