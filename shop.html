@@ -232,20 +232,20 @@
           </div>
           <aside class="hero-panel" data-reveal="right">
             <span class="status-chip" data-i18n="panelBadge">Shop signal</span>
-            <h2 data-i18n="panelTitle">Products built around trust and direct connection.</h2>
+            <h3 data-i18n="panelTitle">A storefront designed to help great listings feel premium.</h3>
             <p class="muted" data-i18n="panelText">Clean category browsing, strong imagery, and direct buyer-to-seller messaging make it easier for diaspora customers to discover products they trust.</p>
             <div class="hero-stat-grid">
               <div class="hero-stat">
                 <strong data-i18n="miniOneValue">Live</strong>
-                <span data-i18n="miniOneText">Approved listings from AfroMkt sellers.</span>
+                <span data-i18n="miniOneText">Approved listings appear automatically after publication checks.</span>
               </div>
               <div class="hero-stat">
                 <strong data-i18n="miniTwoValue">WA</strong>
-                <span data-i18n="miniTwoText">Direct WhatsApp contact with verified seller profiles.</span>
+                <span data-i18n="miniTwoText">WhatsApp contact is built into listings for faster conversion.</span>
               </div>
               <div class="hero-stat">
-                <strong data-i18n="miniThreeValue">Images</strong>
-                <span data-i18n="miniThreeText">Multi-photo product galleries for richer product discovery.</span>
+                <strong data-i18n="miniThreeValue">5</strong>
+                <span data-i18n="miniThreeText">Each seller can showcase a richer gallery with up to five photos.</span>
               </div>
               <div class="hero-stat">
                 <strong data-i18n="miniFourValue">EU</strong>
@@ -320,11 +320,13 @@
             <ul class="footer-links">
               <li><a href="/shop" data-i18n="footerShop">Shop Products</a></li>
               <li><a href="/sell" data-i18n="footerSeller">Become a Seller</a></li>
+              <li><a href="/" data-i18n="footerHome">Home</a></li>
             </ul>
           </div>
           <div>
             <h3 class="footer-heading" data-i18n="footerCompany">Company</h3>
             <ul class="footer-links">
+              <li><a href="/dashboard" data-i18n="footerDashboard">Seller Dashboard</a></li>
               <li><a href="mailto:support@afro-mkt.com" data-i18n="footerContact">Contact</a></li>
             </ul>
           </div>
@@ -368,8 +370,9 @@
         searchLabel: 'What are you looking for?', searchButton: 'Search', searchClear: 'Clear', searchHelp: 'Find matching products and seller stores. Results are ordered by relevance to your search.', searchPlaceholder: 'Birthday cake, eba with egusi, clothing…', searchStores: 'Matching seller stores', searchOrder: 'Ordered by search relevance. Seller ratings are not available yet.', searchViewStore: 'View store products', searchMatch: 'matching listing', searchMatches: 'matching listings', searchEmpty: 'No matching listings yet', searchEmptyBody: 'Try a different product, fewer words, or clear the category filter.', searchResults: 'Search results for', searchStoreProducts: 'Store products', searchBack: 'Back to search results',
         navHome: 'Home', navShop: 'Shop', navSell: 'Sell on AfroMkt', navSignIn: 'Sign In', navGetStarted: 'Get Started',
         heroBadge: 'Approved listings · Direct seller connection', heroTitleLineOne: 'Discover', heroTitleLineTwo: 'African products with presence.', heroDescription: 'Browse live AfroMkt listings across food, fashion, beauty, electronics, home, and services — then message sellers directly on WhatsApp when you are ready.', heroPrimary: 'Explore Products', heroSecondary: 'List Your Products',
-        panelBadge: 'Shop signal', panelTitle: 'Products built around trust and direct connection.', panelText: 'Clean category browsing, strong imagery, and direct buyer-to-seller messaging make it easier for diaspora customers to discover products they trust.',
-        miniOneValue: 'Live', miniOneText: 'Approved listings from AfroMkt sellers.', miniTwoValue: 'WA', miniTwoText: 'Direct WhatsApp contact with verified seller profiles.', miniThreeValue: 'Images', miniThreeText: 'Multi-photo product galleries for richer product discovery.', miniFourValue: 'EU', miniFourText: 'Portugal-first, ready to support discovery across Europe.',
+        panelBadge: 'Shop signal', panelTitle: 'A storefront designed to help great listings feel premium.', panelText: 'Clean category browsing, strong imagery, and direct buyer-to-seller messaging make it easier for diaspora customers to discover products they trust.',
+        miniOneValue: 'Live', miniOneText: 'Approved listings appear automatically after publication checks.', miniTwoValue: 'WA', miniTwoText: 'WhatsApp contact is built into listings for faster conversion.', miniThreeValue: '5', miniThreeText: 'Each seller can showcase a richer gallery with up to five photos.', miniFourValue: 'EU', miniFourText: 'Portugal-first, ready to support discovery across Europe.',
+
         productsEyebrow: 'Marketplace preview', productsTitle: 'Browse by category and find live AfroMkt listings faster.', productsSubtitle: 'Every product here comes from a seller account connected to AfroMkt. Filter by category, scan the gallery, and message the seller directly when you find the right fit.', gridIntro: 'Loading marketplace products...',
         filterAll: 'All', sellerLabel: 'Seller', whatsappCta: 'Chat on WhatsApp', loadingTitle: 'Loading products', loadingBody: 'We are loading the latest approved listings.', emptyTitle: 'No products live yet', emptyBody: 'As soon as sellers publish approved listings, they will show up here for shoppers to explore.', errorTitle: '⚠️ Could not connect to the marketplace.', errorBody: 'Please try again shortly.', showingCount: '{count} live products across {categoryCount} categories', showingFiltered: '{count} products in {category}',
         sellerCtaTitle: 'Open your AfroMkt storefront and start showing up with more credibility.', sellerCtaText: 'Seller onboarding, listing approvals, direct buyer messaging, and a storefront built around African products all work together to make your shop feel more established from day one.', sellerCtaButton: 'Start Selling Today',
@@ -694,7 +697,7 @@
         const sellerName = product.seller_name || 'AfroMkt Seller';
         const whatsappButton = whatsappButtonMarkup(product, dictionary.whatsappCta);
         const sellerActions = whatsappButton ? `<div class="seller-actions">${whatsappButton}</div>` : '';
-        return `<article class="product-card">${buildProductVisual(product, fallbackVisual)}<div class="product-body"><h3>${escapeHtml(product.name)}</h3><div class="product-meta"><a class="seller-pill" href="${escapeHtml(storeUrl(product))}">${dictionary.sellerLabel}: ${escapeHtml(sellerName)}</a><span class="price-tag">€${formatPrice(product.price)}</span></div><p>${escapeHtml(product.description || 'Discover this AfroMkt seller listing.')}</p>${sellerActions}</div></article>`;
+        return `<article class="product-card">${buildProductVisual(product, fallbackVisual)}<div class="product-body"><h3>${escapeHtml(product.name)}</h3><p>${escapeHtml(product.description || 'Discover this AfroMkt seller listing.')}</p><div class="product-meta"><a class="seller-pill" href="${escapeHtml(storeUrl(product))}">${dictionary.sellerLabel}: ${escapeHtml(sellerName)}</a><span class="price-tag">€${formatPrice(product.price)}</span></div>${sellerActions}</div></article>`;
       }).join('');
       initializeProductCarousels();
     }

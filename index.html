@@ -17,59 +17,8 @@
   <meta name="twitter:image" content="https://afro-mkt.com/afromkt-facebook-cover.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="preview-theme.css">
-  <style>
-    .home-search {
-      margin-top: 24px;
-      display: grid;
-      gap: 10px;
-      max-width: 640px;
-    }
-    .home-search label {
-      font-weight: 800;
-      color: var(--green-900);
-    }
-    .home-search-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding: 12px;
-      border-radius: 24px;
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(16, 41, 31, 0.1);
-      box-shadow: var(--shadow-soft);
-    }
-    .home-search input {
-      flex: 1 1 260px;
-      min-width: 0;
-      border: 0;
-      background: transparent;
-      color: var(--green-900);
-      font: inherit;
-      padding: 10px 12px;
-    }
-    .home-search input:focus {
-      outline: none;
-    }
-    .home-search .btn {
-      min-height: 52px;
-      white-space: nowrap;
-    }
-    .category-grid a.category-card {
-      display: block;
-      color: inherit;
-      text-decoration: none;
-    }
-    @media (max-width: 640px) {
-      .home-search-row {
-        padding: 10px;
-      }
-      .home-search .btn {
-        width: 100%;
-      }
-    }
-  </style>
 </head>
 <body>
   <div class="page-shell">
@@ -102,7 +51,7 @@
           </div>
           <a href="/sell" class="btn btn-primary" data-i18n="navGetStarted">Get Started</a>
         </div>
-        <button class="mobile-menu-btn" id="mobileBtn" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+        <button class="nav-toggle" id="mobileBtn" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
       </div>
     </nav>
 
@@ -113,8 +62,8 @@
           <div class="hero-copy" data-reveal>
             <span class="hero-badge" data-i18n="heroBadge">Portugal-first launch · Built for the diaspora</span>
             <h1 class="hero-title">
-              <span data-i18n="heroLineOne">Shop African.</span><br>
-              <span class="hero-gradient-text" id="heroRotator">Sell African.</span><br>
+              <span data-i18n="heroLineOne">Shop African.</span>
+              <span class="hero-gradient-text" id="heroRotator">Sell African.</span>
               <span data-i18n="heroLineThree">Live African.</span>
             </h1>
             <p class="hero-description" data-i18n="heroDescription">AfroMkt brings culture, commerce, and community into one bold digital marketplace — helping African sellers in Portugal reach buyers who already value authenticity.</p>
@@ -122,18 +71,11 @@
               <a href="/shop" class="btn btn-primary" data-i18n="heroPrimary">Browse Marketplace</a>
               <a href="/sell" class="btn btn-secondary" data-i18n="heroSecondary">Become a Seller</a>
             </div>
-            <form class="home-search" action="/shop" method="get" data-reveal>
-              <label for="homeSearchInput">What are you looking for?</label>
-              <div class="home-search-row">
-                <input id="homeSearchInput" name="q" type="search" inputmode="search" placeholder="Birthday cake, eba with egusi, clothing…" maxlength="120">
-                <button class="btn btn-primary" type="submit">Search</button>
-              </div>
-            </form>
             <p class="hero-note" data-i18n="heroNote">Trusted sellers, local discovery, culture-first storytelling, and a marketplace experience designed to feel alive.</p>
           </div>
           <aside class="hero-panel" data-reveal="right">
             <span class="status-chip" data-i18n="panelBadge">Marketplace momentum</span>
-            <h2 data-i18n="panelTitle">A premium storefront for Africa’s diaspora economy</h2>
+            <h3 data-i18n="panelTitle">A premium storefront for Africa’s diaspora economy</h3>
             <p class="muted" data-i18n="panelText">From pantry staples and beauty to fashion, services, and home goods, AfroMkt helps sellers show up with more presence and gives buyers a richer way to discover them.</p>
             <div class="hero-stat-grid">
               <div class="hero-stat">
@@ -192,31 +134,31 @@
             <p class="section-copy" data-i18n="categoriesCopy">AfroMkt is designed around high-intent shopping moments — the essentials, the culture-rich products, and the trusted services buyers come back for.</p>
           </div>
           <div class="category-grid">
-            <a class="category-card" href="/shop?category=food-drinks" data-reveal>
+            <article class="category-card" data-reveal>
               <div class="category-icon">🍛</div>
               <h3 data-i18n="catFood">Food & Groceries</h3>
               <p data-i18n="catFoodText">Staples, ingredients, and taste-of-home essentials that anchor repeat demand.</p>
-            </a>
-            <a class="category-card" href="/shop?category=fashion-clothing" data-reveal>
+            </article>
+            <article class="category-card" data-reveal>
               <div class="category-icon">👗</div>
               <h3 data-i18n="catFashion">Fashion & Apparel</h3>
               <p data-i18n="catFashionText">Style-forward looks, occasion wear, and everyday pieces with stronger identity.</p>
-            </a>
-            <a class="category-card" href="/shop?category=hair-beauty" data-reveal>
+            </article>
+            <article class="category-card" data-reveal>
               <div class="category-icon">💇🏾</div>
               <h3 data-i18n="catHair">Hair & Beauty</h3>
               <p data-i18n="catHairText">Braids, beauty products, skincare, and trusted professionals buyers already rely on.</p>
-            </a>
-            <a class="category-card" href="/shop?category=home-living" data-reveal>
+            </article>
+            <article class="category-card" data-reveal>
               <div class="category-icon">🏠</div>
               <h3 data-i18n="catHome">Home & Lifestyle</h3>
               <p data-i18n="catHomeText">Decor, wellness, and cultural home touches that make the diaspora experience feel personal.</p>
-            </a>
-            <a class="category-card" href="/shop?category=money-services" data-reveal>
+            </article>
+            <article class="category-card" data-reveal>
               <div class="category-icon">🛠️</div>
               <h3 data-i18n="catServices">Services & More</h3>
               <p data-i18n="catServicesText">Community-led service businesses that deserve stronger visibility and easy contact.</p>
-            </a>
+            </article>
           </div>
         </div>
       </section>
@@ -278,7 +220,7 @@
             <div class="social-links" style="margin-top: 18px;">
               <a href="https://www.facebook.com/profile.php?id=61594427231294" target="_blank" rel="noopener noreferrer" aria-label="Visit AfroMkt on Facebook">FB</a>
               <a href="https://www.instagram.com/afro_mkt/" target="_blank" rel="noopener noreferrer" aria-label="Visit AfroMkt on Instagram">IG</a>
-              <span class="disabled-link" aria-disabled="true" aria-label="AfroMkt Twitter link coming soon">TW</span>
+              <span aria-disabled="true">TW</span>
             </div>
           </div>
           <div>
@@ -293,6 +235,7 @@
           <div>
             <h3 class="footer-heading" data-i18n="footerCompany">Company</h3>
             <ul class="footer-links">
+              <li><a href="/#sell" data-i18n="footerAbout">About AfroMkt</a></li>
               <li><a href="/dashboard" data-i18n="footerDashboard">Seller Dashboard</a></li>
               <li><a href="mailto:support@afro-mkt.com" data-i18n="footerContact">Contact</a></li>
             </ul>
@@ -307,7 +250,9 @@
             </ul>
           </div>
         </div>
-        <div class="footer-bottom" data-i18n="footerBottom">© 2026 AfroMkt (afro-mkt.com). All rights reserved.</div>
+        <div class="footer-bottom">
+          <p data-i18n="footerBottom">© 2026 AfroMkt (afro-mkt.com). All rights reserved.</p>
+        </div>
       </div>
     </footer>
   </div>

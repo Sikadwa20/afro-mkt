@@ -17,9 +17,9 @@
   <meta name="twitter:image" content="https://afro-mkt.com/afromkt-facebook-cover.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="config.js?v=3"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="preview-theme.css">
+  <script src="config.js?v=3"></script>
 </head>
 <body>
   <div class="page-shell">
@@ -50,7 +50,7 @@
           </div>
           <a href="#pricing" class="btn btn-primary" data-i18n="navGetStarted">Get Started</a>
         </div>
-        <button class="mobile-menu-btn" id="mobileBtn" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+        <button class="nav-toggle" id="mobileBtn" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
       </div>
     </nav>
 
@@ -61,7 +61,7 @@
           <div class="hero-copy" data-reveal>
             <span class="hero-badge" data-i18n="heroBadge">Seller subscriptions now open</span>
             <h1 class="hero-title">
-              <span data-i18n="heroLineOne">Build your</span><br>
+              <span data-i18n="heroLineOne">Build your</span>
               <span class="hero-gradient-text" data-i18n="heroLineTwo">AfroMkt storefront.</span>
             </h1>
             <p class="hero-description" data-i18n="heroDescription">Reach African communities across Portugal and beyond with seller plans designed to help your listings look credible from the first day.</p>
@@ -73,12 +73,13 @@
           </div>
           <aside class="checkout-card" data-reveal="right">
             <span class="status-chip" data-i18n="checkoutBadge">What happens next</span>
-            <h2 data-i18n="checkoutTitle">Subscribe once, then finish onboarding inside your dashboard.</h2>
+            <h3 data-i18n="checkoutTitle">Choose your plan, select your store category, and launch with clarity.</h3>
             <p class="muted" style="color: rgba(255,255,255,0.82);" data-i18n="checkoutText">AfroMkt keeps the setup simple: plan selection, storefront category placement, secure checkout, then onboarding into your seller dashboard.</p>
             <div class="checkout-orbit">
-              <span>1. Choose plan</span>
-              <span>2. Secure checkout</span>
-              <span>3. Finish onboarding</span>
+              <span data-i18n="checkoutStepOne">Pick your plan</span>
+              <span data-i18n="checkoutStepTwo">Choose your category</span>
+              <span data-i18n="checkoutStepThree">Pay securely</span>
+              <span data-i18n="checkoutStepFour">Start uploading</span>
             </div>
           </aside>
         </div>
@@ -98,6 +99,7 @@
             <article class="plan-card" data-reveal>
               <h3 class="plan-name" data-i18n="basicName">Basic Plan</h3>
               <div class="plan-price"><strong>€9.99</strong><span data-i18n="perMonth">/month</span></div>
+              <p data-i18n="basicDescription">A simple starting point for sellers who want a polished presence without overcommitting.</p>
               <ul class="plan-features">
                 <li><span class="check">✓</span><span data-i18n="basicF1">List up to 10 products</span></li>
                 <li><span class="check">✓</span><span data-i18n="basicF2">Product preview listings</span></li>
@@ -106,6 +108,7 @@
               </ul>
               <button class="btn btn-green checkout-btn" type="button" data-plan="basic" data-i18n="planButton">Get Started</button>
               <p class="promo-note" data-i18n="promoNote">Free first month for the first 10 sellers across both plans.</p>
+              <p data-i18n="renewalBasic">After the free month, Basic renews at €9.99/month unless you cancel.</p>
               <p class="checkout-message" aria-live="polite"></p>
             </article>
 
@@ -113,6 +116,7 @@
               <div class="featured-badge" data-i18n="featured">Featured</div>
               <h3 class="plan-name" data-i18n="premiumName">Premium Plan</h3>
               <div class="plan-price"><strong>€24.99</strong><span data-i18n="perMonth">/month</span></div>
+              <p data-i18n="premiumDescription">For sellers who want room to scale faster, publish more products, and unlock stronger visibility later.</p>
               <ul class="plan-features">
                 <li><span class="check">✓</span><span data-i18n="premiumF1">Unlimited product listings</span></li>
                 <li><span class="check">✓</span><span data-i18n="premiumF2">Featured visibility after buyer launch</span></li>
@@ -121,12 +125,13 @@
               </ul>
               <button class="btn btn-primary checkout-btn" type="button" data-plan="premium" data-i18n="planButton">Get Started</button>
               <p class="promo-note" data-i18n="promoNote">Free first month for the first 10 sellers across both plans.</p>
+              <p data-i18n="renewalPremium">After the free month, Premium renews at €24.99/month unless you cancel.</p>
               <p class="checkout-message" aria-live="polite"></p>
             </article>
           </div>
 
           <div class="store-category-panel" data-reveal style="margin-top: 28px;">
-            <label for="storeCategory" data-i18n="categoryLabel">What best describes your storefront?</label>
+            <label for="storeCategory" data-i18n="categoryLabel">What do you sell?</label>
             <select id="storeCategory" required>
               <option value="Food & Drinks">🍛 Food & Drinks</option>
               <option value="Fashion & Clothing">👗 Fashion & Clothing</option>
@@ -137,28 +142,20 @@
               <option value="Music & Entertainment">🎵 Music & Entertainment</option>
               <option value="General Store" selected>🛒 General Store</option>
             </select>
-            <p data-i18n="categoryHelp">This helps AfroMkt place your storefront inside the right marketplace category before buyer checkout launches.</p>
+            <p data-i18n="categoryHelp">This helps AfroMkt place your storefront in the right marketplace category from the start.</p>
           </div>
 
           <div class="checkout-message-wrap" data-reveal>
-            <p data-i18n="termsIntro">Before subscribing, read our platform terms and seller agreement, including the monthly renewal and cancellation policy.</p>
-            <label style="display:flex; gap:12px; align-items:flex-start; margin-top: 16px; font-weight: 600; color: var(--green-900);">
-              <input id="checkoutTermsAccepted" type="checkbox" style="margin-top: 4px; width: 18px; height: 18px; accent-color: var(--green-700);">
-              <span>
-                <span data-i18n="termsAccept">I agree to the</span>
-                <a href="/policies#terms" target="_blank" rel="noopener">Terms</a>,
-                <a href="/policies#sellers" target="_blank" rel="noopener">Seller Agreement</a>,
-                <span data-i18n="termsAcceptMid">including monthly renewal and the</span>
-                <a href="/policies#cancellation" target="_blank" rel="noopener">cancellation and refund policy</a>.
-              </span>
+            <label style="display:flex; gap:12px; align-items:flex-start; font-weight:700; line-height:1.6;">
+              <input id="checkoutTermsAccepted" type="checkbox" style="margin-top:4px;">
+              <span data-i18n="termsAgree">I agree to the Terms and Seller Agreement, including monthly renewal and the cancellation and refund policy.</span>
             </label>
           </div>
 
           <div class="community-panel" style="margin-top: 28px;" data-reveal>
             <div>
-              <span class="hero-badge" data-i18n="communityBadge">Built for African-owned growth</span>
-              <h2 data-i18n="communityTitle">Turn your products into a community storefront.</h2>
-              <p data-i18n="communityText">AfroMkt helps African-owned shops, food vendors, beauty professionals, fashion sellers, and service providers get discovered by customers who already want to support the culture.</p>
+              <h2 data-i18n="policyTitle">A transparent subscription flow from the start.</h2>
+              <p data-i18n="policyBody">Before subscribing, review our seller terms, privacy notice, and cancellation policy so you know exactly how billing and renewals work.</p>
             </div>
             <div class="mini-stats">
               <div class="mini-stat"><strong data-i18n="policyOneTitle">Terms</strong><span><a href="/policies#terms" target="_blank" rel="noopener" style="color:#fff; text-decoration:underline;" data-i18n="policyOneText">Read the platform terms</a></span></div>
@@ -200,17 +197,17 @@
                 <span class="brand-tag" data-i18n="footerTag">African community marketplace</span>
               </span>
             </div>
-            <p data-i18n="footerBrand">The premier African Community Marketplace. Launching in Portugal and expanding globally to connect culture, commerce, and community.</p>
+            <p data-i18n="footerBrand">The premier African Community Marketplace. Launching in Portugal, expanding globally to connect our vibrant culture.</p>
             <div class="social-links" style="margin-top:18px;">
-              <a href="https://www.facebook.com/profile.php?id=61594427231294" target="_blank" rel="noopener noreferrer" aria-label="Visit AfroMkt on Facebook">FB</a>
-              <a href="https://www.instagram.com/afro_mkt/" target="_blank" rel="noopener noreferrer" aria-label="Visit AfroMkt on Instagram">IG</a>
-              <span class="disabled-link" aria-disabled="true" aria-label="AfroMkt Twitter link coming soon">TW</span>
+              <a href="https://www.facebook.com/profile.php?id=61594427231294" target="_blank" rel="noopener noreferrer">FB</a>
+              <a href="https://www.instagram.com/afro_mkt/" target="_blank" rel="noopener noreferrer">IG</a>
+              <span aria-disabled="true">TW</span>
             </div>
           </div>
           <div>
             <h3 class="footer-heading" data-i18n="footerMarketplace">Marketplace</h3>
             <ul class="footer-links">
-              <li><a href="/shop" data-i18n="footerShop">Shop Marketplace</a></li>
+              <li><a href="/shop" data-i18n="footerShop">Shop Products</a></li>
               <li><a href="/sell" data-i18n="footerSeller">Become a Seller</a></li>
             </ul>
           </div>
@@ -231,7 +228,9 @@
             </ul>
           </div>
         </div>
-        <div class="footer-bottom" data-i18n="footerBottom">© 2026 AfroMkt (afro-mkt.com). All rights reserved.</div>
+        <div class="footer-bottom">
+          <p data-i18n="footerBottom">© 2026 AfroMkt (afro-mkt.com). All rights reserved.</p>
+        </div>
       </div>
     </footer>
   </div>
