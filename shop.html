@@ -629,9 +629,58 @@
       searchInput.focus();
     });
 
+    function normalizeProductImageUrls(value) {
+      if (Array.isArray(value)) {
+        return value.map((url) => String(url || '').trim()).filter(Boolean);
+      }
+      if (typeof value !== 'string') return [];
+      const trimmed = value.trim();
+      if (!trimmed || trimmed === '{}' || trimmed === '[]') return [];
+      if (trimmed.startsWith('[')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          return Array.isArray(parsed) ? parsed.map((url) => String(url || '').trim()).filter(Boolean) : [];
+        } catch {
+          return [];
+        }
+      }
+      if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+        const inner = trimmed.slice(1, -1);
+        if (!inner) return [];
+        const values = [];
+        let current = '';
+        let inQuotes = false;
+        let escaping = false;
+        for (const character of inner) {
+          if (escaping) {
+            current += character;
+            escaping = false;
+            continue;
+          }
+          if (character === '\\') {
+            escaping = true;
+            continue;
+          }
+          if (character === '"') {
+            inQuotes = !inQuotes;
+            continue;
+          }
+          if (character === ',' && !inQuotes) {
+            values.push(current);
+            current = '';
+            continue;
+          }
+          current += character;
+        }
+        values.push(current);
+        return values.map((url) => String(url || '').trim()).filter(Boolean);
+      }
+      return [trimmed];
+    }
+
     function getProductGallery(product) {
       const uniqueUrls = new Set();
-      return [product.image_url].concat(Array.isArray(product.product_images) ? product.product_images : []).map((url) => String(url || '').trim()).filter((url) => {
+      return [product.image_url].concat(normalizeProductImageUrls(product.product_images)).map((url) => String(url || '').trim()).filter((url) => {
         if (!url || uniqueUrls.has(url)) return false;
         uniqueUrls.add(url);
         return true;
@@ -760,7 +809,7 @@
           data = (data || []).map((product) => ({ ...product, product_images: [], store_category: getProductStoreCategory(product) }));
         }
         if (error) throw error;
-        allProducts = (data || []).filter((product) => product && product.name).map((product) => ({ ...product, store_category: getProductStoreCategory(product) }));
+        allProducts = (data || []).filter((product) => product && product.name).map((product) => ({ ...product, product_images: normalizeProductImageUrls(product.product_images), store_category: getProductStoreCategory(product) }));
         try {
           await loadSellerContacts(allProducts);
         } catch (contactError) {
