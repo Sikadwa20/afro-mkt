@@ -173,6 +173,14 @@
     .store-view .section-head {
       display: none;
     }
+    .product-carousel-track {
+      height: 100%;
+    }
+    .product-carousel-slide {
+      position: relative;
+      inset: auto;
+      flex: 0 0 100%;
+    }
     @media (max-width: 640px) {
       .search-controls .btn,
       .search-clear {
@@ -694,6 +702,7 @@
 
     function buildProductVisual(product, fallbackVisual) {
       const galleryImages = getProductGallery(product);
+      console.log('[AfroMkt shop] product card data', { product, galleryImages });
       const categoryLabel = escapeHtml(getStoreCategoryLabel(getProductStoreCategory(product)));
       if (!galleryImages.length) {
         return `<div class="product-visual ${fallbackVisual}"><span class="product-category">${categoryLabel}</span><span class="product-visual-placeholder" aria-hidden="true">📦</span></div>`;
